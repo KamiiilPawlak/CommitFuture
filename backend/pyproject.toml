@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "cv-ai-matcher"
 version = "0.1.0"
@@ -5,123 +9,68 @@ description = "AI powered CV matching system using LLMs"
 requires-python = ">=3.11"
 
 dependencies = [
-
-    # Web Framework & Core
+    # Web & Framework
     "fastapi",
-    "uvicorn",
-    "pydantic",
+    "uvicorn[standard]",
+    "pydantic>=2.0",
     "pydantic-settings",
     "python-dotenv",
     "python-multipart",
     "aiofiles",
+    # Document Processing & OCR
     "pdfplumber",
     "pymupdf",
     "pytesseract",
     "pillow",
+    "pdf2image",
     "python-magic-bin; sys_platform == 'win32'",
     "python-magic; sys_platform != 'win32'",
+    # DB & ORM
     "sqlmodel>=0.0.22",
     "asyncpg",
-    "pdf2image",
     "psycopg2-binary",
+    "alembic",
+    # Text & Utils
     "ftfy",
     "regex",
     "phonenumbers",
     "dateparser",
     "flashtext",
     "httpx",
+    "loguru",
 ]
 
 [project.optional-dependencies]
 dev = [
+    # Static Analysis & Quality Stack
     "ruff",
-    "black",
     "mypy",
-    "alembic",
-    "pre-commit",
-    "loguru",
-    "mkdocs",
-    "mkdocs-material",
-    "mkdocstrings[python]",
-    "pydeps",
     "pylint",
-    "graphviz",
+    "bandit",
+    "pre-commit",
+    # Type Stubs (Mypy Support)
+    "types-dateparser",
+    "types-aiofiles",
+    "types-pillow",
+    # Testing & DB Validation
     "pytest",
     "pytest-dotenv",
     "pytest-asyncio",
     "pytest-mock",
+    "pytest-cov",
+    "testcontainers[postgres]",
     "freezegun",
-    "radon",
-    "cohesion",
-    "bandit"
+    "schemathesis",
+    "deepdiff",
+    "deepeval",
+    # Docs
+    "mkdocs",
+    "mkdocs-material",
+    "mkdocstrings[python]",
 ]
-
-
-[tool.ruff]
-line-length = 88
-target-version = "py311"
-
-[tool.ruff.lint]
-select = ["E", "F", "I"]
-fixable = ["ALL"]
-ignore = ["E501"]
-
-[tool.ruff.format]
-quote-style = "double"
-indent-style = "space"
-
-
-[tool.black]
-line-length = 88
-target-version = ["py311"]
-
-
-[tool.mypy]
-python_version = "3.11"
-strict = true
-ignore_missing_imports = true
-warn_return_any = true
-warn_unused_configs = true
-
-[[tool.mypy.overrides]]
-module = "magic.*"
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
-module = "regex.*"
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
-module = "pytesseract.*"
-ignore_missing_imports = true
-
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-python_files = "test_*.py"
-filterwarnings = "ignore::DeprecationWarning"
-
-env_files = [
-    ".env.test"
-]
-
-[tool.radon]
-cc_min = "B"
-cc_sort = "score"
-show_complexity = true
-show_closures = true
-color = true
-ignore = [
-    ".venv",
-    "venv",
-    "tests",
-    "uploads",
-    "logs",
-    "__pycache__"
-]
-exclude = "**/test_*.py|**/__pycache__/*"
 
 
 [tool.setuptools.packages.find]
-include = ["app"]
-exclude = ["uploads"]
+where = ["."]
+include = ["app*"]
+exclude = ["logs*", "uploads*", "storage*", "tests*"]
