@@ -1,4 +1,3 @@
-
 from .lookup_engine import FlashLookupEngine
 
 TECH_STACK_DICTIONARY: dict[str, list[str]] = {

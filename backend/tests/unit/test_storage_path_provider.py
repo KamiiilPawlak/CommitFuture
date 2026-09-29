@@ -8,7 +8,6 @@ from app.services.ingestion_service.storage_path_provider import DateBasedPathPr
 def test_date_based_path_provider_creates_correct_month_directories(
     tmp_path: Path,
 ) -> None:
-
     base_dir = tmp_path / "storage"
     provider = DateBasedPathProvider(base_dir=base_dir)
 

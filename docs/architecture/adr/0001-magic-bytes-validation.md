@@ -1,7 +1,7 @@
 # 1. Walidacja bezpieczenstwa plikow za pomoca Magic Bytes
 
-**Status:** Zaakceptowany  
-**Data:** 2026-06-01  
+**Status:** Zaakceptowany
+**Data:** 2026-06-01
 **Autor:** Kamil
 
 ## Kontekst i Problem

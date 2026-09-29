@@ -61,6 +61,4 @@ class OllamaLLMClient:
                     f"Błąd walidacji schematu Pydantic z odpowiedzi LLM: {err}"
                 )
                 msg_0 = f"Failed to parse LLM response to CvLlmDto: {err}"
-                raise ValueError(
-                    msg_0
-                ) from err
+                raise ValueError(msg_0) from err

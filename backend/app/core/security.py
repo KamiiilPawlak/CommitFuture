@@ -18,9 +18,7 @@ def verify_file_integrity(content: bytes) -> str:
             f"Dozwolone typy: {settings.ALLOWED_MIME_TYPES}"
         )
         msg_0 = f"Niedozwolony format {mime_type}. Akceptowane są wyłącznie pliki PDF oraz obraz"
-        raise ValueError(
-            msg_0
-        )
+        raise ValueError(msg_0)
 
     logger.info(f"Plik zerwyfikowany pomyslenie. Wykryty typ MIME {mime_type} ")
     return mime_type

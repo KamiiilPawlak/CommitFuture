@@ -4,8 +4,12 @@ from typing import cast
 import ftfy
 import regex
 
-MOJIBAKE_MID_PATTERN: regex.Pattern[str] = regex.compile(r"(\p{L})[^\p{L}\s'`\-\.@+#/&+&](\p{L})")
-MOJIBAKE_START_PATTERN: regex.Pattern[str] = regex.compile(r"\b[^\p{L}\s'`\-\.@+#/&+&](\p{L})")
+MOJIBAKE_MID_PATTERN: regex.Pattern[str] = regex.compile(
+    r"(\p{L})[^\p{L}\s'`\-\.@+#/&+&](\p{L})"
+)
+MOJIBAKE_START_PATTERN: regex.Pattern[str] = regex.compile(
+    r"\b[^\p{L}\s'`\-\.@+#/&+&](\p{L})"
+)
 
 GRAPHIC_NOISE_PATTERN: regex.Pattern[str] = regex.compile(r"[-_.*•■♦'`„”\"«»]{3,}")
 CID_PATTERN: regex.Pattern[str] = regex.compile(r"\(cid:\d+\)")
@@ -24,7 +28,6 @@ def _repair_ocr_mojibake(text: str) -> str:
 
     text = MOJIBAKE_MID_PATTERN.sub(r"\1ż\2", text)
     return MOJIBAKE_START_PATTERN.sub(r"ż\1", text)
-
 
 
 def _remove_graphic_noise(text: str) -> str:

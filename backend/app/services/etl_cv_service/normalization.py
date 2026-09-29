@@ -10,11 +10,11 @@ from loguru import logger
 @dataclass(frozen=True)
 class NormalizerPatterns:
     dashes: regex.Pattern = field(
-        default_factory=lambda: regex.compile(r"[\u2010\u2011\u2012\u2013\u2014\u2015\u2212]")
+        default_factory=lambda: regex.compile(
+            r"[\u2010\u2011\u2012\u2013\u2014\u2015\u2212]"
+        )
     )
-    quotes: regex.Pattern = field(
-        default_factory=lambda: regex.compile(r"[„”\"«»]")
-    )
+    quotes: regex.Pattern = field(default_factory=lambda: regex.compile(r"[„”\"«»]"))
     multiple_spaces: regex.Pattern = field(
         default_factory=lambda: regex.compile(r"[ \t]+")
     )
@@ -27,11 +27,15 @@ class NormalizerPatterns:
     )
 
     digits_date_month_first: regex.Pattern = field(
-        default_factory=lambda: regex.compile(r"\b(0[1-9]|1[0-2])[\./](20\d{2}|19\d{2})\b")
+        default_factory=lambda: regex.compile(
+            r"\b(0[1-9]|1[0-2])[\./](20\d{2}|19\d{2})\b"
+        )
     )
     digits_date: regex.Pattern = digits_date_month_first
     digits_date_year_first: regex.Pattern = field(
-        default_factory=lambda: regex.compile(r"\b(20\d{2}|19\d{2})[\./](0[1-9]|1[0-2])\b")
+        default_factory=lambda: regex.compile(
+            r"\b(20\d{2}|19\d{2})[\./](0[1-9]|1[0-2])\b"
+        )
     )
 
     present: regex.Pattern = field(
@@ -78,7 +82,6 @@ class CVTextNormalizer:
         text = self._normalize_hyperlinks(text)
         text = self._normalize_language_levels(text)
         return self._patterns.multiple_spaces.sub(" ", text)
-
 
     def _normalize_punctuation(self, text: str) -> str:
         text = self._patterns.dashes.sub("-", text)

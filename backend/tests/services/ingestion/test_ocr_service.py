@@ -14,7 +14,6 @@ def ocr_service() -> OCRService:
 async def test_process_document_digital_pdf_success(
     ocr_service: OCRService, mocker: MagicMock
 ) -> None:
-
     fake_content = b"fake_pdf_bytes"
     fake_mime = "application/pdf"
     expected_text = "To jest w pelni cyfrowy tekst wyciagniety z PDF przez pdfplumber i ma ponad sto znakow, zeby warunek dlugosci zostal spelniony bez problemu!"
@@ -47,7 +46,6 @@ async def test_process_document_digital_pdf_success(
 async def test_process_document_image_ocr_success(
     ocr_service: OCRService, mocker: MagicMock
 ) -> None:
-
     fake_content = b"fake_image_bytes"
     fake_mime = "image/png"
     expected_ocr_text = "Tekst odczytany przez sztucznego Tesseracta z obrazka PNG"

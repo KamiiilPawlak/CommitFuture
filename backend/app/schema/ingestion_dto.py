@@ -16,9 +16,7 @@ class CVIngestionResponse(BaseModel):
 
 class ExtractedMetadata(BaseModel):
     email: str | None = Field(None, description="Wyciągnięty adres email kandydata")
-    phone: str | None = Field(
-        None, description="Wyciągnięty numer telefonu kandydata"
-    )
+    phone: str | None = Field(None, description="Wyciągnięty numer telefonu kandydata")
 
 
 class ProcessedCVTO(BaseModel):

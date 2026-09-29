@@ -1,4 +1,3 @@
-
 from .lookup_engine import FlashLookupEngine
 
 JOB_TITLES_DICTIONARY: dict[str, list[str]] = {

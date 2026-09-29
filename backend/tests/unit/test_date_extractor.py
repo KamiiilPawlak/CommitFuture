@@ -6,7 +6,6 @@ from app.services.etl_cv_service.heuristic.extractors.dates import (
 
 
 def test_extract_date_ranges_standard_format() -> None:
-
     text = "Pracowałem w firmie ABC w okresie 01.2020 - 05.2022 na stanowisku Python Developer."
 
     results = extract_date_ranges(text)
@@ -18,7 +17,6 @@ def test_extract_date_ranges_standard_format() -> None:
 
 
 def test_extract_date_ranges_current_job() -> None:
-
     text_pl = "Inżynier Oprogramowania, 03.2021 - obecnie"
     text_en = "Software Engineer, 03/2021 to present"
 

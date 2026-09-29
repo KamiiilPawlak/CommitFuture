@@ -10,19 +10,19 @@ if (Test-Path "backend/.venv/Scripts/Activate.ps1") {
 
 
 switch ($Action) {
-    "clean" { 
-        & .\scripts\clean.ps1 
+    "clean" {
+        & .\scripts\clean.ps1
     }
-    
-    "build" { 
+
+    "build" {
         & .\scripts\build.ps1 -ForceBuild -NoCache:$NoCache
     }
-    
-    default { 
-   
+
+    default {
+
         & .\scripts\build.ps1
 
- 
+
         if ($LASTEXITCODE -eq 0) {
             Write-Host "Uruchamiam kontenery..." -ForegroundColor Green
             docker-compose up

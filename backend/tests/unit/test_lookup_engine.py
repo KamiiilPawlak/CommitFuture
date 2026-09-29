@@ -1,4 +1,3 @@
-
 from app.services.etl_cv_service.heuristic.dictionary.lookup_engine import (
     FlashLookupEngine,
 )

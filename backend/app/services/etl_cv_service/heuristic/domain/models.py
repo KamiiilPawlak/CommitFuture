@@ -17,9 +17,5 @@ class ExperienceMetrics(BaseModel):
     total_years: float = Field(
         ..., description="Liczba lat stażu zaokrąglona do 1 miejsca po przecinku"
     )
-    min_date: date | None = Field(
-        None, description="Data rozpoczęcia pierwszej pracy"
-    )
-    max_date: date | None = Field(
-        None, description="Data zakończenia ostatniej pracy"
-    )
+    min_date: date | None = Field(None, description="Data rozpoczęcia pierwszej pracy")
+    max_date: date | None = Field(None, description="Data zakończenia ostatniej pracy")
