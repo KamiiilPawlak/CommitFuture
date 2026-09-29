@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from app.services.etl_cv_service.heuristic.dictionary.job_titles import (
     JOB_TITLES_DICTIONARY,
@@ -23,7 +23,7 @@ from app.services.etl_cv_service.heuristic.extractors import (
 
 class HeuristicExtractionManager:
     def __init__(self) -> None:
-        combined_keywords: Dict[str, List[str]] = {
+        combined_keywords: dict[str, list[str]] = {
             **TECH_STACK_DICTIONARY,
             **JOB_TITLES_DICTIONARY,
         }
@@ -33,7 +33,7 @@ class HeuristicExtractionManager:
         self._job_keys = set(JOB_TITLES_DICTIONARY.keys())
 
     def _calculate_total_experience_months(
-        self, raw_dates: List[Dict[str, Any]]
+        self, raw_dates: list[dict[str, Any]]
     ) -> int:
         valid_date_tuples = []
 
@@ -53,7 +53,7 @@ class HeuristicExtractionManager:
         total_days = sum((end - start).days + 1 for start, end in merged_ranges)
         return round(total_days / 30.4375)
 
-    def extract_all(self, raw_text: Optional[str]) -> Dict[str, Any]:
+    def extract_all(self, raw_text: str | None) -> dict[str, Any]:
         if not raw_text or not raw_text.strip():
             return {
                 "email": None,

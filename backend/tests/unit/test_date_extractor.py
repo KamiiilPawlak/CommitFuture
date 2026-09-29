@@ -38,7 +38,7 @@ def test_extract_date_ranges_current_job() -> None:
 
 def test_extract_date_ranges_years_only() -> None:
     """Test gdy podane są tylko lata (2018 - 2021)."""
-    text = "Edukacja: Politechnika Krakowska (2016 – 2020)"
+    text = "Edukacja: Politechnika Krakowska (2016 - 2020)"
 
     results = extract_date_ranges(text)
 

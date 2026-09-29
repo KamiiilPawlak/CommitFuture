@@ -1,10 +1,9 @@
-from typing import Optional
 
 import phonenumbers
 from phonenumbers import PhoneNumberFormat, PhoneNumberMatcher
 
 
-def extract_phones(text: Optional[str], default_region: str = "PL") -> list[str]:
+def extract_phones(text: str | None, default_region: str = "PL") -> list[str]:
     if not text or not text.strip():
         return []
 

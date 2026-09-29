@@ -10,7 +10,7 @@ def normalizer() -> CVTextNormalizer:
 
 def test_normalize_punctuation(normalizer: CVTextNormalizer) -> None:
 
-    input_text = "Doświadczenie: „Python Developer” w Firma X (05.2020 – 08.2022) — praca w trybie hybrid."
+    input_text = "Doświadczenie: „Python Developer” w Firma X (05.2020 - 08.2022) — praca w trybie hybrid."
     expected = 'Doświadczenie: "Python Developer" w Firma X (2020-05 - 2022-08) - praca w trybie hybrid.'
 
     result = normalizer.normalize_text(input_text)
@@ -60,4 +60,4 @@ def test_normalize_hyperlinks(normalizer: CVTextNormalizer) -> None:
 
 def test_normalize_empty_text(normalizer: CVTextNormalizer) -> None:
     assert normalizer.normalize_text("") == ""
-    assert normalizer.normalize_text(None) == ""  # type: ignore
+    assert normalizer.normalize_text(None) == ""

@@ -1,3 +1,3 @@
 from .ingestion_service import IngestionService, OCRService, StorageService
 
-__all__ = ["StorageService", "OCRService", "IngestionService"]
+__all__ = ["IngestionService", "OCRService", "StorageService"]

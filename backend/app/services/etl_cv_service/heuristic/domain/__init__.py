@@ -3,4 +3,4 @@ from app.services.etl_cv_service.heuristic.domain.models import (
     ExperienceMetrics,
 )
 
-__all__ = ["DateRange", "ExperienceMetrics", "ExperienceDomainService"]
+__all__ = ["DateRange", "ExperienceDomainService", "ExperienceMetrics"]

@@ -11,7 +11,7 @@ exclude = [
     "cv_ai_matcher.egg-info",
     "logs/",
     ".env",
-    ".env.test"
+    ".env.test",
 ]
 
 [lint]
@@ -26,7 +26,7 @@ select = [
     "ASYNC",
     "C4",
     "PTH",
-    "RUFF",
+    "RUF",
     "PL",
     "C90",
     "A",
@@ -43,6 +43,7 @@ select = [
 ignore = [
     "E501",
     "TRY003",
+    "B008",
 ]
 
 [lint.per-file-ignores]

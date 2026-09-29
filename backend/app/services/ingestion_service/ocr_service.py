@@ -2,7 +2,7 @@ import asyncio
 import io
 
 import pdfplumber
-import pytesseract
+import pytesseract  # type: ignore[import-untyped]
 from loguru import logger
 from pdf2image import convert_from_bytes
 from PIL import Image, ImageFilter, ImageOps
@@ -15,7 +15,6 @@ class OCRService:
         self._config = OCRConfig()
 
     async def process_document(self, content: bytes, mime_type: str) -> str:
-
         if mime_type == "application/pdf":
             text = self._extract_digital_text(content)
             logger.info("Proba ekstrakcji tekstu cyfrowego z pliku PDF")

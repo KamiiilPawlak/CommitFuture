@@ -6,14 +6,13 @@ from loguru import logger
 
 
 def setup_logging() -> None:
-
     logger.remove()
 
     env: str = os.getenv("APP_ENV", "dev").lower()
 
     log_level: str = os.getenv("LOG_LEVEL", "DEBUG" if env == "dev" else "INFO").upper()
 
-    if env == "prod" or env == "ci":
+    if env in {"prod", "ci"}:
         logger.add(
             sys.stdout,
             level=log_level,

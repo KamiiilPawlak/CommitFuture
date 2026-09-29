@@ -1,4 +1,5 @@
 import io
+import tempfile
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -12,12 +13,15 @@ from app.services.ingestion_service import IngestionService
 
 @pytest.mark.asyncio
 async def test_process_cv_document_success() -> None:
+    with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as temp_file:
+        fake_storage_path = temp_file.name
+
     mock_session = MagicMock()
     mock_storage_service = MagicMock()
     mock_ocr_service = MagicMock()
 
     mock_storage_service.save_pdf_file = AsyncMock(
-        return_value=("test_cv.pdf", "/tmp/fake_cv.pdf", 1024)
+        return_value=("test_cv.pdf", fake_storage_path, 1024)
     )
     mock_storage_service.read_file = AsyncMock(return_value=b"%PDF-fake-bytes")
 
@@ -25,7 +29,7 @@ async def test_process_cv_document_success() -> None:
 
     fake_lake_record = CVDocumentLake(
         original_filename="test_cv.pdf",
-        storage_path="/tmp/fake_cv.pdf",
+        storage_path=fake_storage_path,
         file_size_bytes=1024,
         mime_type="application/pdf",
     )
@@ -53,7 +57,7 @@ async def test_process_cv_document_success() -> None:
         mock_storage_service.save_pdf_file.assert_awaited_once_with(fake_file)
         mock_repo.create_lake_record.assert_called_once_with(
             filename="test_cv.pdf",
-            file_path="/tmp/fake_cv.pdf",
+            file_path=fake_storage_path,
             file_size=1024,
             mime_type="application/pdf",
         )

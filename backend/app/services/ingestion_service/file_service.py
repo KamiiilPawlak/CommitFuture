@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import cast
 from uuid import uuid4
 
 import aiofiles
@@ -15,18 +14,19 @@ from app.services.ingestion_service.storage_path_provider import (
 
 class StorageService:
     def __init__(self, *, path_provider: StoragePathProvider | None = None) -> None:
-
         self._path_provider = path_provider or DateBasedPathProvider(STORAGE_DIR)
 
     async def save_pdf_file(self, file: UploadFile) -> tuple[str, str, int]:
         if not file.filename or not file.filename.lower().endswith(".pdf"):
-            raise ValueError("Niedozwolone rozszerzenie pliku. Wymagany format to PDF.")
+            msg = "Niedozwolone rozszerzenie pliku. Wymagany format to PDF."
+            raise ValueError(msg)
 
         content = await file.read()
         file_size = len(content)
 
         if file_size == 0:
-            raise ValueError("Przesłany plik jest pusty.")
+            msg_0 = "Przesłany plik jest pusty."
+            raise ValueError(msg_0)
 
         target_dir = self._path_provider.get_target_dir()
 
@@ -39,18 +39,19 @@ class StorageService:
             logger.info(f"Zapisano plik PDF na dysku: {destination_path}")
         except Exception as err:
             logger.error(f"Błąd zapisu pliku na dysku: {err}")
-            raise ValueError("Wystąpił błąd podczas zapisu pliku na dysku serwera.")
+            msg_1 = "Wystąpił błąd podczas zapisu pliku na dysku serwera."
+            raise ValueError(msg_1)  # noqa: B904
 
         return file.filename, str(destination_path), file_size
 
     async def delete_file(self, file_path: str | Path) -> None:
         path = Path(file_path)
-        if path.exists():
-            path.unlink()
+        if path.exists():  # noqa: ASYNC240
+            path.unlink()  # noqa: ASYNC240
             logger.info(f"Plik fizyczny został usunięty z dysku: {path}")
         else:
             logger.warning(f"Próbowano usunąć plik, ale nie istnieje na dysku: {path}")
 
     async def read_file(self, file_path: str) -> bytes:
         async with aiofiles.open(file_path, "rb") as file:
-            return cast(bytes, await file.read())
+            return await file.read()

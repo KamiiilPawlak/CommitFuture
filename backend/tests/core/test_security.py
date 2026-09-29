@@ -24,7 +24,6 @@ def test_verify_file_integrity_empty_file() -> None:
 
 
 def test_verify_file_integrity_invalid_format() -> None:
-
     if "text/palin" in settings.ALLOWED_MIME_TYPES:
         settings.ALLOWED_MIME_TYPES.remove("text/plain")
 

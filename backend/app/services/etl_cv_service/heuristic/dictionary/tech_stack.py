@@ -1,8 +1,7 @@
-from typing import Dict, List
 
 from .lookup_engine import FlashLookupEngine
 
-TECH_STACK_DICTIONARY: Dict[str, List[str]] = {
+TECH_STACK_DICTIONARY: dict[str, list[str]] = {
     "Python": ["python", "python3", "python2", "py", "cpython", "pypy", "ipython"],
     "JavaScript": [
         "javascript",
@@ -425,5 +424,5 @@ TECH_STACK_DICTIONARY: Dict[str, List[str]] = {
 _tech_engine: FlashLookupEngine = FlashLookupEngine(TECH_STACK_DICTIONARY)
 
 
-def extract_tech_stack(text: str) -> List[str]:
+def extract_tech_stack(text: str) -> list[str]:
     return _tech_engine.extract_matches(text)

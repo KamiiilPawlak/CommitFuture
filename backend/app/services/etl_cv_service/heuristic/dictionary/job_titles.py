@@ -1,8 +1,7 @@
-from typing import Dict, List
 
 from .lookup_engine import FlashLookupEngine
 
-JOB_TITLES_DICTIONARY: Dict[str, List[str]] = {
+JOB_TITLES_DICTIONARY: dict[str, list[str]] = {
     "Software Engineer": [
         "software engineer",
         "software developer",
@@ -582,5 +581,5 @@ JOB_TITLES_DICTIONARY: Dict[str, List[str]] = {
 _job_engine: FlashLookupEngine = FlashLookupEngine(JOB_TITLES_DICTIONARY)
 
 
-def extract_job_titles(text: str) -> List[str]:
+def extract_job_titles(text: str) -> list[str]:
     return _job_engine.extract_matches(text)
