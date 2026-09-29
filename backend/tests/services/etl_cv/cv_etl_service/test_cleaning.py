@@ -26,5 +26,4 @@ def test_clean_ocr_empty_inputs() -> None:
 
 
 def test_clean_ocr_text_replace_hash() -> None:
-
     assert clean_ocr_text("#eton") == "żeton"

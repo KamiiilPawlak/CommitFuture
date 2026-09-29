@@ -16,11 +16,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 COPY pyproject.toml .
 
 
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir .[dev]
+RUN uv pip install --system --no-cache-dir .[dev]
 
 
 COPY ./app ./app

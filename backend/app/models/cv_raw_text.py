@@ -1,5 +1,5 @@
-from datetime import datetime, timezone
-from typing import Any, Dict, Optional
+from datetime import UTC, datetime
+from typing import Any
 from uuid import UUID
 
 from sqlalchemy import Column
@@ -21,18 +21,18 @@ class CVRawText(SQLModel, table=True):
         description="Łączna liczba znaków w wyciągniętym tekście"
     )
     word_count: int = Field(description="Szacowana liczba słów w tekście")
-    page_count: Optional[int] = Field(
+    page_count: int | None = Field(
         default=None, description="Liczba stron w dokumencie PDF"
     )
     extraction_tool: str = Field(
         default="pdfplumber", description="Nazwa narzędzia/silnika ekstrakcji"
     )
-    metadata_json: Optional[Dict[str, Any]] = Field(
+    metadata_json: dict[str, Any] | None = Field(
         default_factory=dict,
         sa_column=Column(JSONB),
         description="Metadane strukturalne zwracane przez parser",
     )
     extracted_at: datetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc),
+        default_factory=lambda: datetime.now(UTC),
         description="Znacznik czasu wykonania ekstrakcji tekstu",
     )

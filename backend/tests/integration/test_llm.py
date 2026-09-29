@@ -48,8 +48,7 @@ async def test_ollama_cv_parsing_integration() -> None:
     result = await client.parse_cv(SAMPLE_RAW_CV)
 
     logger.success("Otrzymano i sparsowano odpowiedź!")
-    print("\n=== WYNIK W FORMACIE PYDANTIC / JSON ===")
-    print(result.model_dump_json(indent=2))
+    print(result.model_dump_json(indent=2))  # noqa: T201
 
     assert result.personal_info.full_name == "Jan Kowalski"
     assert result.personal_info.email == "jan.kowalski@example.com"

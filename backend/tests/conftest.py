@@ -1,5 +1,5 @@
 import os
-from typing import Generator
+from collections.abc import Generator
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
@@ -14,7 +14,6 @@ from app.main import app
 
 @pytest.fixture
 def client() -> Generator[TestClient, None, None]:
-
     with TestClient(app) as c:
         yield c
 
@@ -26,8 +25,8 @@ engine = create_engine(settings.DATABASE_URL, echo=False)
 
 @pytest.fixture(scope="session", autouse=True)
 def setup_database() -> Generator[None, None, None]:
-    from app.models.cv_document import CVDocumentLake
-    from app.models.cv_raw_text import CVRawText
+    from app.models.cv_document import CVDocumentLake  # noqa: PLC0415
+    from app.models.cv_raw_text import CVRawText  # noqa: PLC0415
 
     _ = [CVDocumentLake, CVRawText]
 

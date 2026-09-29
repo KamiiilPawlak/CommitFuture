@@ -1,5 +1,6 @@
-from datetime import datetime, timezone
-from typing import Any, Dict, Sequence
+from collections.abc import Sequence
+from datetime import UTC, datetime
+from typing import Any
 from uuid import UUID
 
 from sqlmodel import Session, select
@@ -30,15 +31,16 @@ class CVRepository:
         self.session.flush()
         return lake_record
 
-    def create_raw_text_record(
+    def create_raw_text_record(  # noqa: PLR0913
         self,
+        *,
         lake_id: UUID,
         raw_text: str,
         character_count: int,
         word_count: int,
         page_count: int,
         extraction_tool: str,
-        metadata_json: Dict[str, Any] | None,
+        metadata_json: dict[str, Any] | None,
     ) -> CVRawText:
         raw_cv_record = CVRawText(
             cv_document_id=lake_id,
@@ -48,7 +50,7 @@ class CVRepository:
             page_count=page_count,
             extraction_tool=extraction_tool,
             metadata_json=metadata_json,
-            extracted_at=datetime.now(timezone.utc),
+            extracted_at=datetime.now(UTC),
         )
 
         self.session.add(raw_cv_record)
@@ -56,7 +58,6 @@ class CVRepository:
         return raw_cv_record
 
     def get_lake_by_id(self, lake_id: UUID) -> CVDocumentLake | None:
-
         return self.session.get(CVDocumentLake, lake_id)
 
     def get_raw_text_by_lake_id(self, lake_id: UUID) -> CVRawText | None:
@@ -64,7 +65,6 @@ class CVRepository:
         return self.session.exec(statement).first()
 
     def get_user_documents(self, user_id: UUID) -> Sequence[CVDocumentLake]:
-
         statement = select(CVDocumentLake).where(CVDocumentLake.id == user_id)
         return self.session.exec(statement).all()
 

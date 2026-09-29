@@ -1,5 +1,5 @@
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator, Dict
 
 from fastapi import FastAPI
 from loguru import logger
@@ -13,7 +13,7 @@ setup_logging()
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:  # noqa: ARG001
     logger.info("Uruchomienie aplikacji")
     init_db()
     yield
@@ -27,7 +27,7 @@ app.include_router(api_router, prefix="/api/v1")
 
 
 @app.get("/")
-def root() -> Dict[str, str]:
+def root() -> dict[str, str]:
     logger.debug("Wywolano endpoint glowny root")
     return {"message": "docker :D"}
 

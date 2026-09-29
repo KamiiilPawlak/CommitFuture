@@ -1,5 +1,4 @@
 # app/models/ingestion_dto.py
-from typing import Dict, Optional
 from uuid import UUID
 
 from pydantic import BaseModel, Field
@@ -16,15 +15,13 @@ class CVIngestionResponse(BaseModel):
 
 
 class ExtractedMetadata(BaseModel):
-    email: Optional[str] = Field(None, description="Wyciągnięty adres email kandydata")
-    phone: Optional[str] = Field(
-        None, description="Wyciągnięty numer telefonu kandydata"
-    )
+    email: str | None = Field(None, description="Wyciągnięty adres email kandydata")
+    phone: str | None = Field(None, description="Wyciągnięty numer telefonu kandydata")
 
 
 class ProcessedCVTO(BaseModel):
     metadata: ExtractedMetadata
-    setions: Dict[str, str] = Field(
+    setions: dict[str, str] = Field(
         default_factory=dict, description="Pocięte sekcje CV"
     )
     full_processed_text: str = Field(..., description="Pełny tekst po normalizacji")

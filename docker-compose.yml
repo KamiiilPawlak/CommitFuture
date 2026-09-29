@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: cv-ai-matcher-db
+    container_name: CommitFuture-db
     restart: always
     environment:
       POSTGRES_USER: postgres
@@ -21,7 +21,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: cv-ai-matcher-backend
+    container_name: CommitFuture-api
     restart: always
     ports:
       - "8000:8000"
@@ -46,5 +46,20 @@ services:
       - .:/docs
     command: mkdocs serve --dev-addr 0.0.0.0:8000
 
+  ollama:
+    image: ollama/ollama:latest
+    container_name: CommitFuture-ollama
+    restart: always
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    entrypoint:
+      [
+        "/bin/sh",
+        "-c",
+        "ollama serve & sleep 3 && ollama pull qwen2.5:3b && wait",
+      ]
 volumes:
   postgres_data:
+  ollama_data:

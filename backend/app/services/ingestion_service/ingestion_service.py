@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Dict, cast
+from typing import Any, cast
 
 from fastapi import Depends, UploadFile
 from loguru import logger
@@ -68,16 +68,16 @@ class IngestionService:
 
             logger.info(f"ETL zakończony sukcesem dla pliku: {original_filename}")
 
-            return lake_record, raw_text_record
+            return lake_record, raw_text_record  # noqa: TRY300
 
         except Exception as error:
             logger.error(f"Błąd ETL dla ścieżki {destination_path}. Rollback: {error}")
             self.repository.rollback()
             await self.file_service.delete_file(destination_path)
-            raise error
+            raise
 
     @staticmethod
-    def _build_text_metrics(raw_text: str) -> tuple[int, int, Dict[str, Any]]:
+    def _build_text_metrics(raw_text: str) -> tuple[int, int, dict[str, Any]]:
         if not raw_text:
             return 0, 0, {"status": "empty", "char_count": 0, "word_count": 0}
 

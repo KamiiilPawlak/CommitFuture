@@ -1,0 +1,35 @@
+[MASTER]
+ignore=tests,uploads,logs
+load-plugins=
+
+[DESIGN]
+max-args=5
+max-attributes=7
+max-locals=15
+max-returns=6
+max-branches=12
+max-statements=50
+min-public-methods=1
+
+[MESSAGES CONTROL]
+disable=
+    C0111,
+    R0903,
+    C0103,
+    C0114,
+    C0115,
+    C0116,
+    C0301,
+    R0801,
+    W0613,
+    W0703
+
+[REPORTS]
+output-format=text
+score=no
+
+[FORMAT]
+max-line-length=88
+
+[BASIC]
+good-names=i,j,k,ex,Run,_,db,id

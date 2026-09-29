@@ -1,13 +1,13 @@
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, Final, Protocol
+from typing import Final, Protocol
 
 
 class StoragePathProvider(Protocol):
     def get_target_dir(self) -> Path: ...
 
 
-MONTH_MAP: Final[Dict[int, str]] = {
+MONTH_MAP: Final[dict[int, str]] = {
     1: "styczen",
     2: "luty",
     3: "marzec",

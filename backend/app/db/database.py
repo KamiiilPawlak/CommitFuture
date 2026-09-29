@@ -1,4 +1,4 @@
-from typing import Generator
+from collections.abc import Generator
 
 from loguru import logger
 from sqlmodel import Session, SQLModel, create_engine

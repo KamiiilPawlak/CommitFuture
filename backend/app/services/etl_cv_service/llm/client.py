@@ -54,11 +54,11 @@ class OllamaLLMClient:
 
             except httpx.HTTPError as err:
                 logger.error(f"Błąd komunikacji z Ollama API: {err}")
-                raise RuntimeError(f"Ollama integration error: {err}") from err
+                msg = f"Ollama integration error: {err}"
+                raise RuntimeError(msg) from err
             except Exception as err:
                 logger.error(
                     f"Błąd walidacji schematu Pydantic z odpowiedzi LLM: {err}"
                 )
-                raise ValueError(
-                    f"Failed to parse LLM response to CvLlmDto: {err}"
-                ) from err
+                msg_0 = f"Failed to parse LLM response to CvLlmDto: {err}"
+                raise ValueError(msg_0) from err

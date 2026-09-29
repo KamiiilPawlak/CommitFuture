@@ -1,11 +1,11 @@
 from datetime import date
-from typing import Dict, List, Optional, Union, cast
+from typing import cast
 
 import dateparser
-import regex as re
+import regex as re  # type: ignore[import-untyped]
 
 
-def _parse_single_date(date_str: str) -> Optional[Union[date, str]]:
+def _parse_single_date(date_str: str) -> date | str | None:
     cleaned = date_str.strip().lower()
 
     if re.match(r"^(obecnie|present|now|aktualnie)$", cleaned):
@@ -28,18 +28,18 @@ def _parse_single_date(date_str: str) -> Optional[Union[date, str]]:
 
     parsed = dateparser.parse(date_str, settings=settings)
     if parsed is not None:
-        return cast(date, parsed.date())
+        return parsed.date()
 
     return None
 
 
-def extract_date_ranges(text: str) -> List[Dict[str, Optional[Union[date, bool, str]]]]:
+def extract_date_ranges(text: str) -> list[dict[str, date | bool | str | None]]:
     date_range_pattern = re.compile(
-        r"((?:\d{1,2}[\./])?(?:\d{1,2}[\./])?\d{4})\s*(?:-|–|—|do|to)\s*((?:\d{1,2}[\./])?(?:\d{1,2}[\./])?\d{4}|obecnie|present|aktualnie|now)",
+        r"((?:\d{1,2}[\./])?(?:\d{1,2}[\./])?\d{4})\s*(?:-||—|do|to)\s*((?:\d{1,2}[\./])?(?:\d{1,2}[\./])?\d{4}|obecnie|present|aktualnie|now)",
         re.IGNORECASE,
     )
 
-    results: List[Dict[str, Optional[Union[date, bool, str]]]] = []
+    results: list[dict[str, date | bool | str | None]] = []
 
     for match in date_range_pattern.finditer(text):
         start_raw, end_raw = match.groups()
@@ -49,7 +49,7 @@ def extract_date_ranges(text: str) -> List[Dict[str, Optional[Union[date, bool, 
 
         if isinstance(start_date, date):
             is_current = end_raw_parsed == "present"
-            end_date = None if is_current else cast(Optional[date], end_raw_parsed)
+            end_date = None if is_current else cast(date | None, end_raw_parsed)
 
             results.append(
                 {

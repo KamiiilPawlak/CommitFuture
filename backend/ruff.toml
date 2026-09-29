@@ -1,0 +1,70 @@
+line-length = 88
+target-version = "py311"
+src = ["app", "tests"]
+
+exclude = [
+    ".git",
+    ".venv",
+    "__pycache__",
+    "build",
+    "dist",
+    "cv_ai_matcher.egg-info",
+    "logs/",
+    ".env",
+    ".env.test",
+]
+
+[lint]
+select = [
+    "E",
+    "F",
+    "I",
+    "B",
+    "UP",
+    "SIM",
+    "S",
+    "ASYNC",
+    "C4",
+    "PTH",
+    "RUF",
+    "PL",
+    "C90",
+    "A",
+    "ARG",
+    "T20",
+    "RET",
+    "TRY",
+    "EM",
+    "ICN",
+    "PIE",
+    "PGH",
+]
+
+ignore = [
+    "E501",
+    "TRY003",
+    "B008",
+]
+
+[lint.per-file-ignores]
+"tests/**/*" = ["S101", "ARG001", "PLR2004"]
+"scripts/**/*" = ["T201"]
+
+[lint.mccabe]
+max-complexity = 10
+
+[lint.pylint]
+max-args = 5
+max-branches = 12
+max-returns = 6
+max-statements = 50
+
+[lint.isort]
+combine-as-imports = true
+known-first-party = ["app"]
+
+[format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"

@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from uuid import UUID, uuid4
 
 from sqlmodel import Field, SQLModel
@@ -17,6 +17,6 @@ class CVDocumentLake(SQLModel, table=True):
     file_size_bytes: int = Field(description="Rozmiar pliku w bajtach")
     mime_type: str = Field(default="application/pdf", description="Typ MIME pliku")
     created_at: datetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc),
+        default_factory=lambda: datetime.now(UTC),
         description="Znacznik czasu zapisania pliku w Data Lake",
     )

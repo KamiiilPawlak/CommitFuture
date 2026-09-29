@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Any
 
 from loguru import logger
 
@@ -14,15 +14,15 @@ from app.services.etl_cv_service.normalization import CVTextNormalizer
 class CVPipelineOrchestrator:
     def __init__(
         self,
-        normalizer: Optional[CVTextNormalizer] = None,
-        heuristic_manager: Optional[HeuristicExtractionManager] = None,
-        llm_client: Optional[OllamaLLMClient] = None,
+        normalizer: CVTextNormalizer | None = None,
+        heuristic_manager: HeuristicExtractionManager | None = None,
+        llm_client: OllamaLLMClient | None = None,
     ) -> None:
         self.normalizer = normalizer or CVTextNormalizer()
         self.heuristic_manager = heuristic_manager or HeuristicExtractionManager()
         self.llm_client = llm_client or OllamaLLMClient()
 
-    async def process_cv(self, raw_text: str) -> Dict[str, Any]:
+    async def process_cv(self, raw_text: str) -> dict[str, Any]:
         """Krok 1: Czyszczenie, normalizacja oraz ekstrakcja heurystyczna."""
         if not raw_text or not raw_text.strip():
             logger.warning("[ETL Orchestrator] Otrzymano pusty tekst CV.")
@@ -37,7 +37,7 @@ class CVPipelineOrchestrator:
         logger.debug("[ETL Orchestrator] Uruchamianie ekstrakcji heurystycznej...")
         heuristic_result = self.heuristic_manager.extract_all(normalized_text)
 
-        llm_result: Optional[CvLlmDto] = None
+        llm_result: CvLlmDto | None = None
 
         try:
             logger.debug("[ETL Orchestrator] Wysyłanie zapytania do Ollama LLM...")

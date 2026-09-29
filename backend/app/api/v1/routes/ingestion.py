@@ -41,7 +41,7 @@ async def upload_cv_document(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(val_err),
-        )
+        ) from val_err
     except Exception as err:
         logger.error(
             f"Nieoczekiwany błąd w procesie ETL dla pliku {file.filename}: {err}"
@@ -49,4 +49,4 @@ async def upload_cv_document(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Wystąpił błąd podczas przetwarzania dokumentu CV.",
-        )
+        ) from err
