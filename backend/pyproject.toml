@@ -3,9 +3,9 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "cv-ai-matcher"
+name = "CommitFuture"
 version = "0.1.0"
-description = "AI powered CV matching system using LLMs"
+description = "AI powered CV matching system"
 requires-python = ">=3.11"
 
 dependencies = [
