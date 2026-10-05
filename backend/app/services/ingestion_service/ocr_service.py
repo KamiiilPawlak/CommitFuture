@@ -7,12 +7,14 @@ from loguru import logger
 from pdf2image import convert_from_bytes
 from PIL import Image, ImageFilter, ImageOps
 
-from app.core.config import OCRConfig
+from app.core.config import OCRConfig, settings
 
 
 class OCRService:
     def __init__(self) -> None:
         self._config = OCRConfig()
+        if settings.TESSERACT_CMD:
+            pytesseract.pytesseract.tesseract_cmd = settings.TESSERACT_CMD
 
     async def process_document(self, content: bytes, mime_type: str) -> tuple[str, int]:
         if mime_type == "application/pdf":

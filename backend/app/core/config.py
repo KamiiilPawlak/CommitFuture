@@ -10,7 +10,6 @@ STORAGE_DIR = BASE_DIR / "storage" / "cv_uploads"
 
 @dataclass(frozen=True)
 class OCRConfig:
-    TESSERACT_CMD: str = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
     MIN_TEXT_LENGTH: int = 100
     TESSERACT_LANG: str = "pol+eng"
     APPLY_SHARPEN: bool = True
@@ -20,6 +19,14 @@ class Settings(BaseSettings):
     # file and security
     MAX_FILE_SIZE: int = 5 * 1024 * 1024
     ALLOWED_MIME_TYPES: list[str] = ["application/pdf", "image/png", "image/jpeg"]
+
+    # OCR Config
+    # Ścieżka do binarki Tesseract. Pozostaw puste (domyślnie), jeśli `tesseract`
+    # jest dostępny w PATH (standard na Linuksie/w kontenerach po `apt install
+    # tesseract-ocr`). Ustaw przez zmienną środowiskową TESSERACT_CMD tylko,
+    # gdy binarka nie jest w PATH (typowo na Windows, np.
+    # "C:\Program Files\Tesseract-OCR\tesseract.exe").
+    TESSERACT_CMD: str | None = None
 
     # LLM Config
     OLLAMA_BASE_URL: str = "http://localhost:11434"

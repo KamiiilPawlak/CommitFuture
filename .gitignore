@@ -1,5 +1,5 @@
 __pycache__/
-*cv_ai_matcher.egg-info
+*CommitFuture.egg-info
 *.pyc
 .pytest_cache
 .ruff_cache
