@@ -46,7 +46,7 @@ class IngestionService:
             )
 
             file_bytes = await self.file_service.read_file(destination_path)
-            raw_text = await self.ocr_service.process_document(
+            raw_text, page_count = await self.ocr_service.process_document(
                 content=file_bytes,
                 mime_type=lake_record.mime_type,
             )
@@ -58,7 +58,7 @@ class IngestionService:
                 raw_text=raw_text,
                 character_count=char_count,
                 word_count=word_count,
-                page_count=0,
+                page_count=page_count,
                 extraction_tool="pdfplumber/pytesseract",
                 metadata_json=metadata,
             )

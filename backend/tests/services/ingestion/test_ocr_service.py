@@ -33,9 +33,10 @@ async def test_process_document_digital_pdf_success(
         "app.services.ingestion_service.ocr_service.pytesseract.image_to_string"
     )
 
-    result = await ocr_service.process_document(fake_content, fake_mime)
+    result, page_count = await ocr_service.process_document(fake_content, fake_mime)
 
     assert result == expected_text
+    assert page_count == 1
 
     mock_open.assert_called_once()
 
@@ -69,9 +70,10 @@ async def test_process_document_image_ocr_success(
         return_value=mock_image_instance,
     )
 
-    result = await ocr_service.process_document(fake_content, fake_mime)
+    result, page_count = await ocr_service.process_document(fake_content, fake_mime)
 
     assert result == expected_ocr_text
+    assert page_count == 1
 
     mock_open_image.assert_called_once()
 
