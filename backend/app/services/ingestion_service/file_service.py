@@ -17,28 +17,38 @@ class StorageService:
     def __init__(self, *, path_provider: StoragePathProvider | None = None) -> None:
         self._path_provider = path_provider or DateBasedPathProvider(STORAGE_DIR)
 
+    async def _read_within_limit(self, file: UploadFile) -> bytes:
+        chunk_size = 1024 * 1024
+        max_size = settings.MAX_FILE_SIZE
+        chunks: list[bytes] = []
+        total_size = 0
+
+        while chunk := await file.read(chunk_size):
+            total_size += len(chunk)
+            if total_size > max_size:
+                logger.error(
+                    f"Plik przekracza maksymalny rozmiar: > {max_size} bajtów"
+                )
+                msg_size = (
+                    f"Przesłany plik jest za duży. Maksymalny rozmiar to "
+                    f"{max_size // (1024 * 1024)} MB."
+                )
+                raise ValueError(msg_size)
+            chunks.append(chunk)
+
+        return b"".join(chunks)
+
     async def save_pdf_file(self, file: UploadFile) -> tuple[str, str, int]:
         if not file.filename or not file.filename.lower().endswith(".pdf"):
             msg = "Niedozwolone rozszerzenie pliku. Wymagany format to PDF."
             raise ValueError(msg)
 
-        content = await file.read()
+        content = await self._read_within_limit(file)
         file_size = len(content)
 
         if file_size == 0:
             msg_0 = "Przesłany plik jest pusty."
             raise ValueError(msg_0)
-
-        if file_size > settings.MAX_FILE_SIZE:
-            logger.error(
-                f"Plik przekracza maksymalny rozmiar: {file_size} > "
-                f"{settings.MAX_FILE_SIZE} bajtów"
-            )
-            msg_size = (
-                f"Przesłany plik jest za duży. Maksymalny rozmiar to "
-                f"{settings.MAX_FILE_SIZE // (1024 * 1024)} MB."
-            )
-            raise ValueError(msg_size)
 
         verify_file_integrity(content)
 
