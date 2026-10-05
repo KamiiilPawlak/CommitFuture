@@ -5,7 +5,8 @@ import aiofiles
 from fastapi import UploadFile
 from loguru import logger
 
-from app.core.config import STORAGE_DIR
+from app.core.config import STORAGE_DIR, settings
+from app.core.security import verify_file_integrity
 from app.services.ingestion_service.storage_path_provider import (
     DateBasedPathProvider,
     StoragePathProvider,
@@ -27,6 +28,19 @@ class StorageService:
         if file_size == 0:
             msg_0 = "Przesłany plik jest pusty."
             raise ValueError(msg_0)
+
+        if file_size > settings.MAX_FILE_SIZE:
+            logger.error(
+                f"Plik przekracza maksymalny rozmiar: {file_size} > "
+                f"{settings.MAX_FILE_SIZE} bajtów"
+            )
+            msg_size = (
+                f"Przesłany plik jest za duży. Maksymalny rozmiar to "
+                f"{settings.MAX_FILE_SIZE // (1024 * 1024)} MB."
+            )
+            raise ValueError(msg_size)
+
+        verify_file_integrity(content)
 
         target_dir = self._path_provider.get_target_dir()
 
