@@ -1,7 +1,18 @@
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, status
+from fastapi import (
+    APIRouter,
+    BackgroundTasks,
+    Depends,
+    HTTPException,
+    UploadFile,
+    status,
+)
 from loguru import logger
 
 from app.schema.ingestion_dto import CVIngestionResponse
+from app.services.etl_cv_service.processing_service import (
+    CVProcessingService,
+    get_cv_processing_service,
+)
 from app.services.ingestion_service.ingestion_service import (
     IngestionService,
     get_ingestion_service,
@@ -19,12 +30,20 @@ router = APIRouter(prefix="/cv", tags=["CV Ingestion"])
 )
 async def upload_cv_document(
     file: UploadFile,
+    background_tasks: BackgroundTasks,
     ingestion_service: IngestionService = Depends(get_ingestion_service),
+    processing_service: CVProcessingService = Depends(get_cv_processing_service),
 ) -> CVIngestionResponse:
     logger.info(f"Otrzymano żądanie POST /cv/upload  plik: {file.filename}")
 
     try:
         lake_record, raw_text_record = await ingestion_service.process_cv_document(file)
+
+        background_tasks.add_task(
+            processing_service.process_and_store,
+            lake_record.id,
+            raw_text_record.raw_text,
+        )
 
         return CVIngestionResponse(
             message="Dokument CV został pomyślnie przetworzony.",

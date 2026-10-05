@@ -9,9 +9,8 @@ from app.services.etl_cv_service.heuristic.dictionary.lookup_engine import (
 from app.services.etl_cv_service.heuristic.dictionary.tech_stack import (
     TECH_STACK_DICTIONARY,
 )
-from app.services.etl_cv_service.heuristic.domain.experience_calc import (
-    convert_extracted_range_to_dates,
-    merge_overlapping_ranges,
+from app.services.etl_cv_service.heuristic.domain.experience_service import (
+    ExperienceService,
 )
 from app.services.etl_cv_service.heuristic.domain.models import DateRange
 from app.services.etl_cv_service.heuristic.extractors import (
@@ -28,30 +27,10 @@ class HeuristicExtractionManager:
             **JOB_TITLES_DICTIONARY,
         }
         self.lookup_engine = FlashLookupEngine(keywords_map=combined_keywords)
+        self.experience_service = ExperienceService()
 
         self._tech_keys = set(TECH_STACK_DICTIONARY.keys())
         self._job_keys = set(JOB_TITLES_DICTIONARY.keys())
-
-    def _calculate_total_experience_months(
-        self, raw_dates: list[dict[str, Any]]
-    ) -> int:
-        valid_date_tuples = []
-
-        for date_dict in raw_dates:
-            date_range_obj = DateRange(
-                start_date=date_dict.get("start_date"),
-                end_date=date_dict.get("end_date"),
-                is_current=bool(date_dict.get("is_current", False)),
-            )
-
-            converted_tuple = convert_extracted_range_to_dates(date_range_obj)
-            if converted_tuple:
-                valid_date_tuples.append(converted_tuple)
-
-        merged_ranges = merge_overlapping_ranges(valid_date_tuples)
-
-        total_days = sum((end - start).days + 1 for start, end in merged_ranges)
-        return round(total_days / 30.4375)
 
     def extract_all(self, raw_text: str | None) -> dict[str, Any]:
         if not raw_text or not raw_text.strip():
@@ -62,6 +41,7 @@ class HeuristicExtractionManager:
                 "tech_stack": [],
                 "job_titles": [],
                 "total_experience_months": 0,
+                "total_experience_years": 0.0,
             }
 
         email = extract_email(raw_text)
@@ -73,7 +53,15 @@ class HeuristicExtractionManager:
         tech_stack = [m for m in matches if m in self._tech_keys]
         job_titles = [m for m in matches if m in self._job_keys]
 
-        total_experience_months = self._calculate_total_experience_months(date_ranges)
+        date_range_objs = [
+            DateRange(
+                start_date=date_dict.get("start_date"),
+                end_date=date_dict.get("end_date"),
+                is_current=bool(date_dict.get("is_current", False)),
+            )
+            for date_dict in date_ranges
+        ]
+        experience = self.experience_service.calculate_experience(date_range_objs)
 
         return {
             "email": email,
@@ -81,5 +69,6 @@ class HeuristicExtractionManager:
             "dates": date_ranges,
             "tech_stack": tech_stack,
             "job_titles": job_titles,
-            "total_experience_months": total_experience_months,
+            "total_experience_months": experience.total_months,
+            "total_experience_years": experience.total_years,
         }

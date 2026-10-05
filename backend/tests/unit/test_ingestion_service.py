@@ -25,7 +25,7 @@ async def test_process_cv_document_success() -> None:
     )
     mock_storage_service.read_file = AsyncMock(return_value=b"%PDF-fake-bytes")
 
-    mock_ocr_service.process_document = AsyncMock(return_value="Sample CV Text")
+    mock_ocr_service.process_document = AsyncMock(return_value=("Sample CV Text", 1))
 
     fake_lake_record = CVDocumentLake(
         original_filename="test_cv.pdf",

@@ -4,11 +4,13 @@ from loguru import logger
 
 from app.schema.cv_llm import CvLlmDto
 from app.services.etl_cv_service.cleaning import clean_ocr_text
+from app.services.etl_cv_service.dictionaries.validator import TechStackValidator
 from app.services.etl_cv_service.heuristic.manager import (
     HeuristicExtractionManager,
 )
 from app.services.etl_cv_service.llm.client import OllamaLLMClient
 from app.services.etl_cv_service.normalization import CVTextNormalizer
+from app.services.etl_cv_service.validation import detect_llm_hallucinations
 
 
 class CVPipelineOrchestrator:
@@ -17,10 +19,12 @@ class CVPipelineOrchestrator:
         normalizer: CVTextNormalizer | None = None,
         heuristic_manager: HeuristicExtractionManager | None = None,
         llm_client: OllamaLLMClient | None = None,
+        tech_stack_validator: TechStackValidator | None = None,
     ) -> None:
         self.normalizer = normalizer or CVTextNormalizer()
         self.heuristic_manager = heuristic_manager or HeuristicExtractionManager()
         self.llm_client = llm_client or OllamaLLMClient()
+        self.tech_stack_validator = tech_stack_validator or TechStackValidator()
 
     async def process_cv(self, raw_text: str) -> dict[str, Any]:
         """Krok 1: Czyszczenie, normalizacja oraz ekstrakcja heurystyczna."""
@@ -48,4 +52,23 @@ class CVPipelineOrchestrator:
                 "Kontynuowanie wyłącznie z danymi z heurystyki."
             )
 
-        return {**heuristic_result, "llm_result": llm_result}
+        validated_hard_skills: list[str] = []
+        if llm_result is not None:
+            validated_hard_skills = self.tech_stack_validator.validate_skills(
+                llm_result.hard_skills
+            )
+
+        llm_warnings = detect_llm_hallucinations(
+            llm_result, heuristic_result, normalized_text
+        )
+        if llm_warnings:
+            logger.warning(
+                f"[ETL Orchestrator] Wykryto niezgodności LLM/heurystyka: {llm_warnings}"
+            )
+
+        return {
+            **heuristic_result,
+            "llm_result": llm_result,
+            "llm_warnings": llm_warnings,
+            "llm_hard_skills_validated": validated_hard_skills,
+        }

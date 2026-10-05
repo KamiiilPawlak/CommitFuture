@@ -59,6 +59,6 @@ def mock_file_service() -> MagicMock:
 def mock_ocr_service() -> MagicMock:
     service = MagicMock()
     service.process_document = AsyncMock(
-        return_value="Sztucznie odczytany tekst z CV Kamila"
+        return_value=("Sztucznie odczytany tekst z CV Kamila", 1)
     )
     return service
