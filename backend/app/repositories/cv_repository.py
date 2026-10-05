@@ -7,6 +7,7 @@ from sqlmodel import Session, select
 
 from app.models.cv_document import CVDocumentLake
 from app.models.cv_raw_text import CVRawText
+from app.models.cv_structured_data import CVStructuredData
 
 
 class CVRepository:
@@ -63,6 +64,35 @@ class CVRepository:
     def get_raw_text_by_lake_id(self, lake_id: UUID) -> CVRawText | None:
         statement = select(CVRawText).where(CVRawText.cv_document_id == lake_id)
         return self.session.exec(statement).first()
+
+    def upsert_structured_record(
+        self,
+        *,
+        cv_document_id: UUID,
+        structured_data: dict[str, Any],
+        status: str,
+    ) -> CVStructuredData:
+        existing = self.session.get(CVStructuredData, cv_document_id)
+
+        if existing is not None:
+            existing.structured_data = structured_data
+            existing.status = status
+            existing.processed_at = datetime.now(UTC)
+            self.session.add(existing)
+            self.session.flush()
+            return existing
+
+        structured_record = CVStructuredData(
+            cv_document_id=cv_document_id,
+            structured_data=structured_data,
+            status=status,
+        )
+        self.session.add(structured_record)
+        self.session.flush()
+        return structured_record
+
+    def get_structured_by_lake_id(self, lake_id: UUID) -> CVStructuredData | None:
+        return self.session.get(CVStructuredData, lake_id)
 
     def get_user_documents(self, user_id: UUID) -> Sequence[CVDocumentLake]:
         statement = select(CVDocumentLake).where(CVDocumentLake.id == user_id)
