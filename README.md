@@ -16,10 +16,6 @@ Pełny opis architektury: [`docs/architecture/overview.md`](docs/architecture/ov
 - Ekstrakcja tekstu: PyMuPDF, pdfplumber, Tesseract OCR, pdf2image
 - LLM: Ollama (`qwen2.5:3b`) jako lokalny serwer wnioskowania
 
-**Frontend**
-- React 19 + TypeScript, Vite
-- Tailwind CSS, Radix UI / shadcn
-
 **DevOps / jakość kodu**
 - Docker & Docker Compose
 - Ruff, mypy, pylint, bandit, pre-commit
@@ -84,15 +80,6 @@ cd backend
 uv pip install --system .[dev]
 uvicorn app.main:app --reload
 ```
-
-**Frontend**
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
 ## Testy i jakość kodu
 
 ```bash
