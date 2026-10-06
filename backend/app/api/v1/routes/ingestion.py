@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from fastapi import (
     APIRouter,
     BackgroundTasks,
@@ -7,8 +9,11 @@ from fastapi import (
     status,
 )
 from loguru import logger
+from sqlmodel import Session
 
-from app.schema.ingestion_dto import CVIngestionResponse
+from app.db.database import get_session
+from app.repositories.cv_repository import CVRepository
+from app.schema.ingestion_dto import CVIngestionResponse, CVStructuredDataResponse
 from app.services.etl_cv_service.processing_service import (
     CVProcessingService,
     get_cv_processing_service,
@@ -69,3 +74,30 @@ async def upload_cv_document(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Wystąpił błąd podczas przetwarzania dokumentu CV.",
         ) from err
+
+
+@router.get(
+    "/{cv_document_id}/structured",
+    response_model=CVStructuredDataResponse,
+    summary="Pobranie ustrukturyzowanych danych CV",
+    description="Zwraca zawartość tabeli cv_structured_data dla wskazanego dokumentu.",
+)
+async def get_cv_structured_data(
+    cv_document_id: UUID,
+    session: Session = Depends(get_session),
+) -> CVStructuredDataResponse:
+    repository = CVRepository(session)
+    structured_record = repository.get_structured_by_lake_id(cv_document_id)
+
+    if structured_record is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Nie znaleziono ustrukturyzowanych danych dla podanego dokumentu CV.",
+        )
+
+    return CVStructuredDataResponse(
+        cv_document_id=structured_record.cv_document_id,
+        status=structured_record.status,
+        structured_data=structured_record.structured_data,
+        processed_at=structured_record.processed_at,
+    )
