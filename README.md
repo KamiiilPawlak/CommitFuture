@@ -11,12 +11,14 @@ Pełny opis architektury: [`docs/architecture/overview.md`](docs/architecture/ov
 ## Stack
 
 **Backend**
+
 - Python 3.11+, FastAPI, Pydantic v2
 - SQLModel / SQLAlchemy + PostgreSQL, Alembic (migracje)
 - Ekstrakcja tekstu: PyMuPDF, pdfplumber, Tesseract OCR, pdf2image
 - LLM: Ollama (`qwen2.5:3b`) jako lokalny serwer wnioskowania
 
 **DevOps / jakość kodu**
+
 - Docker & Docker Compose
 - Ruff, mypy, pylint, bandit, pre-commit
 - pytest (pytest-asyncio, pytest-cov)
@@ -24,12 +26,12 @@ Pełny opis architektury: [`docs/architecture/overview.md`](docs/architecture/ov
 
 ## Architektura — komponenty (`docker-compose.yml`)
 
-| Serwis | Port | Rola |
-| --- | --- | --- |
-| `api` | 8000 | FastAPI — cała logika biznesowa (`backend/app`) |
-| `postgres` | 5432 | Baza `cv_ai_matcher` |
-| `ollama` | 11434 | Lokalny serwer LLM, przy starcie sam pobiera model `qwen2.5:3b` |
-| `mkdocs` | 8001 | Statyczna dokumentacja z katalogu `docs/` |
+| Serwis     | Port  | Rola                                                            |
+| ---------- | ----- | --------------------------------------------------------------- |
+| `api`      | 8000  | FastAPI — cała logika biznesowa (`backend/app`)                 |
+| `postgres` | 5432  | Baza `cv_ai_matcher`                                            |
+| `ollama`   | 11434 | Lokalny serwer LLM, przy starcie sam pobiera model `qwen2.5:3b` |
+| `mkdocs`   | 8001  | Statyczna dokumentacja z katalogu `docs/`                       |
 
 Pliki PDF trzymane są na dysku (`storage/cv_uploads/`), nie w obiektowym storage.
 
@@ -38,14 +40,35 @@ Pliki PDF trzymane są na dysku (`storage/cv_uploads/`), nie w obiektowym storag
 - Docker + Docker Compose
 - Do pracy bez kontenerów: Python 3.11+, [`uv`](https://github.com/astral-sh/uv), Node.js 20+, zainstalowany lokalnie Tesseract OCR
 
-## Szybki start (Docker)
+## Szybki start
+
+### Windows
 
 ```powershell
-# Windows (PowerShell) — buduje obrazy i odpala docker-compose up
+# Domyślny start (sprawdzenie/budowanie obrazów + uruchomienie kontenerów)
 ./run.ps1
 
-# wymuszenie przebudowania obrazów bez cache
-./run.ps1 -Action build -NoCache
+# Wymuszone przebudowanie obrazów bez cache
+./run.ps1 build -ForceBuild -NoCache
+
+# Czyszczenie środowiska i artefaktów
+./run.ps1 clean
+```
+
+### Linux
+
+```bash
+# Nadaj uprawnienia wykonania (jednorazowo)
+chmod +x run.sh scripts/*.sh
+
+# Domyślny start
+./run.sh
+
+# Wymuszone przebudowanie bez cache
+./run.sh build --force-build --no-cache
+
+# Czyszczenie środowiska
+./run.sh clean
 ```
 
 albo bezpośrednio:
@@ -55,6 +78,7 @@ docker compose up --build
 ```
 
 Po starcie:
+
 - API: http://localhost:8000 (dokumentacja Swagger: `/docs`)
 - Dokumentacja (MkDocs): http://localhost:8001
 
@@ -80,6 +104,7 @@ cd backend
 uv pip install --system .[dev]
 uvicorn app.main:app --reload
 ```
+
 ## Testy i jakość kodu
 
 ```bash
