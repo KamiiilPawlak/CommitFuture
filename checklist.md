@@ -24,24 +24,32 @@ Roadmapa oparta na faktycznym stanie kodu opisanym w `docs/architecture/cv-etl-p
 
 ## P3 — Przenośność / infrastruktura
 
-- [ ] Usuń zahardkodowaną ścieżkę `OCRConfig.TESSERACT_CMD` (Windows-only) — przenieś do zmiennej środowiskowej/configu, żeby działało w kontenerach/CI i na innych OS.
-- [ ] Sprawdź `backend/CommitFuture.egg-info/` w statusie gita (untracked) — czy powinno być w `.gitignore`, czy to artefakt do wyczyszczenia.
+- [x] Usuń zahardkodowaną ścieżkę `OCRConfig.TESSERACT_CMD` (Windows-only) — przenieś do zmiennej środowiskowej/configu, żeby działało w kontenerach/CI i na innych OS.
+- [x] Sprawdź `backend/CommitFuture.egg-info/` w statusie gita (untracked) — jest w `.gitignore` (`*CommitFuture.egg-info`).
 
 ## P4 — Dokumentacja (w toku na tym branchu `docs/update-docs`)
 
-- [ ] Zdecyduj, co zrobić z usuniętymi plikami w `docs/architecture/` (diagramy `.drawio.svg`, `dependencies.svg`, `classes/packages_cv_matcher.png`, `security_policies.md`) — czy zastępuje je nowy `overview.md`/`cv-etl-pipline.md`, czy trzeba odtworzyć część z nich.
-- [ ] Uzupełnij `docs/architecture/overview.md` — plik jest obecnie pusty, a `cv-etl-pipline.md` już opisuje szczegóły Etapu A/B.
+- [x] Uzupełnij `docs/architecture/overview.md` — plik opisuje teraz architekturę ogólną (wcześniej był pusty).
+- [x] Odtwórz ADR o walidacji magic bytes — `docs/architecture/adr/0001-magic-bytes-validation.md` istnieje.
+- [ ] Zdecyduj, co zrobić z usuniętymi plikami w `docs/architecture/` (diagramy `.drawio.svg`, `dependencies.svg`, `classes/packages_cv_matcher.png`, `security_policies.md`) — czy zastępuje je `overview.md`/`cv-etl-pipline.md`, czy trzeba odtworzyć część z nich.
 - [ ] Przenieś treść `security_policies.md` (zanim zniknie bezpowrotnie) do nowego dokumentu, jeśli opisane tam zasady są nadal aktualne — część z nich pokrywa się z punktami z sekcji P1 (magic bytes, limit rozmiaru pliku).
 
 ## P5 — Result API (największa luka wg `roadmap.md`, Faza 1)
 
-- [ ] Dodaj `GET /api/v1/cv/{cv_document_id}/status` — zwraca `status` z `cv_structured_data` (albo `pending`, jeśli rekordu jeszcze nie ma).
-- [ ] Dodaj `GET /api/v1/cv/{cv_document_id}/result` — zwraca `structured_data` gdy `status in {completed, partial}`; 404/409 gdy `pending`/`failed`.
-- [ ] Test integracyjny end-to-end: upload → poczekaj na `BackgroundTasks` → `GET /result` zwraca dane zgodne z tym, co zapisał `CVProcessingService`.
-- [ ] Oceń, czy `BackgroundTasks` wystarcza na produkcję, czy potrzebna jest trwała kolejka (Celery/Arq/RQ) z retry/DLQ niezależnym od życia procesu API — dziś restart serwera w trakcie przetwarzania zamraża rekord w `pending` bez mechanizmu odzyskania.
+- [x] Dodaj endpoint odczytu wyniku — `GET /api/v1/cv/{cv_document_id}/structured` zwraca `status` oraz `structured_data` z `cv_structured_data` (404 jeśli rekordu jeszcze nie ma); łączy w jednym endpointzie to, co `roadmap.md` opisywał jako dwa osobne (`/status` + `/result`).
+- [ ] Test integracyjny end-to-end: upload → poczekaj na `BackgroundTasks` → `GET /{cv_document_id}/structured` zwraca dane zgodne z tym, co zapisał `CVProcessingService` (dziś testy pokrywają tylko `POST /cv/upload`, patrz `backend/tests/integration/api/test_cv_endpoints.py`).
+- [ ] Oceń, czy `BackgroundTasks` wystarcza na produkcję, czy potrzebna jest trwała kolejka (Celery/Arq/RQ) z retry/DLQ niezależnym od życia procesu API — dziś restart serwera w trakcie przetwarzania zamraża rekord w `pending` bez mechanizmu odzyskania. Checklista przygotowawcza: [`docs/architecture/celery-migration-checklist.md`](docs/architecture/celery-migration-checklist.md).
+
+## P6 — Frontend (branch `feat/init-frontend`)
+
+- [x] Scaffolding SPA: React 19 + TypeScript + Vite, Tailwind CSS v4, shadcn/ui/Radix UI.
+- [x] Husky + lint-staged + commitlint skonfigurowane dla `frontend/`.
+- [x] `run.ps1 frontend` uruchamia `npm run dev` niezależnie od backendu.
+- [ ] Podłącz frontend do API (`POST /cv/upload`, `GET /cv/{id}/structured`) — dziś SPA jest niepodłączonym szkieletem.
+- [ ] Zdecyduj o konteneryzacji frontendu (dodanie serwisu do `docker-compose.yml`) albo pozostaniu przy uruchamianiu lokalnym (`npm run dev`).
 
 ---
 
-**Źródło:** `docs/architecture/cv-etl-pipline.md`, sekcja "Braki / TODO wynikające z analizy kodu" (punkty 1–8) + stan `git status` z bieżącej rozmowy + `docs/architecture/roadmap.md` (Faza 1, sekcja P5).
+**Źródło:** `docs/architecture/cv-etl-pipline.md`, sekcja "Braki / TODO wynikające z analizy kodu" (punkty 1–8) + stan `git log`/`git status` na branchu `feat/init-frontend` (2026-10-06) + `docs/architecture/roadmap.md` (Faza 1, sekcja P5) + `docs/architecture/celery-migration-checklist.md`.
 
 Co dalej: zaznaczaj `[x]` w miarę realizacji albo powiedz mi, od którego punktu zaczynamy, a rozpiszę go na konkretne kroki/PR.
