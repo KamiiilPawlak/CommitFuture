@@ -27,6 +27,21 @@ function Invoke-Dev {
     }
 }
 
+function Invoke-Start {
+    $uvicornPath = Resolve-Path ".\backend\.venv\Scripts\uvicorn.exe" -ErrorAction SilentlyContinue
+    if (-not $uvicornPath) {
+        throw "Nie znaleziono uvicorn w srodowisku wirtualnym: .\backend\.venv\Scripts\uvicorn.exe"
+    }
+    Write-Host "Uruchomienie FastAPI (uvicorn)..." -ForegroundColor Cyan
+    Push-Location backend
+    try {
+        & $uvicornPath app.main:app --reload
+    }
+    finally {
+        Pop-Location
+    }
+}
+
 function Invoke-BuildTask {
     $ScriptPath = ".\scripts\build.ps1"
     if (Test-Path $ScriptPath) {
@@ -49,6 +64,7 @@ $TaskRegistry = @{
     "build"   = { Invoke-BuildTask }
     "default" = { Invoke-DefaultWorkflow }
     "dev"     = { Invoke-Dev }
+    "start"   = { Invoke-Start }
 }
 
 
