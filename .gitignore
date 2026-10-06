@@ -15,3 +15,4 @@ uploads/
 .env.test
 logs/
 storage/
+frontend/.vite
