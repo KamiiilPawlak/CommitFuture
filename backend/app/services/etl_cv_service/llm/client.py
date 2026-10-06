@@ -40,7 +40,9 @@ class OllamaLLMClient:
             "format": CvLlmDto.model_json_schema(),
             "stream": False,
             "options": {
-                "temperature": 0.0,
+                "temperature": settings.OLLAMA_TEMPERATURE,
+                "num_thread": settings.OLLAMA_NUM_THREAD,
+                "num_ctx": settings.OLLAMA_NUM_CTX,
             },
         }
 

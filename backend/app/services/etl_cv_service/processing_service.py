@@ -37,6 +37,7 @@ class CVProcessingService:
 
         raw_structured_data: dict[str, Any] = {
             **result,
+            "education": dumped_llm["education"] if dumped_llm else [],
             "llm_result": dumped_llm,
         }
 
