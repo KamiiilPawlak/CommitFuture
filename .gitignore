@@ -13,7 +13,5 @@ build/
 uploads/
 .env
 .env.test
-frontend/
 logs/
-frontend/
 storage/

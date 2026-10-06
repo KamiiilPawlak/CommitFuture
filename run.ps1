@@ -42,6 +42,21 @@ function Invoke-Start {
     }
 }
 
+function Invoke-Frontend {
+    $frontendPath = Resolve-Path ".\frontend" -ErrorAction SilentlyContinue
+    if (-not $frontendPath) {
+        throw "Nie znaleziono katalogu frontend"
+    }
+    Write-Host "Uruchomienie React (npm run dev)..." -ForegroundColor Cyan
+    Push-Location $frontendPath
+    try {
+        npm run dev
+    }
+    finally {
+        Pop-Location
+    }
+}
+
 function Invoke-BuildTask {
     $ScriptPath = ".\scripts\build.ps1"
     if (Test-Path $ScriptPath) {
@@ -65,6 +80,7 @@ $TaskRegistry = @{
     "default" = { Invoke-DefaultWorkflow }
     "dev"     = { Invoke-Dev }
     "start"   = { Invoke-Start }
+    "frontend" = { Invoke-Frontend }
 }
 
 
