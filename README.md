@@ -4,7 +4,7 @@
 
 # CommitFuture — CV AI Matcher
 
-System dopasowujący kandydatów do ofert pracy na podstawie treści CV, przetwarzanego lokalnie przez pipeline OCR + heurystyka + LLM. W repozytorium zaimplementowana jest dziś strona CV: upload PDF → OCR → ekstrakcja ustrukturyzowanych danych → zapis wyniku. Strona ofert pracy (scraping + matching) ma na razie jedynie szkielet modelu danych.
+System dopasowujący kandydatów do ofert pracy na podstawie treści CV, przetwarzanego lokalnie przez pipeline OCR + heurystyka + LLM. W repozytorium zaimplementowana jest dziś strona CV: upload PDF → OCR → ekstrakcja ustrukturyzowanych danych → zapis wyniku → odczyt wyniku przez API. Strona ofert pracy (scraping + matching) ma na razie jedynie szkielet modelu danych. Frontend to na razie samodzielny szkielet SPA (React + Vite), jeszcze niepodłączony do API.
 
 Pełny opis architektury: [`docs/architecture/overview.md`](docs/architecture/overview.md) (oraz szczegóły pipeline'u w [`docs/architecture/cv-etl-pipline.md`](docs/architecture/cv-etl-pipline.md)).
 
@@ -16,6 +16,12 @@ Pełny opis architektury: [`docs/architecture/overview.md`](docs/architecture/ov
 - SQLModel / SQLAlchemy + PostgreSQL, Alembic (migracje)
 - Ekstrakcja tekstu: PyMuPDF, pdfplumber, Tesseract OCR, pdf2image
 - LLM: Ollama (`qwen2.5:3b`) jako lokalny serwer wnioskowania
+
+**Frontend**
+
+- React 19, TypeScript, Vite
+- Tailwind CSS v4, shadcn/ui, Radix UI
+- Husky + lint-staged + commitlint (git hooks)
 
 **DevOps / jakość kodu**
 
@@ -35,6 +41,8 @@ Pełny opis architektury: [`docs/architecture/overview.md`](docs/architecture/ov
 
 Pliki PDF trzymane są na dysku (`storage/cv_uploads/`), nie w obiektowym storage.
 
+Kluczowe endpointy: `POST /api/v1/cv/upload` (zapis + OCR, przetwarzanie LLM w tle) oraz `GET /api/v1/cv/{cv_document_id}/structured` (odczyt statusu i wyniku ustrukturyzowanych danych).
+
 ## Wymagania
 
 - Docker + Docker Compose
@@ -53,6 +61,9 @@ Pliki PDF trzymane są na dysku (`storage/cv_uploads/`), nie w obiektowym storag
 
 # Czyszczenie środowiska i artefaktów
 ./run.ps1 clean
+
+# Uruchomienie frontendu (npm run dev), niezależnie od backendu
+./run.ps1 frontend
 ```
 
 ### Linux
@@ -105,6 +116,16 @@ uv pip install --system .[dev]
 uvicorn app.main:app --reload
 ```
 
+**Frontend**
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Po starcie SPA jest dostępne pod adresem wypisanym przez Vite (domyślnie http://localhost:5173).
+
 ## Testy i jakość kodu
 
 ```bash
@@ -114,7 +135,7 @@ ruff check .
 mypy .
 ```
 
-Pre-commit hooki (ruff, formatowanie, lint commitów przez `commitlint.config.js`) są skonfigurowane w `.pre-commit-config.yaml` — włącz je lokalnie przez `pre-commit install`.
+Pre-commit hooki (ruff, formatowanie, lint commitów przez `commitlint.config.js`) są skonfigurowane w `.pre-commit-config.yaml` — włącz je lokalnie przez `pre-commit install`. Dla `frontend/` git hooki (lint-staged + commitlint) są skonfigurowane przez Husky i instalują się automatycznie po `npm install` (skrypt `prepare`).
 
 ## Struktura repozytorium
 
