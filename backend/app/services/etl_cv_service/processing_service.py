@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from typing import Any
 from uuid import UUID
 
@@ -31,10 +32,16 @@ class CVProcessingService:
             return
 
         llm_result = result.pop("llm_result", None)
-        structured_data: dict[str, Any] = {
+
+        dumped_llm = llm_result.model_dump(mode="json") if llm_result else None
+
+        raw_structured_data: dict[str, Any] = {
             **result,
-            "llm_result": llm_result.model_dump() if llm_result else None,
+            "llm_result": dumped_llm,
         }
+
+        structured_data = json.loads(json.dumps(raw_structured_data, default=str))
+
         status = "completed" if llm_result is not None else "partial"
 
         self._store(cv_document_id, structured_data=structured_data, status=status)
