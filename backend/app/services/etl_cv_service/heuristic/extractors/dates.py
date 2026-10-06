@@ -14,6 +14,12 @@ def _parse_single_date(date_str: str) -> date | str | None:
     if re.fullmatch(r"\d{4}", cleaned):
         return date(int(cleaned), 1, 1)
 
+    # Format kanoniczny "YYYY-MM" produkowany przez CVTextNormalizer._normalize_dates.
+    match_ym = re.fullmatch(r"(\d{4})-(\d{1,2})", cleaned)
+    if match_ym:
+        year, month = map(int, match_ym.groups())
+        return date(year, month, 1)
+
     match_my = re.fullmatch(r"(\d{1,2})[\./](\d{4})", cleaned)
     if match_my:
         month, year = map(int, match_my.groups())
@@ -34,8 +40,20 @@ def _parse_single_date(date_str: str) -> date | str | None:
 
 
 def extract_date_ranges(text: str) -> list[dict[str, date | bool | str | None]]:
+    # Jeden człon daty w jednym z obsługiwanych formatów - uporządkowane od
+    # najbardziej do najmniej specyficznego, tak aby np. "2020-03" nie było
+    # dopasowane tylko jako samo "2020":
+    #   DD.MM.YYYY | YYYY-MM (format kanoniczny z CVTextNormalizer) | MM.YYYY | YYYY
+    date_component_pattern = (
+        r"(?:\d{1,2}[\./]\d{1,2}[\./]\d{4}"
+        r"|\d{4}-\d{1,2}"
+        r"|\d{1,2}[\./]\d{4}"
+        r"|\d{4})"
+    )
+
     date_range_pattern = re.compile(
-        r"((?:\d{1,2}[\./])?(?:\d{1,2}[\./])?\d{4})\s*(?:-||—|do|to)\s*((?:\d{1,2}[\./])?(?:\d{1,2}[\./])?\d{4}|obecnie|present|aktualnie|now)",
+        rf"({date_component_pattern})\s*(?:-+|—|do|to)\s*"
+        rf"({date_component_pattern}|obecnie|present|aktualnie|now)",
         re.IGNORECASE,
     )
 

@@ -21,17 +21,12 @@ class Settings(BaseSettings):
     ALLOWED_MIME_TYPES: list[str] = ["application/pdf", "image/png", "image/jpeg"]
 
     # OCR Config
-    # Ścieżka do binarki Tesseract. Pozostaw puste (domyślnie), jeśli `tesseract`
-    # jest dostępny w PATH (standard na Linuksie/w kontenerach po `apt install
-    # tesseract-ocr`). Ustaw przez zmienną środowiskową TESSERACT_CMD tylko,
-    # gdy binarka nie jest w PATH (typowo na Windows, np.
-    # "C:\Program Files\Tesseract-OCR\tesseract.exe").
     TESSERACT_CMD: str | None = None
 
     # LLM Config
     OLLAMA_BASE_URL: str = "http://localhost:11434"
     OLLAMA_MODEL_NAME: str = "qwen2.5:3b"
-    OLLAMA_TIMEOUT: float = 90.0
+    OLLAMA_TIMEOUT: float = 200.0
     OLLAMA_MAX_RETRIES: int = 3
     OLLAMA_RETRY_BACKOFF_SECONDS: float = 1.0
 
