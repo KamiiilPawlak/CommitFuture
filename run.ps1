@@ -1,4 +1,4 @@
-param (
+﻿param (
     [string]$Action = "default",
     [switch]$ForceBuild,
     [switch]$NoCache,
@@ -58,6 +58,16 @@ function Invoke-Frontend {
     }
 }
 
+function Invoke-StartAll {
+    Write-Host "Uruchomienie backendu i frontendu w osobnych oknach..." -ForegroundColor Cyan
+
+    $repoRoot = $PSScriptRoot
+    Start-Process powershell -ArgumentList "-NoExit", "-Command", "Set-Location '$repoRoot'; .\run.ps1 backend"
+    Start-Process powershell -ArgumentList "-NoExit", "-Command", "Set-Location '$repoRoot'; .\run.ps1 frontend"
+
+    Write-Host "Backend (uvicorn) i frontend (npm run dev) zostaly wystartowane w nowych oknach PowerShell." -ForegroundColor Green
+}
+
 function Invoke-Quality {
     param (
         [string]$QualityTarget = "all"
@@ -101,6 +111,7 @@ $TaskRegistry = @{
     "dev"              = { Invoke-Dev }
     "backend"          = { Invoke-Start }
     "frontend"         = { Invoke-Frontend }
+    "start"            = { Invoke-StartAll }
     "quality"          = { Invoke-Quality -QualityTarget "all" }
     "quality-backend"  = { Invoke-Quality -QualityTarget "backend" }
     "quality-frontend" = { Invoke-Quality -QualityTarget "frontend" }

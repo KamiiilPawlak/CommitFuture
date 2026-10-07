@@ -67,6 +67,9 @@ Kluczowe endpointy: `POST /api/v1/cv/upload` (zapis + OCR, przetwarzanie LLM w t
 # Uruchomienie frontendu (npm run dev), niezależnie od backendu
 ./run.ps1 frontend
 
+# Uruchomienie backendu (uvicorn) i frontendu (npm run dev) razem, każdy w nowym oknie PowerShell
+./run.ps1 start
+
 # Narzędzia jakości kodu: backend + frontend / tylko backend / tylko frontend
 ./run.ps1 quality
 ./run.ps1 quality-backend
