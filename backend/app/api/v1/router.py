@@ -7,4 +7,4 @@ api_router = APIRouter()
 
 
 api_router.include_router(health.router, prefix="/health", tags=["System Health"])
-api_router.include_router(ingestion.router, prefix="/cv", tags=["CV Ingestion"])
+api_router.include_router(ingestion.router, tags=["CV Ingestion"])
