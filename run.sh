@@ -4,7 +4,7 @@ CYAN='\033[0;36m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 RED='\033[0;31m'
-NC='\033[0m' 
+NC='\033[0m'
 
 ACTION="default"
 FORCE_BUILD=false
@@ -56,8 +56,8 @@ invoke_build_task() {
     local script_path="./scripts/build.sh"
     if [ -f "$script_path" ]; then
         echo -e "${CYAN}Uruchomienie zadania: Build / Lifecycle...${NC}"
-        
-        
+
+
         local args=()
         if [ "$FORCE_BUILD" = true ]; then
             args+=("--force-build")
@@ -68,7 +68,7 @@ invoke_build_task() {
         if [ "$RECREATE" = true ]; then
             args+=("--recreate")
         fi
-        
+
         bash "$script_path" "${args[@]}"
     else
         echo -e "${RED}BŁĄD: Nie znaleziono pliku skryptu: $script_path${NC}"
@@ -80,7 +80,7 @@ invoke_dev() {
     local venv_path="backend/.venv/bin/activate"
     if [ -f "$venv_path" ]; then
         echo -e "${CYAN}Aktywacja środowiska wirtualnego Pythona...${NC}"
-        
+
         source "$venv_path"
         echo -e "${GREEN}Środowisko .venv aktywowane.${NC}"
     else

@@ -3,12 +3,12 @@ from datetime import datetime
 from typing import cast
 
 import dateparser
-import regex  # type: ignore[import-untyped]
+import regex
 from loguru import logger
 
 
 @dataclass(frozen=True)
-class NormalizerPatterns:
+class NormalizerPatterns:  # pylint: disable=too-many-instance-attributes
     dashes: regex.Pattern = field(
         default_factory=lambda: regex.compile(
             r"[\u2010\u2011\u2012\u2013\u2014\u2015\u2212]"
@@ -81,11 +81,11 @@ class CVTextNormalizer:
         text = self._normalize_phone_numbers(text)
         text = self._normalize_hyperlinks(text)
         text = self._normalize_language_levels(text)
-        return self._patterns.multiple_spaces.sub(" ", text)
+        return cast(str, self._patterns.multiple_spaces.sub(" ", text))
 
     def _normalize_punctuation(self, text: str) -> str:
         text = self._patterns.dashes.sub("-", text)
-        return self._patterns.quotes.sub('"', text)
+        return cast(str, self._patterns.quotes.sub('"', text))
 
     def _normalize_language_levels(self, text: str) -> str:
         return str(

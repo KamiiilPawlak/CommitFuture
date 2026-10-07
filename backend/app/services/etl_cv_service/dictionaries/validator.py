@@ -1,17 +1,17 @@
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Set
+from typing import Any
 
 DICTIONARY_PATH = Path(__file__).parent / "tech_stack.json"
 
 
 class TechStackValidator:
     def __init__(self, dict_path: Path = DICTIONARY_PATH) -> None:
-        self.synonym_map: Dict[str, str] = {}
-        self.canonical_skills: Set[str] = set()
+        self.synonym_map: dict[str, str] = {}
+        self.canonical_skills: set[str] = set()
         self._load_dictionary(dict_path)
 
-    def _register_category(self, category_data: Dict[str, List[str]]) -> None:
+    def _register_category(self, category_data: dict[str, list[str]]) -> None:
         """Helper do rejestrowania par kanoniczna_nazwa -> synonimy."""
         for canonical, synonyms in category_data.items():
             canonical_clean = canonical.lower()
@@ -25,8 +25,8 @@ class TechStackValidator:
         if not path.exists():
             return
 
-        with open(path, "r", encoding="utf-8") as f:
-            data: Dict[str, Any] = json.load(f)
+        with path.open(encoding="utf-8") as f:
+            data: dict[str, Any] = json.load(f)
 
         for key, value in data.items():
             if isinstance(value, dict):
@@ -38,10 +38,10 @@ class TechStackValidator:
         clean_skill = skill.strip().lower()
         return self.synonym_map.get(clean_skill)
 
-    def validate_skills(self, skills: List[str]) -> List[str]:
-        normalized: Set[str] = set()
+    def validate_skills(self, skills: list[str]) -> list[str]:
+        normalized: set[str] = set()
         for skill in skills:
             canonical = self.normalize_skill(skill)
             if canonical:
                 normalized.add(canonical)
-        return sorted(list(normalized))
+        return sorted(normalized)

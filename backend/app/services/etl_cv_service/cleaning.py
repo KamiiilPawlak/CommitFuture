@@ -27,7 +27,7 @@ def _repair_ocr_mojibake(text: str) -> str:
     text = ftfy.fix_text(text)
 
     text = MOJIBAKE_MID_PATTERN.sub(r"\1ż\2", text)
-    return MOJIBAKE_START_PATTERN.sub(r"ż\1", text)
+    return cast(str, MOJIBAKE_START_PATTERN.sub(r"ż\1", text))
 
 
 def _remove_graphic_noise(text: str) -> str:

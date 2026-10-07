@@ -25,8 +25,8 @@ engine = create_engine(settings.DATABASE_URL, echo=False)
 
 @pytest.fixture(scope="session", autouse=True)
 def setup_database() -> Generator[None, None, None]:
-    from app.models.cv_document import CVDocumentLake  # noqa: PLC0415
-    from app.models.cv_raw_text import CVRawText  # noqa: PLC0415
+    from app.models.cv_document import CVDocumentLake
+    from app.models.cv_raw_text import CVRawText
 
     _ = [CVDocumentLake, CVRawText]
 

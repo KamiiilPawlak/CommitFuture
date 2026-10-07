@@ -1,4 +1,4 @@
-import regex  # type: ignore[import-untyped]
+import regex
 
 EMAIL_PATTERN: regex.Pattern[str] = regex.compile(
     r"[\w.%+-]+@[\w.-]+\.[A-Za-z]{2,}", regex.IGNORECASE

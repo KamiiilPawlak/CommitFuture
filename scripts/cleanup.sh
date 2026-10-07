@@ -5,7 +5,7 @@ YELLOW='\033[1;33m'
 GREEN='\033[0;32m'
 GRAY='\033[0;90m'
 RED='\033[0;31m'
-NC='\033[0m' 
+NC='\033[0m'
 
 
 invoke_python_cleanup() {
@@ -33,9 +33,9 @@ invoke_python_cleanup() {
 
 test_docker_running() {
     if docker info >/dev/null 2>&1; then
-        return 0 
+        return 0
     else
-        return 1 
+        return 1
     fi
 }
 
@@ -48,8 +48,8 @@ invoke_docker_cleanup() {
 
 
     read -p "Czy chcesz usunąć powiązane kontenery Docker? (y/n): " odpowiedz
-    
-  
+
+
     odpowiedz=$(echo "$odpowiedz" | tr '[:upper:]' '[:lower:]')
 
     if [[ "$odpowiedz" != "y" && "$odpowiedz" != "yes" && "$odpowiedz" != "t" && "$odpowiedz" != "tak" ]]; then

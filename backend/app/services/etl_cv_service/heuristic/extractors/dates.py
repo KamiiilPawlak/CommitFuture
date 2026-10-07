@@ -2,7 +2,7 @@ from datetime import date
 from typing import cast
 
 import dateparser
-import regex as re  # type: ignore[import-untyped]
+import regex as re
 
 
 def _parse_single_date(date_str: str) -> date | str | None:

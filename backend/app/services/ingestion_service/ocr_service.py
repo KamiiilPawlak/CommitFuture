@@ -2,7 +2,7 @@ import asyncio
 import io
 
 import pdfplumber
-import pytesseract  # type: ignore[import-untyped]
+import pytesseract
 from loguru import logger
 from pdf2image import convert_from_bytes
 from PIL import Image, ImageFilter, ImageOps

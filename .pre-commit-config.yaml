@@ -5,6 +5,7 @@ repos:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: check-yaml
+        exclude: ^mkdocs\.yml$
       - id: check-added-large-files
       - id: mixed-line-ending
         name: Zapobieganie windowsowym końcom linii (CRLF -> LF)
@@ -15,15 +16,24 @@ repos:
     rev: v0.5.0
     hooks:
       - id: ruff
-        args: [--fix, --config=backend/pyproject.toml]
+        args: [--fix, --config=backend/ruff.toml]
       - id: ruff-format
-        args: [--config=backend/pyproject.toml]
+        args: [--config=backend/ruff.toml]
 
   - repo: local
     hooks:
       - id: mypy
         name: mypy
         entry: mypy --config-file=backend/mypy.ini backend/app
+        language: system
+        types: [python]
+        pass_filenames: false
+
+  - repo: local
+    hooks:
+      - id: pylint
+        name: pylint
+        entry: pylint --rcfile=backend/.pylintrc backend/app
         language: system
         types: [python]
         pass_filenames: false

@@ -1,4 +1,4 @@
-import magic  # type: ignore[import-untyped]
+import magic
 from loguru import logger
 
 from app.core.config import settings

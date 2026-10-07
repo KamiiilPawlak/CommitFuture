@@ -13,7 +13,7 @@ setup_logging()
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:  # noqa: ARG001
+async def lifespan(_app: FastAPI) -> AsyncGenerator[None, None]:
     logger.info("Uruchomienie aplikacji")
     init_db()
     yield

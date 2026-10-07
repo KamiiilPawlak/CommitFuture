@@ -13,7 +13,7 @@ from app.services.etl_cv_service.llm.prompts import (
 
 
 class OllamaLLMClient:
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         base_url: str = settings.OLLAMA_BASE_URL,
         model_name: str = settings.OLLAMA_MODEL_NAME,

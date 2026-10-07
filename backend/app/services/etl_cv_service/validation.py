@@ -40,11 +40,7 @@ def detect_llm_hallucinations(
             )
 
     heuristic_email = heuristic_result.get("email")
-    if (
-        heuristic_email
-        and llm_email
-        and heuristic_email.lower() != llm_email.lower()
-    ):
+    if heuristic_email and llm_email and heuristic_email.lower() != llm_email.lower():
         warnings.append(
             f"Rozbieżność email: heurystyka='{heuristic_email}' vs LLM='{llm_email}'."
         )

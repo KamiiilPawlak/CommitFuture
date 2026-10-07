@@ -47,8 +47,8 @@ ignore = [
 ]
 
 [lint.per-file-ignores]
-"tests/**/*" = ["S101", "ARG001", "PLR2004"]
-"scripts/**/*" = ["T201"]
+"**/tests/**/*" = ["S101", "ARG001", "PLR2004"]
+"**/scripts/**/*" = ["T201"]
 
 [lint.mccabe]
 max-complexity = 10

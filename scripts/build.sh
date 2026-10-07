@@ -4,7 +4,7 @@ CYAN='\033[0;36m'
 YELLOW='\033[1;33m'
 GREEN='\033[0;32m'
 RED='\033[0;31m'
-NC='\033[0m' 
+NC='\033[0m'
 
 FORCE_BUILD=false
 NO_CACHE=false
@@ -41,10 +41,10 @@ test_docker_images_exist() {
             continue
         fi
         if [ -z "$(docker images -q "$img" 2>/dev/null)" ]; then
-            return 1 
+            return 1
         fi
     done
-    return 0 
+    return 0
 }
 
 

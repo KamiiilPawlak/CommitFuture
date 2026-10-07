@@ -26,9 +26,7 @@ class StorageService:
         while chunk := await file.read(chunk_size):
             total_size += len(chunk)
             if total_size > max_size:
-                logger.error(
-                    f"Plik przekracza maksymalny rozmiar: > {max_size} bajtów"
-                )
+                logger.error(f"Plik przekracza maksymalny rozmiar: > {max_size} bajtów")
                 msg_size = (
                     f"Przesłany plik jest za duży. Maksymalny rozmiar to "
                     f"{max_size // (1024 * 1024)} MB."
@@ -64,14 +62,14 @@ class StorageService:
         except Exception as err:
             logger.error(f"Błąd zapisu pliku na dysku: {err}")
             msg_1 = "Wystąpił błąd podczas zapisu pliku na dysku serwera."
-            raise ValueError(msg_1)  # noqa: B904
+            raise ValueError(msg_1) from err
 
         return file.filename, str(destination_path), file_size
 
     async def delete_file(self, file_path: str | Path) -> None:
         path = Path(file_path)
-        if path.exists():  # noqa: ASYNC240
-            path.unlink()  # noqa: ASYNC240
+        if path.exists():
+            path.unlink()
             logger.info(f"Plik fizyczny został usunięty z dysku: {path}")
         else:
             logger.warning(f"Próbowano usunąć plik, ale nie istnieje na dysku: {path}")

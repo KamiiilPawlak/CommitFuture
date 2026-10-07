@@ -1,4 +1,4 @@
-from flashtext import KeywordProcessor  # type: ignore[import-untyped]
+from flashtext import KeywordProcessor
 
 
 class FlashLookupEngine:

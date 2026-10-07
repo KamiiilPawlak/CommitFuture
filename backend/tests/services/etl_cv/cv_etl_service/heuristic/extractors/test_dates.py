@@ -30,7 +30,7 @@ from app.services.etl_cv_service.heuristic.extractors.dates import (
             ],
         ),
         (
-            "Backend Developer 2021 – obecnie",
+            "Backend Developer 2021 – obecnie",  # noqa: RUF001
             [
                 DateRange(
                     start_date="2021-01-01",
