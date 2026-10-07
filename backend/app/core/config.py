@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     OLLAMA_MODEL_NAME: str = "qwen2.5:1.5b"
     OLLAMA_NUM_THREAD: int = 4
     OLLAMA_TEMPERATURE: float = 0.0
-    OLLAMA_NUM_CTX: int = 2048
+    OLLAMA_NUM_CTX: int = 1024
     OLLAMA_TIMEOUT: float = 200.0
     OLLAMA_MAX_RETRIES: int = 3
     OLLAMA_RETRY_BACKOFF_SECONDS: float = 1.0

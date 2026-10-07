@@ -6,11 +6,14 @@ import { useCvStore } from "@/store/cvStore"
 function CvResultPage() {
   const { cvDocumentId } = useParams<{ cvDocumentId: string }>()
   const fetchResult = useCvStore((state) => state.fetchResult)
+  const stopPolling = useCvStore((state) => state.stopPolling)
   const entry = useCvStore((state) => (cvDocumentId ? state.results[cvDocumentId] : undefined))
 
   useEffect(() => {
-    if (cvDocumentId) void fetchResult(cvDocumentId)
-  }, [cvDocumentId, fetchResult])
+    if (!cvDocumentId) return
+    void fetchResult(cvDocumentId)
+    return () => stopPolling(cvDocumentId)
+  }, [cvDocumentId, fetchResult, stopPolling])
 
   return (
     <div className="flex min-h-screen flex-col items-center gap-4 bg-background p-8 text-foreground">
@@ -18,6 +21,9 @@ function CvResultPage() {
       <p className="text-sm text-muted-foreground">ID dokumentu: {cvDocumentId}</p>
       {(!entry || entry.status === "loading") && (
         <p className="text-sm text-muted-foreground">Ładowanie...</p>
+      )}
+      {entry?.status === "pending" && (
+        <p className="text-sm text-muted-foreground">Przetwarzanie CV, proszę czekać...</p>
       )}
       {entry?.status === "error" && <p className="text-sm text-destructive">{entry.error}</p>}
       {entry?.status === "success" && (
