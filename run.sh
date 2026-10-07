@@ -14,7 +14,7 @@ RECREATE=false
 
 while [[ "$#" -gt 0 ]]; do
     case $1 in
-        clean|cleanup|build|dev|default|frontend|quality|quality-backend|quality-frontend)
+        clean|cleanup|build|dev|default|frontend|quality|quality-backend|quality-frontend|help)
             ACTION="$1"
             shift
             ;;
@@ -114,6 +114,11 @@ invoke_default_workflow() {
     invoke_build_task
 }
 
+show_help() {
+    echo -e "${CYAN}Uzycie: ./run.sh <akcja> [--force-build] [--no-cache] [--recreate]${NC}"
+    echo -e "${YELLOW}Dostepne akcje: clean, cleanup, build, dev, frontend, quality, quality-backend, quality-frontend, default, help${NC}"
+}
+
 
 invoke_orchestrator() {
     case "$ACTION" in
@@ -141,9 +146,12 @@ invoke_orchestrator() {
         default)
             invoke_default_workflow
             ;;
+        help)
+            show_help
+            ;;
         *)
             echo -e "${RED}BŁĄD: Nieznana akcja '$ACTION'.${NC}"
-            echo -e "${YELLOW}Dostępne akcje: clean, cleanup, build, dev, frontend, quality, quality-backend, quality-frontend, default${NC}"
+            show_help
             exit 1
             ;;
     esac
