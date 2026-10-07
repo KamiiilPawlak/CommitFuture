@@ -13,6 +13,10 @@ class WorkExperienceDto(BaseModel):
     responsibilities: list[str] = Field(
         default_factory=list, description="Kluczowe obowiązki i osiągnięcia"
     )
+    skills_used: list[str] = Field(
+        default_factory=list,
+        description="Technologie i narzędzia używane konkretnie na tym stanowisku (nie globalnie w całym CV)",
+    )
 
 
 class EducationDto(BaseModel):
