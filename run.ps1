@@ -57,6 +57,20 @@ function Invoke-Frontend {
     }
 }
 
+function Invoke-Quality {
+    param (
+        [string]$QualityTarget = "all"
+    )
+    $ScriptPath = ".\scripts\quality.ps1"
+    if (Test-Path $ScriptPath) {
+        Write-Host "Uruchomienie zadania: Quality ($QualityTarget)..." -ForegroundColor Cyan
+        & $ScriptPath -Target $QualityTarget
+    }
+    else {
+        throw "Nie znaleziono pliku skryptu: $ScriptPath"
+    }
+}
+
 function Invoke-BuildTask {
     $ScriptPath = ".\scripts\build.ps1"
     if (Test-Path $ScriptPath) {
@@ -81,6 +95,9 @@ $TaskRegistry = @{
     "dev"     = { Invoke-Dev }
     "start"   = { Invoke-Start }
     "frontend" = { Invoke-Frontend }
+    "quality"          = { Invoke-Quality -QualityTarget "all" }
+    "quality-backend"  = { Invoke-Quality -QualityTarget "backend" }
+    "quality-frontend" = { Invoke-Quality -QualityTarget "frontend" }
 }
 
 
