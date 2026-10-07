@@ -1,9 +1,10 @@
 # app/models/ingestion_dto.py
 from datetime import datetime
-from typing import Any
 from uuid import UUID
 
 from pydantic import BaseModel, Field
+
+from app.schema.cv_structured_record import CVStructuredRecord
 
 
 class CVIngestionResponse(BaseModel):
@@ -19,5 +20,5 @@ class CVIngestionResponse(BaseModel):
 class CVStructuredDataResponse(BaseModel):
     cv_document_id: UUID
     status: str
-    structured_data: dict[str, Any] | None
+    structured_data: CVStructuredRecord | None
     processed_at: datetime

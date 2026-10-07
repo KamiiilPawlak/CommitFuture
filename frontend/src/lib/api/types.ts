@@ -10,12 +10,37 @@ export interface CvIngestionResponse {
 
 export type CvStructuredStatus = "pending" | "completed" | "partial" | "failed"
 
-export interface WorkExperienceDto {
+export type FieldSource = "heuristic" | "llm" | "merged"
+
+export interface PersonalInfoRecord {
+  full_name: string | null
+  email: string | null
+  phone: string | null
+  location: string | null
+  linkedin_url: string | null
+}
+
+export interface WorkExperienceRecord {
   company: string | null
   role: string | null
   start_date: string | null
   end_date: string | null
+  is_current: boolean
   responsibilities: string[]
+  skills_used: string[]
+}
+
+export interface HardSkillRecord {
+  name: string
+  months_used: number | null
+  last_used: string | null
+  source: FieldSource
+}
+
+export interface SkillsRecord {
+  hard: HardSkillRecord[]
+  soft: string[]
+  all_tech_stack_flat: string[]
 }
 
 export interface EducationDto {
@@ -30,49 +55,29 @@ export interface LanguageDto {
   level: string | null
 }
 
-export interface PersonalInfoDto {
-  full_name: string | null
-  email: string | null
-  phone: string | null
-  location: string | null
-  linkedin_url: string | null
+export interface FieldConfidenceRecord {
+  email: FieldSource | null
+  phone: FieldSource | null
 }
 
-export interface ProjectDto {
-  name: string
-  description: string | null
-  technologies: string[]
-}
-
-export interface CvLlmDto {
-  personal_info: PersonalInfoDto
-  summary: string | null
-  hard_skills: string[]
-  soft_skills: string[]
-  work_experience: WorkExperienceDto[]
-  projects: ProjectDto[]
-  education: EducationDto[]
-  languages: LanguageDto[]
-  certifications: string[]
-}
-
-export interface DateRangeDto {
-  start_date: string | null
-  end_date: string | null
-  is_current: boolean
+export interface ValidationRecord {
+  warnings: string[]
+  field_confidence: FieldConfidenceRecord
 }
 
 export interface CvStructuredData {
-  email: string | null
-  phones: string[]
-  dates: DateRangeDto[]
-  tech_stack: string[]
-  job_titles: string[]
-  total_experience_months: number
-  total_experience_years: number
-  llm_result: CvLlmDto | null
-  llm_warnings: string[]
-  llm_hard_skills_validated: string[]
+  cv_document_id: string | null
+  status: string | null
+  personal_info: PersonalInfoRecord | null
+  summary: string | null
+  total_experience_months: number | null
+  seniority_estimate: string | null
+  work_experience: WorkExperienceRecord[]
+  skills: SkillsRecord | null
+  education: EducationDto[]
+  languages: LanguageDto[]
+  certifications: string[]
+  validation: ValidationRecord | null
 }
 
 export interface CvStructuredDataResponse {
