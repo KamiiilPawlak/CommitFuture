@@ -22,6 +22,8 @@ Pełny opis architektury: [`docs/architecture/overview.md`](docs/architecture/ov
 - React 19, TypeScript, Vite
 - Tailwind CSS v4, shadcn/ui, Radix UI
 - Husky + lint-staged + commitlint (git hooks)
+- ESLint, Prettier, Knip (lint, formatowanie, martwy kod)
+- Jest + Testing Library (testy komponentów)
 
 **DevOps / jakość kodu**
 
@@ -64,6 +66,11 @@ Kluczowe endpointy: `POST /api/v1/cv/upload` (zapis + OCR, przetwarzanie LLM w t
 
 # Uruchomienie frontendu (npm run dev), niezależnie od backendu
 ./run.ps1 frontend
+
+# Narzędzia jakości kodu: backend + frontend / tylko backend / tylko frontend
+./run.ps1 quality
+./run.ps1 quality-backend
+./run.ps1 quality-frontend
 ```
 
 ### Linux
@@ -80,6 +87,14 @@ chmod +x run.sh scripts/*.sh
 
 # Czyszczenie środowiska
 ./run.sh clean
+
+# Uruchomienie frontendu (npm run dev), niezależnie od backendu
+./run.sh frontend
+
+# Narzędzia jakości kodu: backend + frontend / tylko backend / tylko frontend
+./run.sh quality
+./run.sh quality-backend
+./run.sh quality-frontend
 ```
 
 albo bezpośrednio:
@@ -135,7 +150,15 @@ ruff check .
 mypy .
 ```
 
-Pre-commit hooki (ruff, formatowanie, lint commitów przez `commitlint.config.js`) są skonfigurowane w `.pre-commit-config.yaml` — włącz je lokalnie przez `pre-commit install`. Dla `frontend/` git hooki (lint-staged + commitlint) są skonfigurowane przez Husky i instalują się automatycznie po `npm install` (skrypt `prepare`).
+```bash
+cd frontend
+npm run test          # testy jednostkowe (Jest + Testing Library)
+npm run lint           # ESLint
+npm run format:check   # sprawdzenie formatowania (Prettier)
+npm run knip           # wykrywanie nieużywanego kodu/zależności
+```
+
+Pre-commit hooki (ruff, formatowanie, lint commitów przez `commitlint.config.js`) są skonfigurowane w `.pre-commit-config.yaml` — włącz je lokalnie przez `pre-commit install`. Dla `frontend/` git hooki (lint-staged + commitlint) są skonfigurowane przez Husky i instalują się automatycznie po `npm install` (skrypt `prepare`) — przy każdym commicie uruchamiają ESLint i Prettier na zmienionych plikach.
 
 ## Struktura repozytorium
 
@@ -146,6 +169,8 @@ docs/           # Dokumentacja architektury (MkDocs)
 storage/        # Pliki CV zapisywane na dysku (runtime, nie commitowane)
 docker-compose.yml
 run.ps1         # Skrypt startowy dla Windows/PowerShell
+run.sh          # Skrypt startowy dla Linux/macOS (bash)
+scripts/        # Skrypty pomocnicze (build, cleanup) dla run.ps1 / run.sh
 checklist.md    # Lista TODO wg priorytetów
 ```
 

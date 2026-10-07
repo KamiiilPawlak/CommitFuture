@@ -14,7 +14,7 @@ RECREATE=false
 
 while [[ "$#" -gt 0 ]]; do
     case $1 in
-        clean|cleanup|build|dev|default)
+        clean|cleanup|build|dev|default|frontend|quality|quality-backend|quality-frontend)
             ACTION="$1"
             shift
             ;;
@@ -88,6 +88,28 @@ invoke_dev() {
     fi
 }
 
+invoke_frontend() {
+    local frontend_path="./frontend"
+    if [ ! -d "$frontend_path" ]; then
+        echo -e "${RED}BŁĄD: Nie znaleziono katalogu frontend${NC}"
+        exit 1
+    fi
+    echo -e "${CYAN}Uruchomienie React (npm run dev)...${NC}"
+    (cd "$frontend_path" && npm run dev)
+}
+
+invoke_quality() {
+    local quality_target="$1"
+    local script_path="./scripts/quality.sh"
+    if [ -f "$script_path" ]; then
+        echo -e "${CYAN}Uruchomienie zadania: Quality (${quality_target})...${NC}"
+        bash "$script_path" "$quality_target"
+    else
+        echo -e "${RED}BŁĄD: Nie znaleziono pliku skryptu: $script_path${NC}"
+        exit 1
+    fi
+}
+
 invoke_default_workflow() {
     invoke_build_task
 }
@@ -104,12 +126,24 @@ invoke_orchestrator() {
         dev)
             invoke_dev
             ;;
+        frontend)
+            invoke_frontend
+            ;;
+        quality)
+            invoke_quality "all"
+            ;;
+        quality-backend)
+            invoke_quality "backend"
+            ;;
+        quality-frontend)
+            invoke_quality "frontend"
+            ;;
         default)
             invoke_default_workflow
             ;;
         *)
             echo -e "${RED}BŁĄD: Nieznana akcja '$ACTION'.${NC}"
-            echo -e "${YELLOW}Dostępne akcje: clean, cleanup, build, dev, default${NC}"
+            echo -e "${YELLOW}Dostępne akcje: clean, cleanup, build, dev, frontend, quality, quality-backend, quality-frontend, default${NC}"
             exit 1
             ;;
     esac

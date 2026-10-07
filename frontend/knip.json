@@ -1,5 +1,5 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
   "ignore": ["src/components/ui/**"],
-  "ignoreDependencies": ["@commitlint/config-conventional"]
+  "ignoreDependencies": ["@commitlint/config-conventional", "lint-staged"]
 }
