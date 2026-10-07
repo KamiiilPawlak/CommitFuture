@@ -9,6 +9,7 @@ from sqlmodel import Session
 
 from app.db.database import engine
 from app.repositories.cv_repository import CVRepository
+from app.services.etl_cv_service.merge import build_unified_record
 from app.services.etl_cv_service.pipeline import CVPipelineOrchestrator
 
 
@@ -32,18 +33,26 @@ class CVProcessingService:
             return
 
         llm_result = result.pop("llm_result", None)
+        llm_warnings = result.pop("llm_warnings", [])
+        validated_hard_skills = result.pop("llm_hard_skills_validated", [])
 
-        dumped_llm = llm_result.model_dump(mode="json") if llm_result else None
+        unified_record = build_unified_record(
+            heuristic_result=result,
+            llm_result=llm_result,
+            llm_warnings=llm_warnings,
+            validated_hard_skills=validated_hard_skills,
+            validator=self.orchestrator.tech_stack_validator,
+        )
+
+        status = "completed" if llm_result is not None else "partial"
 
         raw_structured_data: dict[str, Any] = {
-            **result,
-            "education": dumped_llm["education"] if dumped_llm else [],
-            "llm_result": dumped_llm,
+            "cv_document_id": str(cv_document_id),
+            "status": status,
+            **unified_record,
         }
 
         structured_data = json.loads(json.dumps(raw_structured_data, default=str))
-
-        status = "completed" if llm_result is not None else "partial"
 
         self._store(cv_document_id, structured_data=structured_data, status=status)
 

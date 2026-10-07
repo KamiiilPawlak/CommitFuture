@@ -45,7 +45,11 @@ class CVPipelineOrchestrator:
 
         try:
             logger.debug("[ETL Orchestrator] Wysyłanie zapytania do Ollama LLM...")
-            llm_result = await self.llm_client.parse_cv(normalized_text)
+            llm_result = await self.llm_client.parse_cv(
+                normalized_text,
+                heuristic_dates=heuristic_result.get("dates"),
+                heuristic_job_titles=heuristic_result.get("job_titles"),
+            )
         except Exception as error:
             logger.warning(
                 f"[ETL Orchestrator] Błąd połączenia lub przetwarzania LLM: {error}. "

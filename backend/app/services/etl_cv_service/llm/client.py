@@ -13,7 +13,7 @@ from app.services.etl_cv_service.llm.prompts import (
 
 
 class OllamaLLMClient:
-    def __init__(  # noqa: PLR0913
+    def __init__(
         self,
         base_url: str = settings.OLLAMA_BASE_URL,
         model_name: str = settings.OLLAMA_MODEL_NAME,
@@ -27,9 +27,18 @@ class OllamaLLMClient:
         self.max_retries = max_retries
         self.retry_backoff_seconds = retry_backoff_seconds
 
-    async def parse_cv(self, raw_text: str) -> CvLlmDto:
+    async def parse_cv(
+        self,
+        raw_text: str,
+        heuristic_dates: list[dict[str, Any]] | None = None,
+        heuristic_job_titles: list[str] | None = None,
+    ) -> CvLlmDto:
         endpoint = f"{self.base_url}/api/chat"
-        prompt = build_cv_extraction_prompt(raw_text)
+        prompt = build_cv_extraction_prompt(
+            raw_text,
+            heuristic_dates=heuristic_dates,
+            heuristic_job_titles=heuristic_job_titles,
+        )
 
         payload: dict[str, Any] = {
             "model": self.model_name,
