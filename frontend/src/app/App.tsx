@@ -1,13 +1,14 @@
-import { Button } from "@/components/ui/button"
+import { Route, Routes } from "react-router-dom"
+
+import CvResultPage from "@/app/pages/CvResultPage"
+import UploadPage from "@/app/pages/UploadPage"
 
 function App() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="flex flex-col items-center gap-4">
-        <h1 className="text-2xl font-semibold text-foreground">CommitFuture</h1>
-        <Button>Shadcn UI działa</Button>
-      </div>
-    </div>
+    <Routes>
+      <Route path="/" element={<UploadPage />} />
+      <Route path="/cv/:cvDocumentId" element={<CvResultPage />} />
+    </Routes>
   )
 }
 
