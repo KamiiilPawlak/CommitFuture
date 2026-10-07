@@ -1,6 +1,7 @@
 param (
     [switch]$ForceBuild,
-    [switch]$NoCache
+    [switch]$NoCache,
+    [switch]$Recreate
 )
 
 

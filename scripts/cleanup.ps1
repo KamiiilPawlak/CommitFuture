@@ -24,6 +24,7 @@ function Invoke-DockerCleanup {
     $odpowiedz = Read-Host "Czy chcesz usunąć wszystkie kontenery Docker? (y/n)"
     if ($odpowiedz -notin "t", "tak", "y", "Y") {
         Write-Host "Pominięto czyszczenie kontenerów Docker" -ForegroundColor DarkGray
+        return
     }
 
     Write-Host "Zatrzymanie i czyszczenie kontenerów Docker... " -ForegroundColor Cyan

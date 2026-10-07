@@ -1,7 +1,8 @@
 param (
     [string]$Action = "default",
     [switch]$ForceBuild,
-    [switch]$NoCache
+    [switch]$NoCache,
+    [switch]$Recreate
 )
 
 
@@ -9,7 +10,7 @@ function Invoke-CleanupTask {
     $ScriptPath = ".\scripts\cleanup.ps1"
     if (Test-Path $ScriptPath) {
         Write-Host "Uruchomienie zadania: Cleanup..." -ForegroundColor Cyan
-        & $ScriptPath -ForceBuild:$ForceBuild -NoCache:$NoCache
+        & $ScriptPath
     }
     else {
         throw "Nie znaleziono pliku skryptu: $ScriptPath"
@@ -75,7 +76,7 @@ function Invoke-BuildTask {
     $ScriptPath = ".\scripts\build.ps1"
     if (Test-Path $ScriptPath) {
         Write-Host "Uruchomienie zadania: Build / Lifecycle..." -ForegroundColor Cyan
-        & $ScriptPath -ForceBuild:$ForceBuild -NoCache:$NoCache
+        & $ScriptPath -ForceBuild:$ForceBuild -NoCache:$NoCache -Recreate:$Recreate
     }
     else {
         throw "Nie znaleziono pliku skryptu: $ScriptPath"
@@ -83,8 +84,13 @@ function Invoke-BuildTask {
 }
 
 function Invoke-DefaultWorkflow {
-    Invoke-BuildTask -ForceBuild:$ForceBuild -NoCache:$NoCache
-    
+    Invoke-BuildTask
+}
+
+function Show-Help {
+    $availableActions = $TaskRegistry.Keys -join ', '
+    Write-Host "Uzycie: .\run.ps1 [-Action] <akcja> [-ForceBuild] [-NoCache] [-Recreate]" -ForegroundColor Cyan
+    Write-Host "Dostepne akcje: $availableActions" -ForegroundColor Yellow
 }
 
 $TaskRegistry = @{
@@ -98,6 +104,7 @@ $TaskRegistry = @{
     "quality"          = { Invoke-Quality -QualityTarget "all" }
     "quality-backend"  = { Invoke-Quality -QualityTarget "backend" }
     "quality-frontend" = { Invoke-Quality -QualityTarget "frontend" }
+    "help"             = { Show-Help }
 }
 
 
@@ -120,9 +127,8 @@ function Invoke-Orchestrator {
         }
     }
     else {
-        $availableActions = $TaskRegistry.Keys -join ', '
         Write-Host "BŁĄD: Nieznana akcja '$TargetAction'." -ForegroundColor Red
-        Write-Host "Dostępne akcje: $availableActions" -ForegroundColor Yellow
+        Show-Help
         exit 1
     }
 }
