@@ -73,7 +73,7 @@ services:
       [
         "/bin/sh",
         "-c",
-        "ollama serve & sleep 3 && ollama pull qwen2.5:3b && wait",
+        "ollama serve & sleep 3 && ollama pull qwen2.5:1.5b && wait",
       ]
 volumes:
   postgres_data:

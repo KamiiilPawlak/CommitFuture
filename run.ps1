@@ -88,13 +88,13 @@ function Invoke-DefaultWorkflow {
 }
 
 $TaskRegistry = @{
-    "clean"   = { Invoke-CleanupTask }
-    "cleanup" = { Invoke-CleanupTask }
-    "build"   = { Invoke-BuildTask }
-    "default" = { Invoke-DefaultWorkflow }
-    "dev"     = { Invoke-Dev }
-    "start"   = { Invoke-Start }
-    "frontend" = { Invoke-Frontend }
+    "clean"            = { Invoke-CleanupTask }
+    "cleanup"          = { Invoke-CleanupTask }
+    "build"            = { Invoke-BuildTask }
+    "default"          = { Invoke-DefaultWorkflow }
+    "dev"              = { Invoke-Dev }
+    "backend"          = { Invoke-Start }
+    "frontend"         = { Invoke-Frontend }
     "quality"          = { Invoke-Quality -QualityTarget "all" }
     "quality-backend"  = { Invoke-Quality -QualityTarget "backend" }
     "quality-frontend" = { Invoke-Quality -QualityTarget "frontend" }
