@@ -2,6 +2,7 @@ from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
 
 from app.api.v1.router import api_router
@@ -20,8 +21,15 @@ async def lifespan(_app: FastAPI) -> AsyncGenerator[None, None]:
     logger.info("Zamykanie aplikacji")
 
 
-app = FastAPI(title="CV AI Matcher", lifespan=lifespan)
+app = FastAPI(title="CommitFuture", lifespan=lifespan)
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(api_router, prefix="/api/v1")
 
