@@ -14,7 +14,7 @@ RECREATE=false
 
 while [[ "$#" -gt 0 ]]; do
     case $1 in
-        clean|cleanup|build|dev|default|frontend|quality|quality-backend|quality-frontend|help)
+        clean|cleanup|build|dev|default|backend|frontend|start|stop|stop-backend|stop-frontend|quality|quality-backend|quality-frontend|help)
             ACTION="$1"
             shift
             ;;
@@ -88,15 +88,7 @@ invoke_dev() {
     fi
 }
 
-invoke_frontend() {
-    local frontend_path="./frontend"
-    if [ ! -d "$frontend_path" ]; then
-        echo -e "${RED}BŁĄD: Nie znaleziono katalogu frontend${NC}"
-        exit 1
-    fi
-    echo -e "${CYAN}Uruchomienie React (npm run dev)...${NC}"
-    (cd "$frontend_path" && npm run dev)
-}
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/scripts/process-tracking.sh"
 
 invoke_quality() {
     local quality_target="$1"
@@ -116,7 +108,7 @@ invoke_default_workflow() {
 
 show_help() {
     echo -e "${CYAN}Uzycie: ./run.sh <akcja> [--force-build] [--no-cache] [--recreate]${NC}"
-    echo -e "${YELLOW}Dostepne akcje: clean, cleanup, build, dev, frontend, quality, quality-backend, quality-frontend, default, help${NC}"
+    echo -e "${YELLOW}Dostepne akcje: clean, cleanup, build, dev, backend, frontend, start, stop, stop-backend, stop-frontend, quality, quality-backend, quality-frontend, default, help${NC}"
 }
 
 
@@ -131,8 +123,23 @@ invoke_orchestrator() {
         dev)
             invoke_dev
             ;;
+        backend)
+            invoke_start
+            ;;
         frontend)
             invoke_frontend
+            ;;
+        start)
+            invoke_start_all
+            ;;
+        stop)
+            invoke_stop_all
+            ;;
+        stop-backend)
+            invoke_stop_backend
+            ;;
+        stop-frontend)
+            invoke_stop_frontend
             ;;
         quality)
             invoke_quality "all"

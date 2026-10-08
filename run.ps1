@@ -28,45 +28,7 @@ function Invoke-Dev {
     }
 }
 
-function Invoke-Start {
-    $uvicornPath = Resolve-Path ".\backend\.venv\Scripts\uvicorn.exe" -ErrorAction SilentlyContinue
-    if (-not $uvicornPath) {
-        throw "Nie znaleziono uvicorn w srodowisku wirtualnym: .\backend\.venv\Scripts\uvicorn.exe"
-    }
-    Write-Host "Uruchomienie FastAPI (uvicorn)..." -ForegroundColor Cyan
-    Push-Location backend
-    try {
-        & $uvicornPath app.main:app --reload
-    }
-    finally {
-        Pop-Location
-    }
-}
-
-function Invoke-Frontend {
-    $frontendPath = Resolve-Path ".\frontend" -ErrorAction SilentlyContinue
-    if (-not $frontendPath) {
-        throw "Nie znaleziono katalogu frontend"
-    }
-    Write-Host "Uruchomienie React (npm run dev)..." -ForegroundColor Cyan
-    Push-Location $frontendPath
-    try {
-        npm run dev
-    }
-    finally {
-        Pop-Location
-    }
-}
-
-function Invoke-StartAll {
-    Write-Host "Uruchomienie backendu i frontendu w osobnych oknach..." -ForegroundColor Cyan
-
-    $repoRoot = $PSScriptRoot
-    Start-Process powershell -ArgumentList "-NoExit", "-Command", "Set-Location '$repoRoot'; .\run.ps1 backend"
-    Start-Process powershell -ArgumentList "-NoExit", "-Command", "Set-Location '$repoRoot'; .\run.ps1 frontend"
-
-    Write-Host "Backend (uvicorn) i frontend (npm run dev) zostaly wystartowane w nowych oknach PowerShell." -ForegroundColor Green
-}
+. (Join-Path $PSScriptRoot "scripts\process-tracking.ps1")
 
 function Invoke-Quality {
     param (
@@ -112,6 +74,9 @@ $TaskRegistry = @{
     "backend"          = { Invoke-Start }
     "frontend"         = { Invoke-Frontend }
     "start"            = { Invoke-StartAll }
+    "stop"             = { Invoke-StopAll }
+    "stop-backend"     = { Invoke-StopBackend }
+    "stop-frontend"    = { Invoke-StopFrontend }
     "quality"          = { Invoke-Quality -QualityTarget "all" }
     "quality-backend"  = { Invoke-Quality -QualityTarget "backend" }
     "quality-frontend" = { Invoke-Quality -QualityTarget "frontend" }
