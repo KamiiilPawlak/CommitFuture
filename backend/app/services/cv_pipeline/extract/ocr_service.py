@@ -27,6 +27,14 @@ class OCRService:
         return await asyncio.to_thread(self._extract_via_ocr, content, mime_type)
 
     def _extract_digital_text(self, content: bytes) -> tuple[str, int]:
+        # UWAGA: czytamy WSZYSTKIE strony. Poprzednio pętla przerywała się,
+        # gdy skumulowana długość tekstu przekroczyła MIN_TEXT_LENGTH (próg
+        # = 100 znaków) - przy wielostronicowym CV pierwsza strona sama
+        # zwykle przekracza 100 znaków, więc każda kolejna strona (Edukacja,
+        # Umiejętności, Certyfikaty, Języki...) była bezpowrotnie tracona.
+        # MIN_TEXT_LENGTH i tak jest sprawdzany już w process_document, żeby
+        # zdecydować digital-text vs OCR - nie trzeba duplikować tej decyzji
+        # tutaj kosztem ucinania dokumentu.
         full_text = []
         try:
             with pdfplumber.open(io.BytesIO(content)) as pdf:
@@ -35,13 +43,6 @@ class OCRService:
                     page_text = page.extract_text()
                     if page_text:
                         full_text.append(page_text)
-
-                    current_length = len("\n".join(full_text).strip())
-                    if current_length > self._config.MIN_TEXT_LENGTH:
-                        logger.info(
-                            "Przekroczono minimalny próg tekstu cyfrowego, przerywam czytanie PDF."
-                        )
-                        break
 
             return "\n".join(full_text), page_count
         except Exception as e:
