@@ -220,15 +220,14 @@ def build_unified_record(
 
     return {
         "personal_info": {
-            # full_name/location: heurystyka słownikowa nie potrafi
-            # wiarygodnie wyciągnąć wolnego tekstu bez NER. linkedin_url
-            # natomiast jest regexem po ustandaryzowanym linku (patrz
-            # extractors/linkedin.py) - to się da zrobić bez NER.
+            # full_name/location/linkedin_url: heurystyka słownikowa nie
+            # potrafi wiarygodnie wyciągnąć wolnego tekstu bez NER (i tak nie
+            # jest to potrzebne do matchingu - patrz CandidateMatchingProfileDto).
             "full_name": None,
             "email": heuristic_result.get("email"),
             "phone": heuristic_phone,
             "location": None,
-            "linkedin_url": heuristic_result.get("linkedin_url"),
+            "linkedin_url": None,
         },
         "summary": None,
         "total_experience_months": total_experience_months,

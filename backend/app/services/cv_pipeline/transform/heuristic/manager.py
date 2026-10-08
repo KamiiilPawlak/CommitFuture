@@ -35,7 +35,6 @@ from app.services.cv_pipeline.transform.heuristic.domain.models import DateRange
 from app.services.cv_pipeline.transform.heuristic.extractors import (
     extract_date_ranges,
     extract_email,
-    extract_linkedin_url,
     extract_phones,
 )
 from app.services.cv_pipeline.transform.heuristic.extractors.dates import (
@@ -74,13 +73,11 @@ class HeuristicExtractionManager:
                 "languages": [],
                 "education_field_of_study": None,
                 "work_experience_candidates": [],
-                "linkedin_url": None,
                 "soft_skill_tags": [],
             }
 
         email = extract_email(raw_text)
         phones = extract_phones(raw_text)
-        linkedin_url = extract_linkedin_url(raw_text)
         date_ranges = extract_date_ranges(raw_text)
 
         matches = self.lookup_engine.extract_matches(raw_text)
@@ -134,7 +131,6 @@ class HeuristicExtractionManager:
             "work_experience_candidates": self._build_work_experience_candidates(
                 raw_text, experience_spans, experience_date_ranges
             ),
-            "linkedin_url": linkedin_url,
             "soft_skill_tags": extract_soft_skill_tags(raw_text),
         }
 
