@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import date
 from typing import Any, Final, Literal
 
-from app.schema.cv_llm import CvLlmDto, WorkExperienceDto
+from app.schema.cv_extraction_dto import WorkExperienceDto
 from app.services.cv_pipeline.transform.dictionaries.validator import TechStackValidator
 from app.services.cv_pipeline.transform.heuristic.domain.experience_calc import (
     convert_extracted_range_to_dates,
@@ -24,6 +24,9 @@ _SENIORITY_THRESHOLDS: Final[list[tuple[int, str]]] = [
 ]
 _SENIORITY_DEFAULT: Final[str] = "senior"
 
+# Źródło pola jest dziś zawsze "heuristic" - bez LLM nie ma już z czym
+# "mergować". Literal zostaje szerszy niż faktycznie produkowane wartości,
+# żeby nie trzeba było jednocześnie zmieniać CVStructuredRecord/HardSkillRecord.
 FieldSource: Final[Literal["heuristic", "llm", "merged"]] = Literal[
     "heuristic", "llm", "merged"
 ]
@@ -123,137 +126,136 @@ def estimate_seniority(total_experience_months: int) -> str:
     return _SENIORITY_DEFAULT
 
 
-def resolve_field(
-    heuristic_value: str | None,
-    llm_value: str | None,
-    *,
-    prefer: Literal["heuristic", "llm"],
-) -> tuple[str | None, FieldSource]:
-    if heuristic_value and llm_value:
-        if heuristic_value.strip().lower() == llm_value.strip().lower():
-            return heuristic_value, "merged"
-        return (
-            (heuristic_value, "heuristic")
-            if prefer == "heuristic"
-            else (llm_value, "llm")
-        )
-    if heuristic_value:
-        return heuristic_value, "heuristic"
-    if llm_value:
-        return llm_value, "llm"
-    return None, "merged"
-
-
 def build_flat_tech_stack(
-    hard_skills: list[str],
     heuristic_tech_stack: list[str],
     validator: TechStackValidator,
 ) -> list[str]:
-    return validator.validate_skills([*hard_skills, *heuristic_tech_stack])
+    return validator.validate_skills(heuristic_tech_stack)
 
 
 def build_hard_skills(
     work_experience: list[WorkExperienceDto],
-    llm_hard_skills: list[str],
     heuristic_tech_stack: list[str],
     validator: TechStackValidator,
 ) -> list[dict[str, Any]]:
     usage = compute_skill_usage(work_experience, validator)
-    llm_set = set(validator.validate_skills(llm_hard_skills))
     heuristic_set = set(validator.validate_skills(heuristic_tech_stack))
 
-    all_skills: set[str] = set(usage) | llm_set | heuristic_set
+    all_skills: set[str] = set(usage) | heuristic_set
 
     result: list[dict[str, Any]] = []
     for skill in sorted(all_skills):
-        in_llm: bool = skill in llm_set
-        in_heuristic: bool = skill in heuristic_set
-
-        source: FieldSource
-        if in_llm and in_heuristic:
-            source = "merged"
-        elif in_llm:
-            source = "llm"
-        else:
-            source = "heuristic"
-
         skill_usage: dict[str, Any] = usage.get(skill, {})
         result.append(
             {
                 "name": skill,
                 "months_used": skill_usage.get("months_used"),
                 "last_used": skill_usage.get("last_used"),
-                "source": source,
+                "source": "heuristic",
             }
         )
 
     return result
 
 
+def _heuristic_candidate_to_work_experience_dto(
+    candidate: dict[str, Any],
+) -> WorkExperienceDto:
+    """Zamienia wpis z HeuristicExtractionManager.work_experience_candidates
+    (daty jako obiekty `date`, skille jako {"name","category"}) na
+    WorkExperienceDto - wspólny kształt danych używany dalej przez
+    compute_skill_usage/build_hard_skills/build_work_experience_entry. Brak
+    company/responsibilities: heurystyka (słowniki + offsety) nie potrafi
+    wyciągnąć wolnego tekstu bez NER/LLM."""
+    start_date: date | None = candidate.get("start_date")
+    end_date: date | None = candidate.get("end_date")
+
+    return WorkExperienceDto(
+        company=None,
+        role=candidate.get("job_title"),
+        start_date=start_date.strftime("%Y-%m") if start_date else None,
+        end_date="Present"
+        if candidate.get("is_current")
+        else (end_date.strftime("%Y-%m") if end_date else None),
+        responsibilities=[],
+        skills_used=[skill["name"] for skill in candidate.get("skills_used", [])],
+    )
+
+
+def _build_education_from_heuristic(
+    education_field_of_study: str | None,
+) -> list[dict[str, Any]]:
+    """Heurystyka wyciąga tylko znormalizowaną kategorię kierunku studiów,
+    nie instytucję/tytuł/rok - stąd pozostałe pola EducationDto są None, nie
+    zgadywane."""
+    if not education_field_of_study:
+        return []
+
+    return [
+        {
+            "institution": None,
+            "degree": None,
+            "field_of_study": education_field_of_study,
+            "graduation_year": None,
+        }
+    ]
+
+
 def build_unified_record(
     heuristic_result: dict[str, Any],
-    llm_result: CvLlmDto | None,
-    llm_warnings: list[str],
-    validated_hard_skills: list[str],
     validator: TechStackValidator,
 ) -> dict[str, Any]:
+    """Składa CVStructuredRecord wyłącznie z wyników heurystyki (bez LLM) -
+    patrz heuristic/manager.py za ekstrakcję i heuristic/segmentation.py za
+    podział na sekcje, które to umożliwiają."""
     heuristic_phones: list[str] = heuristic_result.get("phones", [])
     heuristic_phone: str | None = heuristic_phones[0] if heuristic_phones else None
 
-    email, email_source = resolve_field(
-        heuristic_result.get("email"),
-        llm_result.personal_info.email if llm_result else None,
-        prefer="heuristic",
-    )
-    phone, phone_source = resolve_field(
-        heuristic_phone,
-        llm_result.personal_info.phone if llm_result else None,
-        prefer="heuristic",
-    )
-
-    work_experience = llm_result.work_experience if llm_result else []
+    work_experience = [
+        _heuristic_candidate_to_work_experience_dto(candidate)
+        for candidate in heuristic_result.get("work_experience_candidates", [])
+    ]
     total_experience_months: int = heuristic_result.get("total_experience_months", 0)
+    heuristic_tech_stack = heuristic_result.get("tech_stack", [])
 
     return {
         "personal_info": {
-            "full_name": llm_result.personal_info.full_name if llm_result else None,
-            "email": email,
-            "phone": phone,
-            "location": llm_result.personal_info.location if llm_result else None,
-            "linkedin_url": llm_result.personal_info.linkedin_url
-            if llm_result
-            else None,
+            # full_name/location: heurystyka słownikowa nie potrafi
+            # wiarygodnie wyciągnąć wolnego tekstu bez NER. linkedin_url
+            # natomiast jest regexem po ustandaryzowanym linku (patrz
+            # extractors/linkedin.py) - to się da zrobić bez NER.
+            "full_name": None,
+            "email": heuristic_result.get("email"),
+            "phone": heuristic_phone,
+            "location": None,
+            "linkedin_url": heuristic_result.get("linkedin_url"),
         },
-        "summary": llm_result.summary if llm_result else None,
+        "summary": None,
         "total_experience_months": total_experience_months,
         "seniority_estimate": estimate_seniority(total_experience_months),
         "work_experience": [
             build_work_experience_entry(entry, validator) for entry in work_experience
         ],
         "skills": {
-            "hard": build_hard_skills(
-                work_experience,
-                validated_hard_skills,
-                heuristic_result.get("tech_stack", []),
-                validator,
-            ),
-            "soft": llm_result.soft_skills if llm_result else [],
+            "hard": build_hard_skills(work_experience, heuristic_tech_stack, validator),
+            # extract_soft_skill_tags zwraca już znormalizowane slugi (np.
+            # "ownership", "communication") - ten sam słownik co dla ogłoszeń
+            # o pracę, więc po stronie kandydata i oferty porównujemy to samo.
+            "soft": heuristic_result.get("soft_skill_tags", []),
             "all_tech_stack_flat": build_flat_tech_stack(
-                validated_hard_skills, heuristic_result.get("tech_stack", []), validator
+                heuristic_tech_stack, validator
             ),
         },
-        "education": [e.model_dump() for e in llm_result.education]
-        if llm_result
-        else [],
-        "languages": [lang.model_dump() for lang in llm_result.languages]
-        if llm_result
-        else [],
-        "certifications": llm_result.certifications if llm_result else [],
+        "education": _build_education_from_heuristic(
+            heuristic_result.get("education_field_of_study")
+        ),
+        "languages": heuristic_result.get("languages", []),
+        "certifications": heuristic_result.get("certifications", []),
         "validation": {
-            "warnings": llm_warnings,
+            "warnings": [],
             "field_confidence": {
-                "email": email_source,
-                "phone": phone_source,
+                "email": "heuristic" if heuristic_result.get("email") else None,
+                "phone": "heuristic" if heuristic_phone else None,
             },
         },
     }

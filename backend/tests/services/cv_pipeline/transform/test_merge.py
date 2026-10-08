@@ -1,6 +1,6 @@
 import pytest
 
-from app.schema.cv_llm import WorkExperienceDto
+from app.schema.cv_extraction_dto import WorkExperienceDto
 from app.services.cv_pipeline.transform.dictionaries.validator import TechStackValidator
 from app.services.cv_pipeline.transform.merge import (
     build_flat_tech_stack,
@@ -9,7 +9,6 @@ from app.services.cv_pipeline.transform.merge import (
     compute_skill_usage,
     estimate_seniority,
     is_current_role,
-    resolve_field,
 )
 
 
@@ -48,34 +47,6 @@ def test_is_current_role(end_date: str | None, expected: bool) -> None:
 )
 def test_estimate_seniority_thresholds(months: int, expected: str) -> None:
     assert estimate_seniority(months) == expected
-
-
-def test_resolve_field_agreeing_values_are_merged() -> None:
-    value, source = resolve_field("a@test.com", "a@test.com", prefer="heuristic")
-    assert value == "a@test.com"
-    assert source == "merged"
-
-
-def test_resolve_field_conflict_prefers_requested_source() -> None:
-    value, source = resolve_field("a@test.com", "b@test.com", prefer="heuristic")
-    assert value == "a@test.com"
-    assert source == "heuristic"
-
-    value, source = resolve_field("a@test.com", "b@test.com", prefer="llm")
-    assert value == "b@test.com"
-    assert source == "llm"
-
-
-def test_resolve_field_one_sided_value() -> None:
-    assert resolve_field(None, "b@test.com", prefer="heuristic") == ("b@test.com", "llm")
-    assert resolve_field("a@test.com", None, prefer="heuristic") == (
-        "a@test.com",
-        "heuristic",
-    )
-
-
-def test_resolve_field_no_value() -> None:
-    assert resolve_field(None, None, prefer="heuristic") == (None, "merged")
 
 
 def test_build_work_experience_entry_present_role_has_null_end_date(
@@ -139,12 +110,12 @@ def test_compute_skill_usage_ignores_unparseable_dates(
 def test_build_flat_tech_stack_dedupes_across_sources(
     validator: TechStackValidator,
 ) -> None:
-    result = build_flat_tech_stack(["python", "docker"], ["Python", "Kubernetes"], validator)
+    result = build_flat_tech_stack(["Python", "docker", "Kubernetes"], validator)
 
     assert result == ["docker", "kubernetes", "python"]
 
 
-def test_build_unified_record_without_llm_result_is_heuristic_only(
+def test_build_unified_record_is_heuristic_only(
     validator: TechStackValidator,
 ) -> None:
     heuristic_result = {
@@ -157,13 +128,7 @@ def test_build_unified_record_without_llm_result_is_heuristic_only(
         "total_experience_years": 0.8,
     }
 
-    record = build_unified_record(
-        heuristic_result=heuristic_result,
-        llm_result=None,
-        llm_warnings=[],
-        validated_hard_skills=[],
-        validator=validator,
-    )
+    record = build_unified_record(heuristic_result=heuristic_result, validator=validator)
 
     assert record["personal_info"]["email"] == "jan@test.com"
     assert record["personal_info"]["full_name"] is None

@@ -26,18 +26,10 @@ async def test_cv_pipeline_orchestration() -> None:
 
     result = await orchestrator.process_cv(SAMPLE_RAW_CV)
 
-    llm_res = result.get("llm_result")
-
-    # Asercje
     assert result["email"] == "jan.kowalski@example.com"
     assert "Python" in result.get("tech_stack", []) or "python" in [
         t.lower() for t in result.get("tech_stack", [])
     ]
 
     print("\n" + "=" * 20 + " CAŁKOWITY WYNIK ETL " + "=" * 20)  # noqa: T201
-
-    result_to_print = dict(result)
-    if llm_res and hasattr(llm_res, "model_dump"):
-        result_to_print["llm_result"] = llm_res.model_dump()
-
-    print(json.dumps(result_to_print, indent=2, ensure_ascii=False, default=str))  # noqa: T201
+    print(json.dumps(result, indent=2, ensure_ascii=False, default=str))  # noqa: T201

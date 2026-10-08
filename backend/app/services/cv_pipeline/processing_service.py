@@ -9,7 +9,6 @@ from sqlmodel import Session
 
 from app.db.database import engine
 from app.repositories.cv_repository import CVRepository
-from app.schema.cv_llm import CvLlmDto
 from app.services.cv_pipeline.transform.merge import build_unified_record
 from app.services.cv_pipeline.transform.pipeline import CVPipelineOrchestrator
 
@@ -35,19 +34,12 @@ class CVProcessingService:
             self._store(cv_document_id, structured_data={}, status="failed")
             return
 
-        llm_result: CvLlmDto | None = result.pop("llm_result", None)
-        llm_warnings: list[str] = result.pop("llm_warnings", [])
-        validated_hard_skills: list[str] = result.pop("llm_hard_skills_validated", [])
-
         unified_record: dict[str, Any] = build_unified_record(
             heuristic_result=result,
-            llm_result=llm_result,
-            llm_warnings=llm_warnings,
-            validated_hard_skills=validated_hard_skills,
             validator=self.orchestrator.tech_stack_validator,
         )
 
-        status: str = "completed" if llm_result is not None else "partial"
+        status: str = "completed"
 
         raw_structured_data: dict[str, Any] = {
             "cv_document_id": str(cv_document_id),

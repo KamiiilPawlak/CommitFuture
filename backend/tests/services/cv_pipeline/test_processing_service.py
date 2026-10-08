@@ -3,7 +3,6 @@ from uuid import uuid4
 
 import pytest
 
-from app.schema.cv_llm import CvLlmDto, PersonalInfoDto, WorkExperienceDto
 from app.services.cv_pipeline.processing_service import CVProcessingService
 from app.services.cv_pipeline.transform.dictionaries.validator import TechStackValidator
 
@@ -41,18 +40,6 @@ async def test_process_and_store_injects_cv_document_id_and_status(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     cv_document_id = uuid4()
-    llm_result = CvLlmDto(
-        personal_info=PersonalInfoDto(email="jan@test.com"),
-        work_experience=[
-            WorkExperienceDto(
-                company="X",
-                role="Dev",
-                start_date="2020-01",
-                end_date=None,
-                skills_used=["Python"],
-            )
-        ],
-    )
     orchestrator = FakeOrchestrator(
         {
             "email": "jan@test.com",
@@ -62,9 +49,15 @@ async def test_process_and_store_injects_cv_document_id_and_status(
             "job_titles": [],
             "total_experience_months": 12,
             "total_experience_years": 1.0,
-            "llm_result": llm_result,
-            "llm_warnings": [],
-            "llm_hard_skills_validated": ["python"],
+            "work_experience_candidates": [
+                {
+                    "start_date": None,
+                    "end_date": None,
+                    "is_current": False,
+                    "job_title": "Dev",
+                    "skills_used": [],
+                }
+            ],
         }
     )
     service = CVProcessingService(orchestrator=orchestrator)
@@ -77,7 +70,7 @@ async def test_process_and_store_injects_cv_document_id_and_status(
     assert captured["structured_data"]["cv_document_id"] == str(cv_document_id)
     assert captured["structured_data"]["status"] == "completed"
     assert captured["structured_data"]["personal_info"]["email"] == "jan@test.com"
-    assert captured["structured_data"]["work_experience"][0]["company"] == "X"
+    assert captured["structured_data"]["work_experience"][0]["role"] == "Dev"
 
 
 async def test_process_and_store_marks_failed_on_orchestrator_error(
@@ -92,7 +85,7 @@ async def test_process_and_store_marks_failed_on_orchestrator_error(
     assert captured["structured_data"] == {}
 
 
-async def test_process_and_store_partial_status_without_llm_result(
+async def test_process_and_store_completed_status_on_empty_input(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     orchestrator = FakeOrchestrator(
@@ -104,9 +97,6 @@ async def test_process_and_store_partial_status_without_llm_result(
             "job_titles": [],
             "total_experience_months": 0,
             "total_experience_years": 0.0,
-            "llm_result": None,
-            "llm_warnings": [],
-            "llm_hard_skills_validated": [],
         }
     )
     service = CVProcessingService(orchestrator=orchestrator)
@@ -114,6 +104,6 @@ async def test_process_and_store_partial_status_without_llm_result(
 
     await service.process_and_store(uuid4(), "")
 
-    assert captured["status"] == "partial"
-    assert captured["structured_data"]["status"] == "partial"
+    assert captured["status"] == "completed"
+    assert captured["structured_data"]["status"] == "completed"
     assert captured["structured_data"]["work_experience"] == []
