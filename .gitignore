@@ -1,9 +1,11 @@
 __pycache__/
 *CommitFuture.egg-info
 *.pyc
+PID/
 .pytest_cache
 .ruff_cache
 .env
+/tests/test_file
 .deepeval
 .venv/
 dist/
@@ -16,3 +18,4 @@ uploads/
 logs/
 storage/
 frontend/.vite
+

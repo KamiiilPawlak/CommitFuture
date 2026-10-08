@@ -1,0 +1,82 @@
+from pathlib import Path
+from typing import Final
+from uuid import uuid4
+
+import aiofiles
+from fastapi import UploadFile
+from loguru import logger
+
+from app.core.config import STORAGE_DIR, settings
+from app.core.security import verify_file_integrity
+from app.services.cv_pipeline.extract.storage_path_provider import (
+    DateBasedPathProvider,
+    StoragePathProvider,
+)
+
+
+class StorageService:
+    def __init__(self, *, path_provider: StoragePathProvider | None = None) -> None:
+        self._path_provider: StoragePathProvider = (
+            path_provider or DateBasedPathProvider(STORAGE_DIR)
+        )
+
+    async def _read_within_limit(self, file: UploadFile) -> bytes:
+        chunk_size: int = 1024 * 1024
+        max_size: Final[int] = settings.MAX_FILE_SIZE
+        chunks: list[bytes] = []
+        total_size: int = 0
+
+        while chunk := await file.read(chunk_size):
+            total_size += len(chunk)
+            if total_size > max_size:
+                logger.error(f"Plik przekracza maksymalny rozmiar: > {max_size} bajtów")
+                msg_size: str = (
+                    f"Przesłany plik jest za duży. Maksymalny rozmiar to "
+                    f"{max_size // (1024 * 1024)} MB."
+                )
+                raise ValueError(msg_size)
+            chunks.append(chunk)
+
+        return b"".join(chunks)
+
+    async def save_pdf_file(self, file: UploadFile) -> tuple[str, str, int]:
+        if not file.filename or not file.filename.lower().endswith(".pdf"):
+            msg: str = "Niedozwolone rozszerzenie pliku. Wymagany format to PDF."
+            raise ValueError(msg)
+
+        content = await self._read_within_limit(file)
+        file_size: int = len(content)
+
+        if file_size == 0:
+            msg_0: str = "Przesłany plik jest pusty."
+            raise ValueError(msg_0)
+
+        verify_file_integrity(content)
+
+        target_dir = self._path_provider.get_target_dir()
+
+        file_extension = Path(file.filename).suffix
+        unique_filename = f"{uuid4()}{file_extension}"
+        destination_path = target_dir / unique_filename
+
+        try:
+            destination_path.write_bytes(content)
+            logger.info(f"Zapisano plik PDF na dysku: {destination_path}")
+        except Exception as err:
+            logger.error(f"Błąd zapisu pliku na dysku: {err}")
+            msg_1: str = "Wystąpił błąd podczas zapisu pliku na dysku serwera."
+            raise ValueError(msg_1) from err
+
+        return file.filename, str(destination_path), file_size
+
+    async def delete_file(self, file_path: str | Path) -> None:
+        path = Path(file_path)
+        if path.exists():
+            path.unlink()
+            logger.info(f"Plik fizyczny został usunięty z dysku: {path}")
+        else:
+            logger.warning(f"Próbowano usunąć plik, ale nie istnieje na dysku: {path}")
+
+    async def read_file(self, file_path: str) -> bytes:
+        async with aiofiles.open(file_path, "rb") as file:
+            return await file.read()

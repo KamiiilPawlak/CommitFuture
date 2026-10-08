@@ -1,4 +1,4 @@
-from app.services.etl_cv_service.heuristic.extractors.phone import (
+from app.services.cv_pipeline.transform.heuristic.extractors.phone import (
     extract_phones,
 )
 

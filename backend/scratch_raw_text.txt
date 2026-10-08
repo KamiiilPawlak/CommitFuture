@@ -1,0 +1,55 @@
+Mateusz Krawczyk Email: m.krawczyk93.test@example.com
+Tel: +48 601 234 567
+Lokalizacja: Warszawa, Polska (Hybrydowo/Zdalnie)
+PYTHON / BACKEND
+GitHub: github.com/mkrawczyk-dev | LinkedIn: linkedin.com/in/mateusz-
+DEVELOPER
+krawczyk-dev
+Programista Python z ponad 4-letnim doświadczeniem w projektowaniu i wdrażaniu rozproszonych aplikacji
+backendowych oraz mikroserwisów opartych o FastAPI i Django. Posługuję się również Dockerem, PostgreSQL
+oraz narzędziami CI/CD. Zorientowany na pisanie czystego, optymalnego kodu (Clean Code, TDD) oraz
+automatyzację testów jednostkowych i integracyjnych.
+UMIEJĘTNOŚCI DOŚWIADCZENIE ZAWODOWE
+Języki & Frameworki Mid Python Developer 10.2023 – Obecnie
+Python 3.11+ FastAPI Django TechSolutions Sp. z o.o., Warszawa
+Projektowanie i wdrażanie wydajnych interfejsów API w oparciu o FastAPI
+Flask Pydantic
+oraz PostgreSQL.
+Bazy Danych & ORM Refaktoryzacja monolitycznego modułu do architektury mikroserwisowej z
+użyciem Celery i Redis.
+PostgreSQL Redis SQLAlchemy
+Optymalizacja zapytań SQL i architektur bazodanowych, co skróciło czas
+MongoDB
+odpowiedzi wybranych endpointów o 40%.
+DevOps & Narzędzia Konteneryzacja aplikacji w środowisku Docker oraz konfiguracja pipeline'ów
+GitHub Actions (CI/CD).
+Docker Docker Compose
+Uczestnictwo w code review, tworzenie dokumentacji OpenAPI oraz
+Git / GitHub CI/CD (Actions) mentoring młodszych programistów.
+Linux
+Junior Python Developer 03.2022 – 09.2023
+Testowanie & Inne DataCode Systems, Warszawa
+Tworzenie i rozbudowa panelu administracyjnego w frameworku Django dla
+Pytest Celery REST API
+systemu e-commerce.
+GraphQL Swagger/OpenAPI
+Integracja z zewnętrznymi bramkami płatności oraz systemami kurierskimi
+via REST API.
+JĘZYKI
+Pisanie automatycznych testów jednostkowych i integracyjnych w Pytest
+(pokrycie kodu > 85%).
+Polski (Ojczysty) Angielski (B2/C1)
+Usuwanie błędów oraz optymalizacja istniejącego kodu źródłowego.
+EDUKACJA WYBRANE PROJEKTY
+Inżynieria Oprogramowania
+Async Task Manager (Projekty własne)
+Politechnika Warszawska
+System do asynchronicznego przetwarzania dużych wolumenów danych z
+2018 – 2022 | Tytuł: Inżynier
+powiadomieniami via WebSockets.
+Zbudowany przy użyciu FastAPI, Redis, Docker oraz PostgreSQL.
+Wyrażam zgodę na przetwarzanie moich danych osobowych dla potrzeb niezbędnych do realizacji procesu rekrutacji (zgodnie z ustawą z dnia 10
+maja 2018 roku o ochronie danych osobowych (Dz. U. ustawy z 2018 r. poz. 1000) oraz zgodnie z Rozporządzeniem Parlamentu Europejskiego i
+Rady (UE) 2016/679 z dnia 27 kwietnia 2016 r. w sprawie ochrony osób fizycznych w związku z przetwarzaniem danych osobowych i w sprawie
+swobodnego przepływu takich danych oraz uchylenia dyrektywy 95/46/WE (RODO)).
+CV – Mateusz Krawczyk (Python Developer) Strona 1 z 1

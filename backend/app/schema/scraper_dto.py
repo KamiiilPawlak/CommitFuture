@@ -2,8 +2,6 @@ from pydantic import BaseModel, Field, HttpUrl
 
 
 class DataLakeScraperBase(BaseModel):
-    """Bazowy schemat zawierający wspólne pola dla scrapera."""
-
     source_portal: str = Field(
         ...,
         description="Nazwa portalu, z ktorego pochodzi oferta",
@@ -15,8 +13,6 @@ class DataLakeScraperBase(BaseModel):
 
 
 class DataLakeScraperCreate(DataLakeScraperBase):
-    """Schemat uzywany do walidacji danych wejściowych ze scrapera (wymaga poprawnego formatu URL)."""
-
     url: HttpUrl = Field(
         ...,
         description="Pelny, zweryfikowany adres URL ogloszenia o prace",
@@ -25,8 +21,6 @@ class DataLakeScraperCreate(DataLakeScraperBase):
 
 
 class DataLakeScraperResponse(DataLakeScraperBase):
-    """Schemat uzywany do zwracana danych z bazy (zwraca URL jako zwykły ciąg znaków)."""
-
     id: str
     url: str = Field(..., description="Adres URL w postaci tekstowej")
 

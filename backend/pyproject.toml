@@ -62,7 +62,6 @@ dev = [
     "freezegun",
     "schemathesis",
     "deepdiff",
-    "deepeval",
     # Docs
     "mkdocs",
     "mkdocs-material",

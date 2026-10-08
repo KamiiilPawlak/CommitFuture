@@ -2,7 +2,7 @@ from pathlib import Path
 
 from freezegun import freeze_time
 
-from app.services.ingestion_service.storage_path_provider import DateBasedPathProvider
+from app.services.cv_pipeline.extract.storage_path_provider import DateBasedPathProvider
 
 
 def test_date_based_path_provider_creates_correct_month_directories(

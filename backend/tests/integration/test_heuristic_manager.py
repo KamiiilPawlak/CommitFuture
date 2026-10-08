@@ -1,12 +1,12 @@
 from datetime import date
 from unittest.mock import MagicMock, patch
 
-from app.services.etl_cv_service.heuristic.manager import (
+from app.services.cv_pipeline.transform.heuristic.manager import (
     HeuristicExtractionManager,
 )
 
 
-@patch("app.services.etl_cv_service.heuristic.domain.experience_calc.date")
+@patch("app.services.cv_pipeline.transform.heuristic.domain.experience_calc.date")
 def test_heuristic_manager_full_cv_integration(mock_date: MagicMock) -> None:
     mock_date.today.return_value = date(2024, 1, 1)
     mock_date.side_effect = lambda *args, **kw: date(*args, **kw)

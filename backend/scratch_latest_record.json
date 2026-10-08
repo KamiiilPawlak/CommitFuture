@@ -1,0 +1,197 @@
+{
+  "skills": {
+    "hard": [
+      {
+        "name": "celery",
+        "source": "heuristic",
+        "last_used": null,
+        "months_used": null
+      },
+      {
+        "name": "ci/cd",
+        "source": "heuristic",
+        "last_used": null,
+        "months_used": null
+      },
+      {
+        "name": "django",
+        "source": "heuristic",
+        "last_used": null,
+        "months_used": null
+      },
+      {
+        "name": "docker",
+        "source": "heuristic",
+        "last_used": null,
+        "months_used": null
+      },
+      {
+        "name": "fastapi",
+        "source": "heuristic",
+        "last_used": null,
+        "months_used": null
+      },
+      {
+        "name": "flask",
+        "source": "heuristic",
+        "last_used": null,
+        "months_used": null
+      },
+      {
+        "name": "git",
+        "source": "heuristic",
+        "last_used": null,
+        "months_used": null
+      },
+      {
+        "name": "github",
+        "source": "heuristic",
+        "last_used": null,
+        "months_used": null
+      },
+      {
+        "name": "github actions",
+        "source": "heuristic",
+        "last_used": null,
+        "months_used": null
+      },
+      {
+        "name": "graphql",
+        "source": "heuristic",
+        "last_used": null,
+        "months_used": null
+      },
+      {
+        "name": "linux",
+        "source": "heuristic",
+        "last_used": null,
+        "months_used": null
+      },
+      {
+        "name": "mongodb",
+        "source": "heuristic",
+        "last_used": null,
+        "months_used": null
+      },
+      {
+        "name": "postgresql",
+        "source": "heuristic",
+        "last_used": null,
+        "months_used": null
+      },
+      {
+        "name": "pytest",
+        "source": "heuristic",
+        "last_used": null,
+        "months_used": null
+      },
+      {
+        "name": "python",
+        "source": "heuristic",
+        "last_used": null,
+        "months_used": null
+      },
+      {
+        "name": "redis",
+        "source": "heuristic",
+        "last_used": null,
+        "months_used": null
+      },
+      {
+        "name": "rest api",
+        "source": "heuristic",
+        "last_used": null,
+        "months_used": null
+      },
+      {
+        "name": "sql",
+        "source": "heuristic",
+        "last_used": null,
+        "months_used": null
+      },
+      {
+        "name": "sqlalchemy",
+        "source": "heuristic",
+        "last_used": null,
+        "months_used": null
+      },
+      {
+        "name": "swagger / openapi",
+        "source": "heuristic",
+        "last_used": null,
+        "months_used": null
+      }
+    ],
+    "soft": [],
+    "all_tech_stack_flat": [
+      "celery",
+      "ci/cd",
+      "django",
+      "docker",
+      "fastapi",
+      "flask",
+      "git",
+      "github",
+      "github actions",
+      "graphql",
+      "linux",
+      "mongodb",
+      "postgresql",
+      "pytest",
+      "python",
+      "redis",
+      "rest api",
+      "sql",
+      "sqlalchemy",
+      "swagger / openapi"
+    ]
+  },
+  "status": "completed",
+  "summary": null,
+  "education": [
+    {
+      "degree": "Inżynieria Oprogramowania",
+      "institution": null,
+      "field_of_study": "Inżynieria Oprogramowania",
+      "graduation_year": 2022
+    }
+  ],
+  "languages": [
+    {
+      "level": "Native",
+      "language": "Polish"
+    },
+    {
+      "level": "B2/C1",
+      "language": "English"
+    }
+  ],
+  "validation": {
+    "warnings": [
+      "LLM zwrócił email 'mateusz.krawczyk@example.com', którego nie znaleziono w tekście CV.",
+      "LLM zwrócił telefon '+48 123 456 789', którego nie znaleziono w tekście CV.",
+      "Rozbieżność email: heurystyka='m.krawczyk93.test@example.com' vs LLM='mateusz.krawczyk@example.com'."
+    ],
+    "field_confidence": {
+      "email": "heuristic",
+      "phone": "heuristic"
+    }
+  },
+  "personal_info": {
+    "email": "m.krawczyk93.test@example.com",
+    "phone": "+48601234567",
+    "location": "Warszawa, Poland",
+    "full_name": "Mateusz Krawczyk",
+    "linkedin_url": null
+  },
+  "certifications": [
+    "Pytest Automation",
+    "GraphQL",
+    "Swagger",
+    "REST API Integration"
+  ],
+  "cv_document_id": "e3aedb39-3c4e-4205-a9fa-12011a3b96d7",
+  "work_experience": [],
+  "seniority_estimate": "senior",
+  "total_experience_months": 104
+}

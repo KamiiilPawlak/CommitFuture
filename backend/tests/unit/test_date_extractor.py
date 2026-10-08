@@ -1,6 +1,6 @@
 from datetime import date
 
-from app.services.etl_cv_service.heuristic.extractors.dates import (
+from app.services.cv_pipeline.transform.heuristic.extractors.dates import (
     extract_date_ranges,
 )
 
