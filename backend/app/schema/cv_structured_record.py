@@ -4,7 +4,7 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field, model_validator
 
-from app.schema.cv_llm import EducationDto, LanguageDto
+from app.schema.cv_extraction_dto import EducationDto, LanguageDto
 
 FieldSource = Literal["heuristic", "llm", "merged"]
 

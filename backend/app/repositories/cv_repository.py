@@ -69,7 +69,7 @@ class CVRepository:
         self,
         *,
         cv_document_id: UUID,
-        structured_data: dict[str, Any],
+        structured_data: dict[str, Any] | None,
         status: str,
     ) -> CVStructuredData:
         existing = self.session.get(CVStructuredData, cv_document_id)
