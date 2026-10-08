@@ -1,7 +1,7 @@
-from app.services.etl_cv_service.heuristic.domain.experience_service import (
+from app.services.cv_pipeline.transform.heuristic.domain.experience_service import (
     ExperienceService,
 )
-from app.services.etl_cv_service.heuristic.domain.models import (
+from app.services.cv_pipeline.transform.heuristic.domain.models import (
     DateRange,
     ExperienceMetrics,
 )

@@ -6,7 +6,7 @@ from loguru import logger
 
 from app.core.config import settings
 from app.schema.cv_llm import CvLlmDto
-from app.services.etl_cv_service.llm.prompts import (
+from app.services.cv_pipeline.transform.llm.prompts import (
     SYSTEM_PROMPT,
     build_cv_extraction_prompt,
 )

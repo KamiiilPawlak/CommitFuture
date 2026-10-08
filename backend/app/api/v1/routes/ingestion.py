@@ -9,18 +9,19 @@ from fastapi import (
     status,
 )
 from loguru import logger
+from pydantic import ValidationError
 from sqlmodel import Session
 
 from app.db.database import get_session
 from app.repositories.cv_repository import CVRepository
 from app.schema.ingestion_dto import CVIngestionResponse, CVStructuredDataResponse
-from app.services.etl_cv_service.processing_service import (
-    CVProcessingService,
-    get_cv_processing_service,
-)
-from app.services.ingestion_service.ingestion_service import (
+from app.services.cv_pipeline.extract.ingestion_service import (
     IngestionService,
     get_ingestion_service,
+)
+from app.services.cv_pipeline.processing_service import (
+    CVProcessingService,
+    get_cv_processing_service,
 )
 
 router = APIRouter(prefix="/cv", tags=["CV Ingestion"])
@@ -95,9 +96,23 @@ async def get_cv_structured_data(
             detail="Nie znaleziono ustrukturyzowanych danych dla podanego dokumentu CV.",
         )
 
-    return CVStructuredDataResponse(
-        cv_document_id=structured_record.cv_document_id,
-        status=structured_record.status,
-        structured_data=structured_record.structured_data,
-        processed_at=structured_record.processed_at,
-    )
+    try:
+        return CVStructuredDataResponse(
+            cv_document_id=structured_record.cv_document_id,
+            status=structured_record.status,
+            structured_data=structured_record.structured_data,
+            processed_at=structured_record.processed_at,
+        )
+    except ValidationError as val_err:
+        logger.error(
+            f"[structured_data] Zapisany kształt danych dla dokumentu "
+            f"{cv_document_id} nie pasuje do aktualnego schematu: {val_err}"
+        )
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=(
+                "Ustrukturyzowane dane tego dokumentu są w nieobsługiwanym "
+                "formacie (prawdopodobnie sprzed aktualizacji schematu) i "
+                "wymagają ponownego przetworzenia."
+            ),
+        ) from val_err

@@ -2,15 +2,15 @@ from typing import Any
 
 from loguru import logger
 
+import app.services.etl_cv_service.validation
 from app.schema.cv_llm import CvLlmDto
-from app.services.cv_pipeline.transform.cleaning import clean_ocr_text
-from app.services.cv_pipeline.transform.dictionaries.validator import TechStackValidator
-from app.services.cv_pipeline.transform.heuristic.manager import (
+from app.services.etl_cv_service.cleaning import clean_ocr_text
+from app.services.etl_cv_service.dictionaries.validator import TechStackValidator
+from app.services.etl_cv_service.heuristic.manager import (
     HeuristicExtractionManager,
 )
-from app.services.cv_pipeline.transform.llm.client import OllamaLLMClient
-from app.services.cv_pipeline.transform.normalization import CVTextNormalizer
-from app.services.cv_pipeline.transform.validation import detect_llm_hallucinations
+from app.services.etl_cv_service.llm.client import OllamaLLMClient
+from app.services.etl_cv_service.normalization import CVTextNormalizer
 
 
 class CVPipelineOrchestrator:
@@ -27,7 +27,6 @@ class CVPipelineOrchestrator:
         self.tech_stack_validator = tech_stack_validator or TechStackValidator()
 
     async def process_cv(self, raw_text: str) -> dict[str, Any]:
-        """Krok 1: Czyszczenie, normalizacja oraz ekstrakcja heurystyczna."""
         if not raw_text or not raw_text.strip():
             logger.warning("[ETL Orchestrator] Otrzymano pusty tekst CV.")
             return self.heuristic_manager.extract_all("")
@@ -62,7 +61,7 @@ class CVPipelineOrchestrator:
                 llm_result.hard_skills
             )
 
-        llm_warnings = detect_llm_hallucinations(
+        llm_warnings = app.services.etl_cv_service.validation.detect_llm_hallucinations(
             llm_result, heuristic_result, normalized_text
         )
         if llm_warnings:

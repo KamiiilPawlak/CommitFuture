@@ -4,8 +4,8 @@ from uuid import uuid4
 import pytest
 
 from app.schema.cv_llm import CvLlmDto, PersonalInfoDto, WorkExperienceDto
-from app.services.etl_cv_service.dictionaries.validator import TechStackValidator
-from app.services.etl_cv_service.processing_service import CVProcessingService
+from app.services.cv_pipeline.processing_service import CVProcessingService
+from app.services.cv_pipeline.transform.dictionaries.validator import TechStackValidator
 
 
 class FakeOrchestrator:

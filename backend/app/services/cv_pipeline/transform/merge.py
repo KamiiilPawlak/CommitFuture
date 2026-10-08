@@ -1,43 +1,46 @@
 from __future__ import annotations
 
 from datetime import date
-from typing import Any, Literal
+from typing import Any, Final, Literal
 
 from app.schema.cv_llm import CvLlmDto, WorkExperienceDto
-from app.services.etl_cv_service.dictionaries.validator import TechStackValidator
-from app.services.etl_cv_service.heuristic.domain.experience_calc import (
+from app.services.cv_pipeline.transform.dictionaries.validator import TechStackValidator
+from app.services.cv_pipeline.transform.heuristic.domain.experience_calc import (
     convert_extracted_range_to_dates,
     merge_overlapping_ranges,
 )
-from app.services.etl_cv_service.heuristic.domain.models import DateRange
+from app.services.cv_pipeline.transform.heuristic.domain.models import DateRange
 
-_CURRENT_MARKERS = {"present", "obecnie", "aktualnie", "now"}
+_CURRENT_MARKERS: Final[set[str]] = {"present", "obecnie", "aktualnie", "now"}
 
-_DAYS_PER_MONTH = 30.4375
+_DAYS_PER_MONTH: Final[float] = 30.4375
 
-_YEAR_ONLY_LENGTH = 4
-_YEAR_MONTH_LENGTH = 7
+_YEAR_ONLY_LENGTH: Final[int] = 4
+_YEAR_MONTH_LENGTH: Final[int] = 7
 
-_SENIORITY_THRESHOLDS: list[tuple[int, str]] = [
+_SENIORITY_THRESHOLDS: Final[list[tuple[int, str]]] = [
     (24, "junior"),
     (72, "mid"),
 ]
-_SENIORITY_DEFAULT = "senior"
+_SENIORITY_DEFAULT: Final[str] = "senior"
 
-FieldSource = Literal["heuristic", "llm", "merged"]
+FieldSource: Final[Literal["heuristic", "llm", "merged"]] = Literal[
+    "heuristic", "llm", "merged"
+]
 
 
 def _parse_role_date(value: str | None) -> date | None:
-    """Parsuje datę w formacie zwracanym przez LLM dla WorkExperienceDto (YYYY-MM lub YYYY)."""
     if not value:
         return None
 
-    cleaned = value.strip()
+    cleaned: str = value.strip()
 
     if len(cleaned) == _YEAR_ONLY_LENGTH and cleaned.isdigit():
         return date(int(cleaned), 1, 1)
 
     if len(cleaned) == _YEAR_MONTH_LENGTH and cleaned[_YEAR_ONLY_LENGTH] == "-":
+        year_str: str
+        month_str: str
         year_str, month_str = cleaned.split("-")
         if year_str.isdigit() and month_str.isdigit():
             return date(int(year_str), int(month_str), 1)
@@ -52,12 +55,12 @@ def is_current_role(end_date: str | None) -> bool:
 
 
 def _role_date_span(entry: WorkExperienceDto) -> tuple[date, date] | None:
-    start = _parse_role_date(entry.start_date)
+    start: date | None = _parse_role_date(entry.start_date)
     if start is None:
         return None
 
-    is_current = is_current_role(entry.end_date)
-    end = None if is_current else _parse_role_date(entry.end_date)
+    is_current: bool = is_current_role(entry.end_date)
+    end: date | None = None if is_current else _parse_role_date(entry.end_date)
 
     return convert_extracted_range_to_dates(
         DateRange(start_date=start, end_date=end, is_current=is_current)
@@ -72,11 +75,11 @@ def compute_skill_usage(
     skill_is_current: dict[str, bool] = {}
 
     for entry in work_experience:
-        span = _role_date_span(entry)
+        span: tuple[date, date] | None = _role_date_span(entry)
         if span is None:
             continue
 
-        is_current = is_current_role(entry.end_date)
+        is_current: bool = is_current_role(entry.end_date)
 
         for skill in validator.validate_skills(entry.skills_used):
             skill_spans.setdefault(skill, []).append(span)
@@ -130,7 +133,9 @@ def resolve_field(
         if heuristic_value.strip().lower() == llm_value.strip().lower():
             return heuristic_value, "merged"
         return (
-            (heuristic_value, "heuristic") if prefer == "heuristic" else (llm_value, "llm")
+            (heuristic_value, "heuristic")
+            if prefer == "heuristic"
+            else (llm_value, "llm")
         )
     if heuristic_value:
         return heuristic_value, "heuristic"
@@ -157,12 +162,12 @@ def build_hard_skills(
     llm_set = set(validator.validate_skills(llm_hard_skills))
     heuristic_set = set(validator.validate_skills(heuristic_tech_stack))
 
-    all_skills = set(usage) | llm_set | heuristic_set
+    all_skills: set[str] = set(usage) | llm_set | heuristic_set
 
     result: list[dict[str, Any]] = []
     for skill in sorted(all_skills):
-        in_llm = skill in llm_set
-        in_heuristic = skill in heuristic_set
+        in_llm: bool = skill in llm_set
+        in_heuristic: bool = skill in heuristic_set
 
         source: FieldSource
         if in_llm and in_heuristic:
@@ -172,7 +177,7 @@ def build_hard_skills(
         else:
             source = "heuristic"
 
-        skill_usage = usage.get(skill, {})
+        skill_usage: dict[str, Any] = usage.get(skill, {})
         result.append(
             {
                 "name": skill,
@@ -193,7 +198,7 @@ def build_unified_record(
     validator: TechStackValidator,
 ) -> dict[str, Any]:
     heuristic_phones: list[str] = heuristic_result.get("phones", [])
-    heuristic_phone = heuristic_phones[0] if heuristic_phones else None
+    heuristic_phone: str | None = heuristic_phones[0] if heuristic_phones else None
 
     email, email_source = resolve_field(
         heuristic_result.get("email"),
@@ -215,7 +220,9 @@ def build_unified_record(
             "email": email,
             "phone": phone,
             "location": llm_result.personal_info.location if llm_result else None,
-            "linkedin_url": llm_result.personal_info.linkedin_url if llm_result else None,
+            "linkedin_url": llm_result.personal_info.linkedin_url
+            if llm_result
+            else None,
         },
         "summary": llm_result.summary if llm_result else None,
         "total_experience_months": total_experience_months,
@@ -235,7 +242,9 @@ def build_unified_record(
                 validated_hard_skills, heuristic_result.get("tech_stack", []), validator
             ),
         },
-        "education": [e.model_dump() for e in llm_result.education] if llm_result else [],
+        "education": [e.model_dump() for e in llm_result.education]
+        if llm_result
+        else [],
         "languages": [lang.model_dump() for lang in llm_result.languages]
         if llm_result
         else [],

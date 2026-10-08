@@ -22,9 +22,9 @@ class IngestionService:
         file_service: StorageService | None = None,
         ocr_service: OCRService | None = None,
     ) -> None:
-        self.repository = CVRepository(session)
-        self.file_service = file_service or StorageService()
-        self.ocr_service = ocr_service or OCRService()
+        self.repository: CVRepository = CVRepository(session)
+        self.file_service: StorageService = file_service or StorageService()
+        self.ocr_service: OCRService = ocr_service or OCRService()
 
     async def process_cv_document(
         self, file: UploadFile
@@ -38,14 +38,14 @@ class IngestionService:
         ) = await self.file_service.save_pdf_file(file)
 
         try:
-            lake_record = self.repository.create_lake_record(
+            lake_record: CVDocumentLake = self.repository.create_lake_record(
                 filename=original_filename,
                 file_path=destination_path,
                 file_size=file_size,
                 mime_type=cast(Any, file.content_type or "application/pdf"),
             )
 
-            file_bytes = await self.file_service.read_file(destination_path)
+            file_bytes: bytes = await self.file_service.read_file(destination_path)
             raw_text, page_count = await self.ocr_service.process_document(
                 content=file_bytes,
                 mime_type=lake_record.mime_type,
@@ -53,7 +53,7 @@ class IngestionService:
 
             char_count, word_count, metadata = self._build_text_metrics(raw_text)
 
-            raw_text_record = self.repository.create_raw_text_record(
+            raw_text_record: CVRawText = self.repository.create_raw_text_record(
                 lake_id=lake_record.id,
                 raw_text=raw_text,
                 character_count=char_count,
@@ -81,9 +81,9 @@ class IngestionService:
         if not raw_text:
             return 0, 0, {"status": "empty", "char_count": 0, "word_count": 0}
 
-        char_count = len(raw_text)
-        word_count = len(raw_text.split())
-        metadata = {
+        char_count: int = len(raw_text)
+        word_count: int = len(raw_text.split())
+        metadata: dict[str, Any] = {
             "status": "success",
             "char_count": char_count,
             "word_count": word_count,

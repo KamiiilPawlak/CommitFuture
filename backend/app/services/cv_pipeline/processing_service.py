@@ -9,13 +9,16 @@ from sqlmodel import Session
 
 from app.db.database import engine
 from app.repositories.cv_repository import CVRepository
-from app.services.etl_cv_service.merge import build_unified_record
-from app.services.etl_cv_service.pipeline import CVPipelineOrchestrator
+from app.schema.cv_llm import CvLlmDto
+from app.services.cv_pipeline.transform.merge import build_unified_record
+from app.services.cv_pipeline.transform.pipeline import CVPipelineOrchestrator
 
 
 class CVProcessingService:
     def __init__(self, orchestrator: CVPipelineOrchestrator | None = None) -> None:
-        self.orchestrator = orchestrator or CVPipelineOrchestrator()
+        self.orchestrator: CVPipelineOrchestrator = (
+            orchestrator or CVPipelineOrchestrator()
+        )
 
     async def process_and_store(self, cv_document_id: UUID, raw_text: str) -> None:
         logger.info(
@@ -23,7 +26,7 @@ class CVProcessingService:
         )
 
         try:
-            result = await self.orchestrator.process_cv(raw_text)
+            result: dict[str, Any] = await self.orchestrator.process_cv(raw_text)
         except Exception as error:
             logger.error(
                 f"[Etap B] Nieoczekiwany błąd pipeline'u dla dokumentu "
@@ -32,11 +35,11 @@ class CVProcessingService:
             self._store(cv_document_id, structured_data={}, status="failed")
             return
 
-        llm_result = result.pop("llm_result", None)
-        llm_warnings = result.pop("llm_warnings", [])
-        validated_hard_skills = result.pop("llm_hard_skills_validated", [])
+        llm_result: CvLlmDto | None = result.pop("llm_result", None)
+        llm_warnings: list[str] = result.pop("llm_warnings", [])
+        validated_hard_skills: list[str] = result.pop("llm_hard_skills_validated", [])
 
-        unified_record = build_unified_record(
+        unified_record: dict[str, Any] = build_unified_record(
             heuristic_result=result,
             llm_result=llm_result,
             llm_warnings=llm_warnings,
@@ -44,7 +47,7 @@ class CVProcessingService:
             validator=self.orchestrator.tech_stack_validator,
         )
 
-        status = "completed" if llm_result is not None else "partial"
+        status: str = "completed" if llm_result is not None else "partial"
 
         raw_structured_data: dict[str, Any] = {
             "cv_document_id": str(cv_document_id),
@@ -52,7 +55,9 @@ class CVProcessingService:
             **unified_record,
         }
 
-        structured_data = json.loads(json.dumps(raw_structured_data, default=str))
+        structured_data: dict[str, Any] = json.loads(
+            json.dumps(raw_structured_data, default=str)
+        )
 
         self._store(cv_document_id, structured_data=structured_data, status=status)
 
@@ -66,7 +71,7 @@ class CVProcessingService:
         cv_document_id: UUID, *, structured_data: dict[str, Any], status: str
     ) -> None:
         with Session(engine) as session:
-            repository = CVRepository(session)
+            repository: CVRepository = CVRepository(session)
             repository.upsert_structured_record(
                 cv_document_id=cv_document_id,
                 structured_data=structured_data,

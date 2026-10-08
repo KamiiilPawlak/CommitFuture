@@ -13,11 +13,7 @@ def detect_llm_hallucinations(
     heuristic_result: dict[str, Any],
     raw_text: str,
 ) -> list[str]:
-    """Wykrywa dane zwrócone przez LLM, których nie ma w oryginalnym tekście CV.
 
-    Nie przerywa pipeline'u — służy jako ostrzeżenie dla warstwy wyższej
-    (np. do oznaczenia wyniku jako wymagającego ręcznej weryfikacji).
-    """
     if llm_result is None:
         return []
 

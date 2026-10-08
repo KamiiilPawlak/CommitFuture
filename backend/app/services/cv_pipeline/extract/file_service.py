@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Final
 from uuid import uuid4
 
 import aiofiles
@@ -7,7 +8,7 @@ from loguru import logger
 
 from app.core.config import STORAGE_DIR, settings
 from app.core.security import verify_file_integrity
-from app.services.ingestion_service.storage_path_provider import (
+from app.services.cv_pipeline.extract.storage_path_provider import (
     DateBasedPathProvider,
     StoragePathProvider,
 )
@@ -15,19 +16,21 @@ from app.services.ingestion_service.storage_path_provider import (
 
 class StorageService:
     def __init__(self, *, path_provider: StoragePathProvider | None = None) -> None:
-        self._path_provider = path_provider or DateBasedPathProvider(STORAGE_DIR)
+        self._path_provider: StoragePathProvider = (
+            path_provider or DateBasedPathProvider(STORAGE_DIR)
+        )
 
     async def _read_within_limit(self, file: UploadFile) -> bytes:
-        chunk_size = 1024 * 1024
-        max_size = settings.MAX_FILE_SIZE
+        chunk_size: int = 1024 * 1024
+        max_size: Final[int] = settings.MAX_FILE_SIZE
         chunks: list[bytes] = []
-        total_size = 0
+        total_size: int = 0
 
         while chunk := await file.read(chunk_size):
             total_size += len(chunk)
             if total_size > max_size:
                 logger.error(f"Plik przekracza maksymalny rozmiar: > {max_size} bajtów")
-                msg_size = (
+                msg_size: str = (
                     f"Przesłany plik jest za duży. Maksymalny rozmiar to "
                     f"{max_size // (1024 * 1024)} MB."
                 )
@@ -38,14 +41,14 @@ class StorageService:
 
     async def save_pdf_file(self, file: UploadFile) -> tuple[str, str, int]:
         if not file.filename or not file.filename.lower().endswith(".pdf"):
-            msg = "Niedozwolone rozszerzenie pliku. Wymagany format to PDF."
+            msg: str = "Niedozwolone rozszerzenie pliku. Wymagany format to PDF."
             raise ValueError(msg)
 
         content = await self._read_within_limit(file)
-        file_size = len(content)
+        file_size: int = len(content)
 
         if file_size == 0:
-            msg_0 = "Przesłany plik jest pusty."
+            msg_0: str = "Przesłany plik jest pusty."
             raise ValueError(msg_0)
 
         verify_file_integrity(content)
@@ -61,7 +64,7 @@ class StorageService:
             logger.info(f"Zapisano plik PDF na dysku: {destination_path}")
         except Exception as err:
             logger.error(f"Błąd zapisu pliku na dysku: {err}")
-            msg_1 = "Wystąpił błąd podczas zapisu pliku na dysku serwera."
+            msg_1: str = "Wystąpił błąd podczas zapisu pliku na dysku serwera."
             raise ValueError(msg_1) from err
 
         return file.filename, str(destination_path), file_size

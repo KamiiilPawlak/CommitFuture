@@ -1,10 +1,10 @@
 from datetime import date
 
-from app.services.etl_cv_service.heuristic.domain.experience_calc import (
+from app.services.cv_pipeline.transform.heuristic.domain.experience_calc import (
     convert_extracted_range_to_dates,
     merge_overlapping_ranges,
 )
-from app.services.etl_cv_service.heuristic.domain.models import DateRange
+from app.services.cv_pipeline.transform.heuristic.domain.models import DateRange
 
 
 def test_convert_range_valid_dates() -> None:

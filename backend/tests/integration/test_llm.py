@@ -1,7 +1,7 @@
 import pytest
 from loguru import logger
 
-from app.services.etl_cv_service.llm.client import OllamaLLMClient
+from app.services.cv_pipeline.transform.llm.client import OllamaLLMClient
 
 SAMPLE_RAW_CV = """
 Jan Kowalski

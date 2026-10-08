@@ -63,8 +63,6 @@ class ProjectDto(BaseModel):
 
 
 class CvLlmDto(BaseModel):
-    """Główny obiekt DTO do odebrania ustrukturyzowanej odpowiedzi z LLM."""
-
     personal_info: PersonalInfoDto = Field(description="Dane osobowe i kontaktowe")
     summary: str | None = Field(
         default=None, description="Podsumowanie zawodowe lub profil kandydata"

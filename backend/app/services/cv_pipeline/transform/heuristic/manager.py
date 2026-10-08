@@ -1,19 +1,19 @@
 from typing import Any
 
-from app.services.etl_cv_service.heuristic.dictionary.job_titles import (
+from app.services.cv_pipeline.transform.heuristic.dictionary.job_titles import (
     JOB_TITLES_DICTIONARY,
 )
-from app.services.etl_cv_service.heuristic.dictionary.lookup_engine import (
+from app.services.cv_pipeline.transform.heuristic.dictionary.lookup_engine import (
     FlashLookupEngine,
 )
-from app.services.etl_cv_service.heuristic.dictionary.tech_stack import (
+from app.services.cv_pipeline.transform.heuristic.dictionary.tech_stack import (
     TECH_STACK_DICTIONARY,
 )
-from app.services.etl_cv_service.heuristic.domain.experience_service import (
+from app.services.cv_pipeline.transform.heuristic.domain.experience_service import (
     ExperienceService,
 )
-from app.services.etl_cv_service.heuristic.domain.models import DateRange
-from app.services.etl_cv_service.heuristic.extractors import (
+from app.services.cv_pipeline.transform.heuristic.domain.models import DateRange
+from app.services.cv_pipeline.transform.heuristic.extractors import (
     extract_date_ranges,
     extract_email,
     extract_phones,

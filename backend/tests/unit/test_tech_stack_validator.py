@@ -1,4 +1,4 @@
-from app.services.etl_cv_service.dictionaries.validator import TechStackValidator
+from app.services.cv_pipeline.transform.dictionaries.validator import TechStackValidator
 
 
 def test_normalize_synonyms() -> None:

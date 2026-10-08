@@ -8,7 +8,7 @@ from starlette.datastructures import Headers
 
 from app.models.cv_document import CVDocumentLake
 from app.models.cv_raw_text import CVRawText
-from app.services.ingestion_service import IngestionService
+from app.services.cv_pipeline.extract import IngestionService
 
 
 @pytest.mark.asyncio
@@ -35,7 +35,7 @@ async def test_process_cv_document_success() -> None:
     )
     fake_raw_text_record = MagicMock(spec=CVRawText)
 
-    with patch("app.services.ingestion_service.CVRepository") as mock_repo_class:
+    with patch("app.services.cv_pipeline.extract.CVRepository") as mock_repo_class:
         mock_repo = mock_repo_class.return_value
         mock_repo.create_lake_record.return_value = fake_lake_record
         mock_repo.create_raw_text_record.return_value = fake_raw_text_record

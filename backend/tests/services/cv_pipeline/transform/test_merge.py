@@ -1,8 +1,8 @@
 import pytest
 
 from app.schema.cv_llm import WorkExperienceDto
-from app.services.etl_cv_service.dictionaries.validator import TechStackValidator
-from app.services.etl_cv_service.merge import (
+from app.services.cv_pipeline.transform.dictionaries.validator import TechStackValidator
+from app.services.cv_pipeline.transform.merge import (
     build_flat_tech_stack,
     build_unified_record,
     build_work_experience_entry,

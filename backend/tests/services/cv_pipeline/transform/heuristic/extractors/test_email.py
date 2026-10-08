@@ -1,6 +1,6 @@
 import pytest
 
-from app.services.etl_cv_service.heuristic.extractors.emails import extract_email
+from app.services.cv_pipeline.transform.heuristic.extractors.emails import extract_email
 
 
 @pytest.mark.parametrize(

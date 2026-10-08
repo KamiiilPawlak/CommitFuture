@@ -1,4 +1,4 @@
-from app.services.etl_cv_service.heuristic.dictionary.lookup_engine import (
+from app.services.cv_pipeline.transform.heuristic.dictionary.lookup_engine import (
     FlashLookupEngine,
 )
 

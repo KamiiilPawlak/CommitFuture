@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from app.services.etl_cv_service.pipeline import CVPipelineOrchestrator
+from app.services.cv_pipeline.transform.pipeline import CVPipelineOrchestrator
 
 SAMPLE_RAW_CV = """
 JAN KOWALSKI

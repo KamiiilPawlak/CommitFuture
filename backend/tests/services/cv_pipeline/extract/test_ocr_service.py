@@ -2,7 +2,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from app.services.ingestion_service.ocr_service import OCRService
+from app.services.cv_pipeline.extract.ocr_service import OCRService
 
 
 @pytest.fixture
@@ -25,12 +25,12 @@ async def test_process_document_digital_pdf_success(
     mock_pdf.pages = [mock_page]
 
     mock_open = mocker.patch(
-        "app.services.ingestion_service.ocr_service.pdfplumber.open"
+        "app.services.cv_pipeline.extract.ocr_service.pdfplumber.open"
     )
     mock_open.return_value.__enter__.return_value = mock_pdf
 
     mock_tesseract = mocker.patch(
-        "app.services.ingestion_service.ocr_service.pytesseract.image_to_string"
+        "app.services.cv_pipeline.extract.ocr_service.pytesseract.image_to_string"
     )
 
     result, page_count = await ocr_service.process_document(fake_content, fake_mime)
@@ -52,13 +52,13 @@ async def test_process_document_image_ocr_success(
     expected_ocr_text = "Tekst odczytany przez sztucznego Tesseracta z obrazka PNG"
 
     mock_tesseract = mocker.patch(
-        "app.services.ingestion_service.ocr_service.pytesseract.image_to_string"
+        "app.services.cv_pipeline.extract.ocr_service.pytesseract.image_to_string"
     )
     mock_tesseract.return_value = expected_ocr_text
 
     mock_image_instance = MagicMock()
     mock_open_image = mocker.patch(
-        "app.services.ingestion_service.ocr_service.Image.open"
+        "app.services.cv_pipeline.extract.ocr_service.Image.open"
     )
     mock_open_image.return_value = mock_image_instance
 
@@ -66,7 +66,7 @@ async def test_process_document_image_ocr_success(
     mock_image_instance.filter.return_value = mock_image_instance
 
     mocker.patch(
-        "app.services.ingestion_service.ocr_service.ImageOps.autocontrast",
+        "app.services.cv_pipeline.extract.ocr_service.ImageOps.autocontrast",
         return_value=mock_image_instance,
     )
 

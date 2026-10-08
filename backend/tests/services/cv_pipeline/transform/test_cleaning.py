@@ -1,6 +1,6 @@
 import pytest
 
-from app.services.etl_cv_service.cleaning import clean_ocr_text
+from app.services.cv_pipeline.transform.cleaning import clean_ocr_text
 
 
 @pytest.mark.parametrize(

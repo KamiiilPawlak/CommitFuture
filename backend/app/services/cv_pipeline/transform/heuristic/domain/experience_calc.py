@@ -1,7 +1,7 @@
 from calendar import monthrange
 from datetime import date
 
-from app.services.etl_cv_service.heuristic.domain.models import DateRange
+from app.services.cv_pipeline.transform.heuristic.domain.models import DateRange
 
 
 def convert_extracted_range_to_dates(extracted: DateRange) -> tuple[date, date] | None:

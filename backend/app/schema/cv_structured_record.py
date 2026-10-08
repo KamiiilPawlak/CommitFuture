@@ -1,12 +1,27 @@
 from __future__ import annotations
 
-from typing import Literal
+from typing import Any, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from app.schema.cv_llm import EducationDto, LanguageDto
 
 FieldSource = Literal["heuristic", "llm", "merged"]
+
+_KNOWN_RECORD_KEYS = {
+    "cv_document_id",
+    "status",
+    "personal_info",
+    "summary",
+    "total_experience_months",
+    "seniority_estimate",
+    "work_experience",
+    "skills",
+    "education",
+    "languages",
+    "certifications",
+    "validation",
+}
 
 
 class PersonalInfoRecord(BaseModel):
@@ -53,13 +68,6 @@ class ValidationRecord(BaseModel):
 
 
 class CVStructuredRecord(BaseModel):
-    """Odzwierciedla dokładnie kształt budowany przez merge.build_unified_record().
-
-    Wszystkie pola opcjonalne z defaultami, bo przy status="failed" (błąd
-    pipeline'u w processing_service.py) structured_data w bazie to {} —
-    model musi to przyjąć bez walidacyjnego 500.
-    """
-
     cv_document_id: str | None = None
     status: str | None = None
     personal_info: PersonalInfoRecord | None = None
@@ -72,3 +80,19 @@ class CVStructuredRecord(BaseModel):
     languages: list[LanguageDto] = Field(default_factory=list)
     certifications: list[str] = Field(default_factory=list)
     validation: ValidationRecord | None = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def _reject_unrecognized_shape(cls, data: Any) -> Any:
+        if not isinstance(data, dict) or not data:
+            return data
+
+        if _KNOWN_RECORD_KEYS.isdisjoint(data.keys()):
+            msg = (
+                "structured_data nie zawiera żadnego rozpoznawalnego pola "
+                "aktualnego schematu (personal_info/work_experience/skills/...). "
+                "Wygląda na dane w starym formacie sprzed refaktoru merge.py."
+            )
+            raise ValueError(msg)
+
+        return data

@@ -1,4 +1,4 @@
-from app.services.etl_cv_service.cleaning import clean_ocr_text
+from app.services.cv_pipeline.transform.cleaning import clean_ocr_text
 
 
 def test_clean_ocr_text_remoces_noise_and_keeps_email() -> None:
