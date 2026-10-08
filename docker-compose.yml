@@ -29,7 +29,10 @@ services:
       - ./backend:/code
     environment:
       - WATCHFILES_FORCE_POLLING=true
-      - DATABASE_URL=postgresql://postgres:abcd1234@postgres:5432/cv_ai_matcher
+      - DATABASE_URL=postgresql+psycopg2://postgres:abcd1234@postgres:5432/cv_ai_matcher
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     depends_on:
       postgres:
@@ -61,20 +64,5 @@ services:
       - .:/docs
     command: mkdocs serve --dev-addr 0.0.0.0:8000
 
-  ollama:
-    image: ollama/ollama:latest
-    container_name: CommitFuture-ollama
-    restart: always
-    ports:
-      - "11434:11434"
-    volumes:
-      - ollama_data:/root/.ollama
-    entrypoint:
-      [
-        "/bin/sh",
-        "-c",
-        "ollama serve & sleep 3 && ollama pull qwen2.5:1.5b && wait",
-      ]
 volumes:
   postgres_data:
-  ollama_data:
