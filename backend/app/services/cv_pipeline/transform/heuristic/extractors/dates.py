@@ -39,27 +39,30 @@ def _parse_single_date(date_str: str) -> date | str | None:
     return None
 
 
-def extract_date_ranges(text: str) -> list[dict[str, date | bool | str | None]]:
+_DATE_COMPONENT_PATTERN = (
     # Jeden człon daty w jednym z obsługiwanych formatów - uporządkowane od
     # najbardziej do najmniej specyficznego, tak aby np. "2020-03" nie było
     # dopasowane tylko jako samo "2020":
     #   DD.MM.YYYY | YYYY-MM (format kanoniczny z CVTextNormalizer) | MM.YYYY | YYYY
-    date_component_pattern = (
-        r"(?:\d{1,2}[\./]\d{1,2}[\./]\d{4}"
-        r"|\d{4}-\d{1,2}"
-        r"|\d{1,2}[\./]\d{4}"
-        r"|\d{4})"
-    )
+    r"(?:\d{1,2}[\./]\d{1,2}[\./]\d{4}"
+    r"|\d{4}-\d{1,2}"
+    r"|\d{1,2}[\./]\d{4}"
+    r"|\d{4})"
+)
 
-    date_range_pattern = re.compile(
-        rf"({date_component_pattern})\s*(?:-+|—|do|to)\s*"
-        rf"({date_component_pattern}|obecnie|present|aktualnie|now)",
-        re.IGNORECASE,
-    )
+_DATE_RANGE_PATTERN = re.compile(
+    rf"({_DATE_COMPONENT_PATTERN})\s*(?:-+|—|do|to)\s*"
+    rf"({_DATE_COMPONENT_PATTERN}|obecnie|present|aktualnie|now)",
+    re.IGNORECASE,
+)
 
-    results: list[dict[str, date | bool | str | None]] = []
 
-    for match in date_range_pattern.finditer(text):
+def _find_date_ranges(
+    text: str,
+) -> list[tuple[date, date | None, bool, int]]:
+    results: list[tuple[date, date | None, bool, int]] = []
+
+    for match in _DATE_RANGE_PATTERN.finditer(text):
         start_raw, end_raw = match.groups()
 
         start_date = _parse_single_date(start_raw)
@@ -68,13 +71,31 @@ def extract_date_ranges(text: str) -> list[dict[str, date | bool | str | None]]:
         if isinstance(start_date, date):
             is_current = end_raw_parsed == "present"
             end_date = None if is_current else cast(date | None, end_raw_parsed)
-
-            results.append(
-                {
-                    "start_date": start_date,
-                    "end_date": end_date,
-                    "is_current": is_current,
-                }
-            )
+            results.append((start_date, end_date, is_current, match.start()))
 
     return results
+
+
+def extract_date_ranges(text: str) -> list[dict[str, date | bool | str | None]]:
+    return [
+        {"start_date": start_date, "end_date": end_date, "is_current": is_current}
+        for start_date, end_date, is_current, _offset in _find_date_ranges(text)
+    ]
+
+
+def extract_date_ranges_with_offsets(
+    text: str,
+) -> list[dict[str, date | bool | str | int | None]]:
+    """Jak extract_date_ranges, ale z dodatkowym kluczem 'offset' (pozycja
+    początku dopasowania w tekście) — potrzebnym do przypisywania wpisów
+    doświadczenia (tech stack, obowiązki) do najbliższego wcześniejszego
+    zakresu dat bez pomocy LLM."""
+    return [
+        {
+            "start_date": start_date,
+            "end_date": end_date,
+            "is_current": is_current,
+            "offset": offset,
+        }
+        for start_date, end_date, is_current, offset in _find_date_ranges(text)
+    ]
