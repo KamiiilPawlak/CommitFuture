@@ -2,48 +2,76 @@
   <img src="logo-cf.png" alt="CommitFuture logo" width="160" />
 </p>
 
-# CommitFuture — CV AI Matcher
+<h1 align="center">CommitFuture</h1>
 
-System dopasowujący kandydatów do ofert pracy na podstawie treści CV, przetwarzanego lokalnie przez pipeline OCR + heurystyka + LLM. W repozytorium zaimplementowana jest dziś strona CV: upload PDF → OCR → ekstrakcja ustrukturyzowanych danych → zapis wyniku → odczyt wyniku przez API. Strona ofert pracy (scraping + matching) ma na razie jedynie szkielet modelu danych. Frontend to na razie samodzielny szkielet SPA (React + Vite), jeszcze niepodłączony do API.
+<p align="center">
+  System dopasowujący kandydatów do ofert pracy na podstawie treści CV, przetwarzanego lokalnie przez pipeline OCR + ekstrakcja heurystyczna (słowniki, segmentacja sekcji, <b>bez LLM</b>).
+</p>
 
-Pełny opis architektury: [`docs/architecture/overview.md`](docs/architecture/overview.md) (oraz szczegóły pipeline'u w [`docs/architecture/cv-etl-pipline.md`](docs/architecture/cv-etl-pipline.md)).
+<p align="center">
+  <a href="docs/architecture/overview.md"><b>Architektura</b></a> ·
+  <a href="docs/architecture/cv-etl-pipline.md">Pipeline CV</a> ·
+  <a href="checklist.md">Checklist</a> ·
+  <a href="docs/architecture/roadmap.md">Roadmap</a>
+</p>
+
+<p align="center">
+  W repozytorium zaimplementowana jest dziś strona CV: upload PDF → OCR → ekstrakcja ustrukturyzowanych danych → zapis wyniku → odczyt wyniku przez API.
+  Strona ofert pracy (scraping + matching) ma na razie jedynie szkielet modelu danych. Frontend to na razie samodzielny szkielet SPA (React + Vite), jeszcze niepodłączony do API.
+</p>
+
+---
 
 ## Stack
+
+<table>
+<tr>
+<td valign="top" width="33%">
 
 **Backend**
 
 - Python 3.11+, FastAPI, Pydantic v2
-- SQLModel / SQLAlchemy + PostgreSQL, Alembic (migracje)
-- Ekstrakcja tekstu: PyMuPDF, pdfplumber, Tesseract OCR, pdf2image
-- LLM: Ollama (`qwen2.5:3b`) jako lokalny serwer wnioskowania
+- SQLModel / SQLAlchemy + PostgreSQL, Alembic
+- PyMuPDF, pdfplumber, Tesseract OCR, pdf2image
+- Ekstrakcja ustrukturyzowanych danych: heurystyka (słowniki + regex + segmentacja sekcji, `backend/app/services/cv_pipeline/transform/heuristic/`), **bez LLM**
+
+</td>
+<td valign="top" width="33%">
 
 **Frontend**
 
 - React 19, TypeScript, Vite
 - Tailwind CSS v4, shadcn/ui, Radix UI
-- Husky + lint-staged + commitlint (git hooks)
-- ESLint, Prettier, Knip (lint, formatowanie, martwy kod)
-- Jest + Testing Library (testy komponentów)
+- Husky + lint-staged + commitlint
+- ESLint, Prettier, Knip
+- Jest + Testing Library
+
+</td>
+<td valign="top" width="33%">
 
 **DevOps / jakość kodu**
 
 - Docker & Docker Compose
 - Ruff, mypy, pylint, bandit, pre-commit
 - pytest (pytest-asyncio, pytest-cov)
-- MkDocs (dokumentacja serwowana jako statyczna strona)
+- MkDocs (statyczna dokumentacja)
+
+</td>
+</tr>
+</table>
 
 ## Architektura — komponenty (`docker-compose.yml`)
 
-| Serwis     | Port  | Rola                                                            |
-| ---------- | ----- | --------------------------------------------------------------- |
-| `api`      | 8000  | FastAPI — cała logika biznesowa (`backend/app`)                 |
-| `postgres` | 5432  | Baza `cv_ai_matcher`                                            |
-| `ollama`   | 11434 | Lokalny serwer LLM, przy starcie sam pobiera model `qwen2.5:3b` |
-| `mkdocs`   | 8001  | Statyczna dokumentacja z katalogu `docs/`                       |
+<table>
+<tr><th>Serwis</th><th>Port</th><th>Rola</th></tr>
+<tr><td><code>api</code></td><td>8000</td><td>FastAPI — cała logika biznesowa (<code>backend/app</code>)</td></tr>
+<tr><td><code>postgres</code></td><td>5432</td><td>Baza <code>cv_ai_matcher</code></td></tr>
+<tr><td><code>mkdocs</code></td><td>8001</td><td>Statyczna dokumentacja z katalogu <code>docs/</code></td></tr>
+</table>
 
 Pliki PDF trzymane są na dysku (`storage/cv_uploads/`), nie w obiektowym storage.
 
-Kluczowe endpointy: `POST /api/v1/cv/upload` (zapis + OCR, przetwarzanie LLM w tle) oraz `GET /api/v1/cv/{cv_document_id}/structured` (odczyt statusu i wyniku ustrukturyzowanych danych).
+Kluczowe endpointy: `POST /api/v1/cv/upload` (zapis + OCR, ekstrakcja heurystyczna w tle) oraz `GET /api/v1/cv/{cv_document_id}/structured` (odczyt statusu i wyniku ustrukturyzowanych danych).
 
 ## Wymagania
 
@@ -52,7 +80,8 @@ Kluczowe endpointy: `POST /api/v1/cv/upload` (zapis + OCR, przetwarzanie LLM w t
 
 ## Szybki start
 
-### Windows
+<details open>
+<summary><b>🪟 Windows (PowerShell)</b></summary>
 
 ```powershell
 # Domyślny start (sprawdzenie/budowanie obrazów + uruchomienie kontenerów)
@@ -76,7 +105,10 @@ Kluczowe endpointy: `POST /api/v1/cv/upload` (zapis + OCR, przetwarzanie LLM w t
 ./run.ps1 quality-frontend
 ```
 
-### Linux
+</details>
+
+<details>
+<summary><b>🐧 Linux / macOS (bash)</b></summary>
 
 ```bash
 # Nadaj uprawnienia wykonania (jednorazowo)
@@ -100,33 +132,39 @@ chmod +x run.sh scripts/*.sh
 ./run.sh quality-frontend
 ```
 
-albo bezpośrednio:
+</details>
+
+<details>
+<summary><b>🐳 Bezpośrednio przez Docker Compose</b></summary>
 
 ```bash
 docker compose up --build
 ```
 
+</details>
+
 Po starcie:
 
-- API: http://localhost:8000 (dokumentacja Swagger: `/docs`)
-- Dokumentacja (MkDocs): http://localhost:8001
+- API: <http://localhost:8000> (dokumentacja Swagger: `/docs`)
+- Dokumentacja (MkDocs): <http://localhost:8001>
 
 ## Konfiguracja
 
 Backend czyta ustawienia z `backend/.env` (patrz `backend/app/core/config.py`). Minimalny zestaw zmiennych:
 
-```
+```env
 POSTGRES_USER=...
 POSTGRES_PASSWORD=...
 POSTGRES_DB=...
 DATABASE_URL=postgresql://user:password@host:5432/dbname
 ```
 
-Dodatkowe opcje konfiguracyjne (z wartościami domyślnymi w kodzie): `MAX_FILE_SIZE`, `ALLOWED_MIME_TYPES`, `TESSERACT_CMD` (ścieżka do binarki Tesseract — ustaw, jeśli nie jest dostępna w `PATH`, np. na Windows), `OLLAMA_BASE_URL`, `OLLAMA_MODEL_NAME`, `OLLAMA_TIMEOUT`, `OLLAMA_MAX_RETRIES`.
+Dodatkowe opcje konfiguracyjne (z wartościami domyślnymi w kodzie): `MAX_FILE_SIZE`, `ALLOWED_MIME_TYPES`, `TESSERACT_CMD` (ścieżka do binarki Tesseract — ustaw, jeśli nie jest dostępna w `PATH`, np. na Windows).
 
 ## Praca lokalna bez Dockera
 
-**Backend**
+<details>
+<summary><b>Backend</b></summary>
 
 ```bash
 cd backend
@@ -134,7 +172,10 @@ uv pip install --system .[dev]
 uvicorn app.main:app --reload
 ```
 
-**Frontend**
+</details>
+
+<details>
+<summary><b>Frontend</b></summary>
 
 ```bash
 cd frontend
@@ -142,9 +183,14 @@ npm install
 npm run dev
 ```
 
-Po starcie SPA jest dostępne pod adresem wypisanym przez Vite (domyślnie http://localhost:5173).
+Po starcie SPA jest dostępne pod adresem wypisanym przez Vite (domyślnie <http://localhost:5173>).
+
+</details>
 
 ## Testy i jakość kodu
+
+<details>
+<summary><b>Backend</b></summary>
 
 ```bash
 cd backend
@@ -152,6 +198,11 @@ pytest
 ruff check .
 mypy .
 ```
+
+</details>
+
+<details>
+<summary><b>Frontend</b></summary>
 
 ```bash
 cd frontend
@@ -161,12 +212,14 @@ npm run format:check   # sprawdzenie formatowania (Prettier)
 npm run knip           # wykrywanie nieużywanego kodu/zależności
 ```
 
+</details>
+
 Pre-commit hooki (ruff, formatowanie, lint commitów przez `commitlint.config.js`) są skonfigurowane w `.pre-commit-config.yaml` — włącz je lokalnie przez `pre-commit install`. Dla `frontend/` git hooki (lint-staged + commitlint) są skonfigurowane przez Husky i instalują się automatycznie po `npm install` (skrypt `prepare`) — przy każdym commicie uruchamiają ESLint i Prettier na zmienionych plikach.
 
 ## Struktura repozytorium
 
-```
-backend/        # FastAPI, pipeline OCR/ETL/LLM, modele, repozytoria, testy
+```text
+backend/        # FastAPI, pipeline OCR/ETL (ekstrakcja heurystyczna), modele, repozytoria, testy
 frontend/       # React + Vite SPA
 docs/           # Dokumentacja architektury (MkDocs)
 storage/        # Pliki CV zapisywane na dysku (runtime, nie commitowane)
