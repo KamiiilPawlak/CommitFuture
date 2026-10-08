@@ -50,7 +50,10 @@ TECH_STACK_DICTIONARY: dict[str, list[str]] = {
     "HTML": ["html", "html5", "xhtml"],
     "CSS": ["css", "css3"],
     "Dart": ["dart", "dartlang"],
-    "R": ["r", "r language", "r-lang", "r programming"],
+    # Celowo bez samego "r" jako aliasu: w polskich CV "r." to powszechny
+    # skrót od "roku" (np. "27 kwietnia 2016 r."), co dawało fałszywe
+    # dopasowania języka R przy każdej dacie zapisanej słownie.
+    "R": ["r language", "r-lang", "r programming", "rlang"],
     "MATLAB": ["matlab", "octave"],
     "Elixir": ["elixir"],
     "Erlang": ["erlang"],
@@ -78,6 +81,7 @@ TECH_STACK_DICTIONARY: dict[str, list[str]] = {
     "Remix": ["remix", "remix.run"],
     "Ember.js": ["ember", "ember.js", "emberjs"],
     "Tailwind CSS": ["tailwind", "tailwindcss", "tailwind css", "tailwind-css"],
+    "Vuetify": ["vuetify"],
     "Bootstrap": ["bootstrap", "bootstrap4", "bootstrap5"],
     "Sass/SCSS": ["sass", "scss", "syntactically awesome style sheets"],
     "LESS": ["less", "less.js"],
@@ -149,6 +153,8 @@ TECH_STACK_DICTIONARY: dict[str, list[str]] = {
     "Asyncio": ["asyncio"],
     "Tornado": ["tornado"],
     "SQLAlchemy": ["sqlalchemy", "sqla"],
+    "Pydantic": ["pydantic"],
+    "Alembic": ["alembic"],
     "Prisma": ["prisma", "prisma orm"],
     "Drizzle ORM": ["drizzle", "drizzle orm"],
     "TypeORM": ["typeorm"],
@@ -300,6 +306,7 @@ TECH_STACK_DICTIONARY: dict[str, list[str]] = {
     "OpenTelemetry": ["opentelemetry", "otel"],
     "Sentry": ["sentry"],
     "ELK / Logstash": ["logstash", "kibana", "fluentd", "fluentbit"],
+    "AWS CloudWatch": ["cloudwatch", "aws cloudwatch"],
     "PyTorch": ["pytorch", "torch", "torchvision", "torchaudio"],
     "TensorFlow": ["tensorflow", "tf", "keras"],
     "Scikit-Learn": ["scikit-learn", "sklearn", "scikit learn"],
@@ -425,3 +432,7 @@ _tech_engine: FlashLookupEngine = FlashLookupEngine(TECH_STACK_DICTIONARY)
 
 def extract_tech_stack(text: str) -> list[str]:
     return _tech_engine.extract_matches(text)
+
+
+def extract_tech_stack_with_offsets(text: str) -> list[tuple[str, int]]:
+    return _tech_engine.extract_matches_with_offsets(text)
