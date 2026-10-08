@@ -45,6 +45,13 @@ async def upload_cv_document(
     try:
         lake_record, raw_text_record = await ingestion_service.process_cv_document(file)
 
+        ingestion_service.repository.upsert_structured_record(
+            cv_document_id=lake_record.id,
+            structured_data=None,
+            status="pending",
+        )
+        ingestion_service.repository.commit()
+
         background_tasks.add_task(
             processing_service.process_and_store,
             lake_record.id,
