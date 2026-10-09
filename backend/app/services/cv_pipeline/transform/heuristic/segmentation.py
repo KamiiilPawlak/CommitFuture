@@ -1,11 +1,5 @@
 import regex as re
 
-# Frazy nagłówków sekcji (PL/EN). Nagłówek to cała linia - albo "goła"
-# (np. "Doświadczenie" / "EXPERIENCE" jako jedyna treść linii), albo z
-# dwukropkiem i treścią w tej samej linii (np. "Certyfikaty: AWS, CKA").
-# Fraza w środku zdania opisowego (np. "Doświadczenie w pracy z Pythonem")
-# nie jest traktowana jako nagłówek, bo nie zaczyna linii / nie ma po sobie
-# dwukropka.
 SECTION_HEADER_PATTERNS: dict[str, str] = {
     "experience": (
         r"doświadczenie\s+zawodowe|doświadczenie|"
@@ -89,13 +83,6 @@ def _match_header(
 def find_sections(
     text: str, header_patterns: dict[str, str] | None = None
 ) -> list[tuple[str, int, int]]:
-    """Dzieli tekst (CV albo ogłoszenie o pracę) na sekcje na podstawie
-    nagłówków. Domyślnie używa SECTION_HEADER_PATTERNS (sekcje CV) - dla
-    ogłoszeń o pracę przekaż JOB_POSTING_SECTION_HEADER_PATTERNS. Zwraca
-    listę (typ_sekcji, start, end), gdzie start/end to offsety treści
-    NALEŻĄCEJ do sekcji (bez samej frazy nagłówka). Tekst przed pierwszym
-    nagłówkiem nie trafia do żadnej sekcji.
-    """
     if not text:
         return []
 

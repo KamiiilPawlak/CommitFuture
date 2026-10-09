@@ -88,10 +88,6 @@ class HeuristicExtractionManager:
         sections = find_sections(raw_text)
         experience_spans = spans_for_type(sections, "experience")
         if not experience_spans:
-            # Brak wykrytych nagłówków sekcji (np. CV bez jawnej struktury) -
-            # zachowujemy dotychczasowe zachowanie i traktujemy cały tekst
-            # jako jedną sekcję doświadczenia, żeby nie regresować CV bez
-            # nagłówków.
             experience_spans = [(0, len(raw_text))]
 
         date_ranges_with_offsets = extract_date_ranges_with_offsets(raw_text)
@@ -101,10 +97,6 @@ class HeuristicExtractionManager:
             if offset_in_spans(offsets["offset"], experience_spans)
         ]
 
-        # UWAGA: staż liczony WYŁĄCZNIE z zakresów dat leżących w sekcji
-        # Doświadczenie - zakres dat z Edukacji (np. lata studiów) nie może
-        # wliczać się w total_experience_months/years, inaczej zawyża to
-        # seniority_estimate i total_experience_years na wejściu do matchingu.
         experience_date_range_objs = [
             DateRange(
                 start_date=date_range.get("start_date"),
@@ -154,9 +146,7 @@ class HeuristicExtractionManager:
 
         anchor_offsets = [offset for _dr, offset in experience_date_ranges]
 
-        matches_with_offsets = self.lookup_engine.extract_matches_with_offsets(
-            raw_text
-        )
+        matches_with_offsets = self.lookup_engine.extract_matches_with_offsets(raw_text)
         matches_in_experience = [
             (name, offset)
             for name, offset in matches_with_offsets
