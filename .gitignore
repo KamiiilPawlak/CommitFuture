@@ -5,7 +5,7 @@ PID/
 .pytest_cache
 .ruff_cache
 .env
-/tests/test_file
+/test_file
 .deepeval
 .venv/
 dist/

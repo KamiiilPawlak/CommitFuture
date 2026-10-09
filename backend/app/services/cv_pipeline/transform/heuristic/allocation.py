@@ -2,14 +2,7 @@ def allocate_matches_to_nearest_preceding_anchor(
     matches_with_offsets: list[tuple[str, int]],
     anchor_offsets: list[int],
 ) -> dict[int, list[str]]:
-    """Przypisuje każde dopasowanie (np. technologię) do najbliższego
-    wcześniejszego kotwicy (np. zakresu dat stanowiska) na podstawie offsetu
-    w tekście. Dopasowanie bez żadnej wcześniejszej kotwicy jest odrzucane.
 
-    Zastępuje krok, w którym LLM decydował, do którego stanowiska należy dana
-    technologia (`skills_used`) — tutaj o przypisaniu decyduje wyłącznie
-    pozycja tekstu, bez generowania treści.
-    """
     anchors_sorted_by_offset = sorted(
         range(len(anchor_offsets)), key=lambda i: anchor_offsets[i]
     )
@@ -37,21 +30,17 @@ def pick_nearest_label_per_anchor(
     labels_with_offsets: list[tuple[str, int]],
     anchor_offsets: list[int],
 ) -> dict[int, str | None]:
-    """Przypisuje każdej kotwicy (np. zakresowi dat stanowiska) etykietę
-    (np. tytuł stanowiska) o najmniejszej odległości offsetu w tekście - w
-    obie strony, nie tylko wcześniejszą. W CV tytuł stanowiska równie często
-    stoi przed datami ("Senior Developer, 2022 - obecnie") jak i po nich
-    ("2022 - obecnie, Senior Developer"), więc w przeciwieństwie do
-    allocate_matches_to_nearest_preceding_anchor tu liczy się bliskość, a nie
-    kierunek w tekście. Każda etykieta i każda kotwica biorą udział w co
-    najwyżej jednym przypisaniu (greedy nearest-first matching)."""
     result: dict[int, str | None] = dict.fromkeys(range(len(anchor_offsets)))
     if not labels_with_offsets or not anchor_offsets:
         return result
 
     candidate_pairs = sorted(
         (
-            (abs(anchor_offsets[anchor_index] - label_offset), anchor_index, label_index)
+            (
+                abs(anchor_offsets[anchor_index] - label_offset),
+                anchor_index,
+                label_index,
+            )
             for label_index, (_label, label_offset) in enumerate(labels_with_offsets)
             for anchor_index in range(len(anchor_offsets))
         ),

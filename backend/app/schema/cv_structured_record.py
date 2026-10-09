@@ -24,14 +24,6 @@ _KNOWN_RECORD_KEYS = {
 }
 
 
-class PersonalInfoRecord(BaseModel):
-    full_name: str | None = None
-    email: str | None = None
-    phone: str | None = None
-    location: str | None = None
-    linkedin_url: str | None = None
-
-
 class WorkExperienceRecord(BaseModel):
     company: str | None = None
     role: str | None = None
@@ -55,22 +47,11 @@ class SkillsRecord(BaseModel):
     all_tech_stack_flat: list[str] = Field(default_factory=list)
 
 
-class FieldConfidenceRecord(BaseModel):
-    email: FieldSource | None = None
-    phone: FieldSource | None = None
-
-
 class ValidationRecord(BaseModel):
     warnings: list[str] = Field(default_factory=list)
-    field_confidence: FieldConfidenceRecord = Field(
-        default_factory=FieldConfidenceRecord
-    )
 
 
 class CVStructuredRecord(BaseModel):
-    cv_document_id: str | None = None
-    status: str | None = None
-    personal_info: PersonalInfoRecord | None = None
     summary: str | None = None
     total_experience_months: int | None = None
     seniority_estimate: str | None = None

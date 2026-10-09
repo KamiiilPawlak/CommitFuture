@@ -12,14 +12,6 @@ export type CvStructuredStatus = "pending" | "completed" | "partial" | "failed"
 
 export type FieldSource = "heuristic" | "llm" | "merged"
 
-export interface PersonalInfoRecord {
-  full_name: string | null
-  email: string | null
-  phone: string | null
-  location: string | null
-  linkedin_url: string | null
-}
-
 export interface WorkExperienceRecord {
   company: string | null
   role: string | null
@@ -55,20 +47,11 @@ export interface LanguageDto {
   level: string | null
 }
 
-export interface FieldConfidenceRecord {
-  email: FieldSource | null
-  phone: FieldSource | null
-}
-
 export interface ValidationRecord {
   warnings: string[]
-  field_confidence: FieldConfidenceRecord
 }
 
 export interface CvStructuredData {
-  cv_document_id: string | null
-  status: string | null
-  personal_info: PersonalInfoRecord | null
   summary: string | null
   total_experience_months: number | null
   seniority_estimate: string | null

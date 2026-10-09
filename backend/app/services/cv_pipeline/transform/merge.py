@@ -161,12 +161,6 @@ def build_hard_skills(
 def _heuristic_candidate_to_work_experience_dto(
     candidate: dict[str, Any],
 ) -> WorkExperienceDto:
-    """Zamienia wpis z HeuristicExtractionManager.work_experience_candidates
-    (daty jako obiekty `date`, skille jako {"name","category"}) na
-    WorkExperienceDto - wspólny kształt danych używany dalej przez
-    compute_skill_usage/build_hard_skills/build_work_experience_entry. Brak
-    company/responsibilities: heurystyka (słowniki + offsety) nie potrafi
-    wyciągnąć wolnego tekstu bez NER/LLM."""
     start_date: date | None = candidate.get("start_date")
     end_date: date | None = candidate.get("end_date")
 
@@ -185,9 +179,6 @@ def _heuristic_candidate_to_work_experience_dto(
 def _build_education_from_heuristic(
     education_field_of_study: str | None,
 ) -> list[dict[str, Any]]:
-    """Heurystyka wyciąga tylko znormalizowaną kategorię kierunku studiów,
-    nie instytucję/tytuł/rok - stąd pozostałe pola EducationDto są None, nie
-    zgadywane."""
     if not education_field_of_study:
         return []
 
@@ -205,12 +196,6 @@ def build_unified_record(
     heuristic_result: dict[str, Any],
     validator: TechStackValidator,
 ) -> dict[str, Any]:
-    """Składa CVStructuredRecord wyłącznie z wyników heurystyki (bez LLM) -
-    patrz heuristic/manager.py za ekstrakcję i heuristic/segmentation.py za
-    podział na sekcje, które to umożliwiają."""
-    heuristic_phones: list[str] = heuristic_result.get("phones", [])
-    heuristic_phone: str | None = heuristic_phones[0] if heuristic_phones else None
-
     work_experience = [
         _heuristic_candidate_to_work_experience_dto(candidate)
         for candidate in heuristic_result.get("work_experience_candidates", [])
@@ -219,16 +204,6 @@ def build_unified_record(
     heuristic_tech_stack = heuristic_result.get("tech_stack", [])
 
     return {
-        "personal_info": {
-            # full_name/location/linkedin_url: heurystyka słownikowa nie
-            # potrafi wiarygodnie wyciągnąć wolnego tekstu bez NER (i tak nie
-            # jest to potrzebne do matchingu - patrz CandidateMatchingProfileDto).
-            "full_name": None,
-            "email": heuristic_result.get("email"),
-            "phone": heuristic_phone,
-            "location": None,
-            "linkedin_url": None,
-        },
         "summary": None,
         "total_experience_months": total_experience_months,
         "seniority_estimate": estimate_seniority(total_experience_months),
@@ -252,9 +227,5 @@ def build_unified_record(
         "certifications": heuristic_result.get("certifications", []),
         "validation": {
             "warnings": [],
-            "field_confidence": {
-                "email": "heuristic" if heuristic_result.get("email") else None,
-                "phone": "heuristic" if heuristic_phone else None,
-            },
         },
     }

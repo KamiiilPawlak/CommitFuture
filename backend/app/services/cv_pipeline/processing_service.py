@@ -41,14 +41,8 @@ class CVProcessingService:
 
         status: str = "completed"
 
-        raw_structured_data: dict[str, Any] = {
-            "cv_document_id": str(cv_document_id),
-            "status": status,
-            **unified_record,
-        }
-
         structured_data: dict[str, Any] = json.loads(
-            json.dumps(raw_structured_data, default=str)
+            json.dumps(unified_record, default=str)
         )
 
         self._store(cv_document_id, structured_data=structured_data, status=status)

@@ -26,7 +26,7 @@ def _normalize_unicode(text: str) -> str:
 
 
 def _repair_ocr_mojibake(text: str) -> str:
-    text = ftfy.fix_text(text)
+    text: str = ftfy.fix_text(text)
 
     text: str = MOJIBAKE_MID_PATTERN.sub(r"\1ż\2", text)
     return cast(str, MOJIBAKE_START_PATTERN.sub(r"ż\1", text))

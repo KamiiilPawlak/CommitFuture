@@ -130,9 +130,6 @@ def test_build_unified_record_is_heuristic_only(
 
     record = build_unified_record(heuristic_result=heuristic_result, validator=validator)
 
-    assert record["personal_info"]["email"] == "jan@test.com"
-    assert record["personal_info"]["full_name"] is None
     assert record["work_experience"] == []
     assert record["seniority_estimate"] == "junior"
     assert record["skills"]["all_tech_stack_flat"] == ["python"]
-    assert record["validation"]["field_confidence"]["email"] == "heuristic"
