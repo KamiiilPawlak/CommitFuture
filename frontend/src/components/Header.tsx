@@ -1,4 +1,3 @@
-import { DropdownMenu } from "radix-ui"
 import { Link } from "react-router-dom"
 
 import logo from "@/assets/logo-cf.png"
@@ -36,67 +35,26 @@ function Header() {
           </Link>
         </nav>
         <div className="hidden h-5 w-px shrink-0 bg-border sm:block" aria-hidden="true" />
-        <DropdownMenu.Root>
-          <DropdownMenu.Trigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              aria-label="Menu konta"
-              className="h-8 shrink-0 cursor-pointer gap-1 rounded-full px-2 text-foreground transition-colors hover:bg-muted data-[state=open]:bg-muted sm:h-9"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.75"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="size-4.5"
-              >
-                <circle cx="12" cy="8" r="4" />
-                <path d="M4 20c0-3.5 3.5-6 8-6s8 2.5 8 6" />
-              </svg>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="size-3"
-                aria-hidden="true"
-              >
-                <path d="m6 9 6 6 6-6" />
-              </svg>
-            </Button>
-          </DropdownMenu.Trigger>
-          <DropdownMenu.Portal>
-            <DropdownMenu.Content
-              align="end"
-              sideOffset={8}
-              className="z-20 min-w-36 rounded-lg border border-border bg-card p-1 shadow-md"
-            >
-              <DropdownMenu.Item asChild>
-                <Link
-                  to="/historia"
-                  className="flex cursor-pointer items-center rounded-md px-2.5 py-1.5 text-sm font-medium text-foreground outline-none transition-colors hover:bg-muted focus:bg-muted sm:hidden"
-                >
-                  Historia
-                </Link>
-              </DropdownMenu.Item>
-              <DropdownMenu.Item asChild>
-                <Link
-                  to="/konto"
-                  className="flex cursor-pointer items-center rounded-md px-2.5 py-1.5 text-sm font-medium text-foreground outline-none transition-colors hover:bg-muted focus:bg-muted"
-                >
-                  Ustawienia konta
-                </Link>
-              </DropdownMenu.Item>
-            </DropdownMenu.Content>
-          </DropdownMenu.Portal>
-        </DropdownMenu.Root>
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="Konto"
+          className="size-8 shrink-0 cursor-pointer rounded-full text-foreground transition-colors hover:bg-muted sm:size-9"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.75"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="size-4.5"
+          >
+            <circle cx="12" cy="8" r="4" />
+            <path d="M4 20c0-3.5 3.5-6 8-6s8 2.5 8 6" />
+          </svg>
+        </Button>
       </div>
     </header>
   )
