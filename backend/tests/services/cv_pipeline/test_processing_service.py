@@ -36,7 +36,7 @@ def _capture_store(monkeypatch: pytest.MonkeyPatch) -> dict[str, Any]:
     return captured
 
 
-async def test_process_and_store_injects_cv_document_id_and_status(
+async def test_process_and_store_builds_structured_data_without_duplicating_envelope(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     cv_document_id = uuid4()
@@ -67,9 +67,9 @@ async def test_process_and_store_injects_cv_document_id_and_status(
 
     assert captured["cv_document_id"] == cv_document_id
     assert captured["status"] == "completed"
-    assert captured["structured_data"]["cv_document_id"] == str(cv_document_id)
-    assert captured["structured_data"]["status"] == "completed"
-    assert captured["structured_data"]["personal_info"]["email"] == "jan@test.com"
+    assert "cv_document_id" not in captured["structured_data"]
+    assert "status" not in captured["structured_data"]
+    assert "personal_info" not in captured["structured_data"]
     assert captured["structured_data"]["work_experience"][0]["role"] == "Dev"
 
 
@@ -105,5 +105,5 @@ async def test_process_and_store_completed_status_on_empty_input(
     await service.process_and_store(uuid4(), "")
 
     assert captured["status"] == "completed"
-    assert captured["structured_data"]["status"] == "completed"
+    assert "status" not in captured["structured_data"]
     assert captured["structured_data"]["work_experience"] == []
