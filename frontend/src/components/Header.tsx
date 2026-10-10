@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom"
-
-import logo from "@/assets/logo-cf.png"
+import { CommitFuture } from "@/components/CommitFuture"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import userIcon from "@/assets/icon/user-icon.svg"
@@ -8,18 +7,13 @@ import userIcon from "@/assets/icon/user-icon.svg"
 function Header() {
   return (
     <header className="sticky top-0 z-10 flex min-h-16 w-full shrink-0 items-center justify-between gap-2 border-b border-border bg-card px-4 py-3 sm:py-2">
-      <div className="flex shrink-0 items-center gap-2 text-center">
-        <img src={logo} alt="CommitFuture" className="h-9 w-auto shrink-0 object-contain sm:h-11" />
-        <span className="text-base font-semibold tracking-tight text-foreground sm:text-lg">
-          <span className="text-chart-5">Commit</span>Future
-        </span>
-      </div>
+      <CommitFuture />
       <div className="flex shrink-0 items-center gap-2 sm:gap-3">
         <Link
           to="/"
           className={cn(
             buttonVariants({ variant: "default", size: "sm" }),
-            "h-8 cursor-pointer bg-chart-5 px-2.5 text-sm font-semibold text-black transition-colors hover:bg-chart-5/80! focus-visible:border-chart-5 focus-visible:ring-chart-5/50 sm:h-9 sm:px-3 sm:text-base",
+            "h-8 cursor-pointer bg-chart-5 px-2.5 text-sm font-semibold text-accent-foreground transition-colors hover:bg-chart-5/80! focus-visible:border-chart-5 focus-visible:ring-chart-5/50 sm:h-9 sm:px-3 sm:text-base",
           )}
         >
           Nowe CV
