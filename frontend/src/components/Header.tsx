@@ -3,6 +3,7 @@ import { Link } from "react-router-dom"
 import logo from "@/assets/logo-cf.png"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import userIcon from "@/assets/icon/user-icon.svg"
 
 function Header() {
   return (
@@ -41,19 +42,7 @@ function Header() {
           aria-label="Konto"
           className="size-8 shrink-0 cursor-pointer rounded-full text-foreground transition-colors hover:bg-muted sm:size-9"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.75"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="size-4.5"
-          >
-            <circle cx="12" cy="8" r="4" />
-            <path d="M4 20c0-3.5 3.5-6 8-6s8 2.5 8 6" />
-          </svg>
+          <img src={userIcon} alt="User Icon" className="h-4 w-4 sm:h-5 sm:w-5" />
         </Button>
       </div>
     </header>
