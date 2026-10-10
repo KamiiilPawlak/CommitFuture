@@ -10,6 +10,6 @@ describe("App", () => {
         <App />
       </MemoryRouter>,
     )
-    expect(screen.getByRole("heading", { name: "CommitFuture" })).toBeInTheDocument()
+    expect(screen.getByRole("heading", { name: "Commit Future" })).toBeInTheDocument()
   })
 })
