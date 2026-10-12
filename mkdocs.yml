@@ -55,3 +55,4 @@ nav:
       - Punkty Końcowe (Endpoints): reference/api_endpoints.md
       - Moduł Ingestion: reference/ingestion_services.md
       - ETL CV: reference/etl_cv_services.md
+      - Matching Engine: reference/matching_engine.md
