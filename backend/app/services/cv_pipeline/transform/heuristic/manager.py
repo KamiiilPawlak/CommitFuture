@@ -4,43 +4,38 @@ from app.services.cv_pipeline.transform.heuristic.allocation import (
     allocate_matches_to_nearest_preceding_anchor,
     pick_nearest_label_per_anchor,
 )
-from app.services.cv_pipeline.transform.heuristic.dictionary.certifications import (
-    extract_certifications,
-)
-from app.services.cv_pipeline.transform.heuristic.dictionary.education_fields import (
-    extract_field_of_study,
-)
-from app.services.cv_pipeline.transform.heuristic.dictionary.job_titles import (
-    JOB_TITLES_DICTIONARY,
-)
-from app.services.cv_pipeline.transform.heuristic.dictionary.languages import (
-    extract_languages,
-)
-from app.services.cv_pipeline.transform.heuristic.dictionary.lookup_engine import (
-    FlashLookupEngine,
-)
-from app.services.cv_pipeline.transform.heuristic.dictionary.soft_skills import (
-    extract_soft_skill_tags,
-)
-from app.services.cv_pipeline.transform.heuristic.dictionary.tech_categories import (
-    get_skill_category,
-)
-from app.services.cv_pipeline.transform.heuristic.dictionary.tech_stack import (
-    TECH_STACK_DICTIONARY,
-)
 from app.services.cv_pipeline.transform.heuristic.domain.experience_service import (
     ExperienceService,
 )
 from app.services.cv_pipeline.transform.heuristic.domain.models import DateRange
-from app.services.cv_pipeline.transform.heuristic.extractors import (
-    extract_date_ranges,
-    extract_email,
-    extract_phones,
-)
 from app.services.cv_pipeline.transform.heuristic.extractors.dates import (
     extract_date_ranges_with_offsets,
 )
-from app.services.cv_pipeline.transform.heuristic.segmentation import (
+from app.services.heuristic_shared.dictionary.certifications import (
+    extract_certifications,
+)
+from app.services.heuristic_shared.dictionary.education_fields import (
+    extract_field_of_study,
+)
+from app.services.heuristic_shared.dictionary.job_titles import (
+    JOB_TITLES_DICTIONARY,
+)
+from app.services.heuristic_shared.dictionary.languages import (
+    extract_languages,
+)
+from app.services.heuristic_shared.dictionary.lookup_engine import (
+    FlashLookupEngine,
+)
+from app.services.heuristic_shared.dictionary.soft_skills import (
+    extract_soft_skill_tags,
+)
+from app.services.heuristic_shared.dictionary.tech_categories import (
+    get_skill_category,
+)
+from app.services.heuristic_shared.dictionary.tech_stack import (
+    TECH_STACK_DICTIONARY,
+)
+from app.services.heuristic_shared.segmentation import (
     find_sections,
     offset_in_spans,
     spans_for_type,
@@ -62,9 +57,6 @@ class HeuristicExtractionManager:
     def extract_all(self, raw_text: str | None) -> dict[str, Any]:
         if not raw_text or not raw_text.strip():
             return {
-                "email": None,
-                "phones": [],
-                "dates": [],
                 "tech_stack": [],
                 "job_titles": [],
                 "total_experience_months": 0,
@@ -75,10 +67,6 @@ class HeuristicExtractionManager:
                 "work_experience_candidates": [],
                 "soft_skill_tags": [],
             }
-
-        email = extract_email(raw_text)
-        phones = extract_phones(raw_text)
-        date_ranges = extract_date_ranges(raw_text)
 
         matches = self.lookup_engine.extract_matches(raw_text)
 
@@ -92,8 +80,8 @@ class HeuristicExtractionManager:
 
         date_ranges_with_offsets = extract_date_ranges_with_offsets(raw_text)
         experience_date_ranges = [
-            (date_ranges[index], offsets["offset"])
-            for index, offsets in enumerate(date_ranges_with_offsets)
+            (offsets, offsets["offset"])
+            for offsets in date_ranges_with_offsets
             if offset_in_spans(offsets["offset"], experience_spans)
         ]
 
@@ -110,9 +98,6 @@ class HeuristicExtractionManager:
         )
 
         return {
-            "email": email,
-            "phones": phones,
-            "dates": date_ranges,
             "tech_stack": tech_stack,
             "job_titles": job_titles,
             "total_experience_months": experience.total_months,
