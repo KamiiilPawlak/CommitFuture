@@ -5,11 +5,21 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import Session, SQLModel, create_engine
+from testcontainers.community.postgres import PostgresContainer
 
-os.environ.setdefault("DATABASE_URL", "sqlite:///:memory:")
+_postgres_container = PostgresContainer(
+    "postgres:16-alpine", dbname="cv_ai_matcher_test"
+)
+_postgres_container.start()
+os.environ["DATABASE_URL"] = _postgres_container.get_connection_url()
 
-from app.core.config import settings
-from app.main import app
+
+def pytest_sessionfinish(*_args: object, **_kwargs: object) -> None:
+    _postgres_container.stop()
+
+
+from app.core.config import settings  # noqa: E402
+from app.main import app  # noqa: E402
 
 
 @pytest.fixture
@@ -25,11 +35,6 @@ engine = create_engine(settings.DATABASE_URL, echo=False)
 
 @pytest.fixture(scope="session", autouse=True)
 def setup_database() -> Generator[None, None, None]:
-    from app.models.cv_document import CVDocumentLake
-    from app.models.cv_raw_text import CVRawText
-
-    _ = [CVDocumentLake, CVRawText]
-
     SQLModel.metadata.create_all(engine)
     yield
     SQLModel.metadata.drop_all(engine)
