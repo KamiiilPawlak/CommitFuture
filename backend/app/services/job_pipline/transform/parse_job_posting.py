@@ -5,28 +5,28 @@ from app.schema.matching_profile import (
     RequiredSkillDto,
     SeniorityLevel,
 )
-from app.services.cv_pipeline.transform.heuristic.dictionary.domains import (
+from app.services.heuristic_shared.dictionary.domains import (
     extract_domain_tags,
 )
-from app.services.cv_pipeline.transform.heuristic.dictionary.education_fields import (
+from app.services.heuristic_shared.dictionary.education_fields import (
     extract_field_of_study_categories,
 )
-from app.services.cv_pipeline.transform.heuristic.dictionary.soft_skills import (
+from app.services.heuristic_shared.dictionary.soft_skills import (
     extract_soft_skill_tags,
 )
-from app.services.cv_pipeline.transform.heuristic.dictionary.tech_categories import (
+from app.services.heuristic_shared.dictionary.tech_categories import (
     get_skill_category,
 )
-from app.services.cv_pipeline.transform.heuristic.dictionary.tech_stack import (
+from app.services.heuristic_shared.dictionary.tech_stack import (
     extract_tech_stack_with_offsets,
 )
-from app.services.cv_pipeline.transform.heuristic.segmentation import (
+from app.services.heuristic_shared.segmentation import (
     JOB_POSTING_SECTION_HEADER_PATTERNS,
     find_sections,
     offset_in_spans,
     spans_for_type,
 )
-from app.services.cv_pipeline.transform.slug import slugify
+from app.services.heuristic_shared.slug import slugify
 
 _REQUIREMENTS_WEIGHT = 1.0
 _RESPONSIBILITIES_ONLY_WEIGHT = 0.6

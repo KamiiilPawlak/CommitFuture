@@ -6,7 +6,6 @@ from app.services.cv_pipeline.transform.pipeline import CVPipelineOrchestrator
 
 SAMPLE_RAW_CV = """
 JAN KOWALSKI
-Email: jan.kowalski@example.com | Tel: +48 123-456-789
 LinkedIn: linkedin.com/in/jankowalski
 
 DOŚWIADCZENIE:
@@ -26,7 +25,6 @@ async def test_cv_pipeline_orchestration() -> None:
 
     result = await orchestrator.process_cv(SAMPLE_RAW_CV)
 
-    assert result["email"] == "jan.kowalski@example.com"
     assert "Python" in result.get("tech_stack", []) or "python" in [
         t.lower() for t in result.get("tech_stack", [])
     ]

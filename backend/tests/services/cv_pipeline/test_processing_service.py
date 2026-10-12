@@ -42,9 +42,6 @@ async def test_process_and_store_builds_structured_data_without_duplicating_enve
     cv_document_id = uuid4()
     orchestrator = FakeOrchestrator(
         {
-            "email": "jan@test.com",
-            "phones": [],
-            "dates": [],
             "tech_stack": [],
             "job_titles": [],
             "total_experience_months": 12,
@@ -90,9 +87,6 @@ async def test_process_and_store_completed_status_on_empty_input(
 ) -> None:
     orchestrator = FakeOrchestrator(
         {
-            "email": None,
-            "phones": [],
-            "dates": [],
             "tech_stack": [],
             "job_titles": [],
             "total_experience_months": 0,
