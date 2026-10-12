@@ -6,13 +6,13 @@ from app.schema.matching_profile import (
     SeniorityLevel,
     SkillMatchDto,
 )
-from app.services.cv_pipeline.transform.heuristic.dictionary.education_fields import (
+from app.services.heuristic_shared.dictionary.education_fields import (
     normalize_field_of_study,
 )
-from app.services.cv_pipeline.transform.heuristic.dictionary.tech_categories import (
+from app.services.heuristic_shared.dictionary.tech_categories import (
     get_skill_category,
 )
-from app.services.cv_pipeline.transform.slug import slugify as _slugify
+from app.services.heuristic_shared.slug import slugify as _slugify
 
 _MONTHS_PER_YEAR = 12
 

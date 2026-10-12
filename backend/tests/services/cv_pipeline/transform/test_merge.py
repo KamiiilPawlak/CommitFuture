@@ -119,9 +119,6 @@ def test_build_unified_record_is_heuristic_only(
     validator: TechStackValidator,
 ) -> None:
     heuristic_result = {
-        "email": "jan@test.com",
-        "phones": ["+48123456789"],
-        "dates": [],
         "tech_stack": ["Python"],
         "job_titles": ["Python Developer"],
         "total_experience_months": 10,

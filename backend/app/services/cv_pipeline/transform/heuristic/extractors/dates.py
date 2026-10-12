@@ -76,13 +76,6 @@ def _find_date_ranges(
     return results
 
 
-def extract_date_ranges(text: str) -> list[dict[str, date | bool | str | None]]:
-    return [
-        {"start_date": start_date, "end_date": end_date, "is_current": is_current}
-        for start_date, end_date, is_current, _offset in _find_date_ranges(text)
-    ]
-
-
 def extract_date_ranges_with_offsets(
     text: str,
 ) -> list[dict[str, date | bool | str | int | None]]:

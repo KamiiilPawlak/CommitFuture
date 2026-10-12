@@ -33,11 +33,13 @@ dependencies = [
     # Text & Utils
     "ftfy",
     "regex",
-    "phonenumbers",
     "dateparser",
     "flashtext",
     "httpx",
     "loguru",
+    # Matching
+    "scikit-learn",
+    "numpy",
 ]
 
 [project.optional-dependencies]

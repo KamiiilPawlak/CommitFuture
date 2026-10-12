@@ -15,7 +15,6 @@ def test_heuristic_manager_full_cv_integration(mock_date: MagicMock) -> None:
 
     cv_text = """
     Jan Kowalski
-    Email: jan.kowalski@example.com | Tel: +48 600 100 200
 
     Doświadczenie zawodowe:
      Python Developer w Firma ABC (01.2020 - 05.2022)
@@ -27,18 +26,6 @@ def test_heuristic_manager_full_cv_integration(mock_date: MagicMock) -> None:
     """
 
     results = manager.extract_all(cv_text)
-
-    assert results["email"] == "jan.kowalski@example.com"
-    assert "+48600100200" in results["phones"]
-
-    assert len(results["dates"]) == 2
-    assert results["dates"][0]["start_date"] == date(2020, 1, 1)
-    assert results["dates"][0]["end_date"] == date(2022, 5, 1)
-    assert results["dates"][0]["is_current"] is False
-
-    assert results["dates"][1]["start_date"] == date(2022, 6, 1)
-    assert results["dates"][1]["end_date"] is None
-    assert results["dates"][1]["is_current"] is True
 
     assert results["total_experience_months"] == 48
 
@@ -55,15 +42,11 @@ def test_heuristic_manager_empty_and_invalid_input() -> None:
     manager = HeuristicExtractionManager()
 
     empty_result = manager.extract_all("")
-    assert empty_result["email"] is None
-    assert empty_result["phones"] == []
-    assert empty_result["dates"] == []
     assert empty_result["tech_stack"] == []
     assert empty_result["job_titles"] == []
     assert empty_result["total_experience_months"] == 0
 
     none_result = manager.extract_all(None)
-    assert none_result["email"] is None
     assert none_result["total_experience_months"] == 0
 
 
