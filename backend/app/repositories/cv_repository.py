@@ -3,6 +3,7 @@ from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID
 
+from sqlalchemy import func
 from sqlmodel import Session, select
 
 from app.models.cv_document import CVDocumentLake
@@ -93,6 +94,12 @@ class CVRepository:
 
     def get_structured_by_lake_id(self, lake_id: UUID) -> CVStructuredData | None:
         return self.session.get(CVStructuredData, lake_id)
+
+    def count_structured_by_status(self) -> dict[str, int]:
+        statement = select(CVStructuredData.status, func.count()).group_by(
+            CVStructuredData.status
+        )
+        return dict(self.session.exec(statement).all())
 
     def get_user_documents(self, user_id: UUID) -> Sequence[CVDocumentLake]:
         statement = select(CVDocumentLake).where(CVDocumentLake.id == user_id)

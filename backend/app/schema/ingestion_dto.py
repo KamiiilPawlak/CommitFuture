@@ -22,3 +22,10 @@ class CVStructuredDataResponse(BaseModel):
     status: str
     structured_data: CVStructuredRecord | None
     processed_at: datetime
+
+
+class CVProcessingStatsResponse(BaseModel):
+    pending: int = 0
+    completed: int = 0
+    partial: int = 0
+    failed: int = 0

@@ -37,8 +37,8 @@ Roadmapa oparta na faktycznym stanie kodu opisanym w `docs/architecture/cv-etl-p
 ## P5 — Result API (największa luka wg `roadmap.md`, Faza 1)
 
 - [x] Dodaj endpoint odczytu wyniku — `GET /api/v1/cv/{cv_document_id}/structured` zwraca `status` oraz `structured_data` z `cv_structured_data` (404 jeśli rekordu jeszcze nie ma); łączy w jednym endpointzie to, co `roadmap.md` opisywał jako dwa osobne (`/status` + `/result`).
-- [ ] Test integracyjny end-to-end: upload → poczekaj na `BackgroundTasks` → `GET /{cv_document_id}/structured` zwraca dane zgodne z tym, co zapisał `CVProcessingService` (dziś testy pokrywają tylko `POST /cv/upload`, patrz `backend/tests/integration/api/test_cv_endpoints.py`).
-- [ ] Oceń, czy `BackgroundTasks` wystarcza na produkcję, czy potrzebna jest trwała kolejka (Celery/Arq/RQ) z retry/DLQ niezależnym od życia procesu API — dziś restart serwera w trakcie przetwarzania zamraża rekord w `pending` bez mechanizmu odzyskania. Checklista przygotowawcza: [`docs/architecture/celery-migration-checklist.md`](docs/architecture/celery-migration-checklist.md).
+- [ ] Test integracyjny end-to-end: upload → poczekaj na przetworzenie → `GET /{cv_document_id}/structured` zwraca dane zgodne z tym, co zapisał `CVProcessingService` (dziś testy pokrywają tylko `POST /cv/upload`, patrz `backend/tests/integration/api/test_cv_endpoints.py`).
+- [x] Oceń, czy `BackgroundTasks` wystarcza na produkcję, czy potrzebna jest trwała kolejka (Celery/Arq/RQ) z retry/DLQ niezależnym od życia procesu API — **zrobione: trwała kolejka (Celery + Redis) jest już wdrożona**, `BackgroundTasks` usunięty z `ingestion.py`. Patrz [`docs/architecture/celery-roadmap.md`](docs/architecture/celery-roadmap.md) (Fazy 1–4) i [`docs/architecture/celery-migration-checklist.md`](docs/architecture/celery-migration-checklist.md).
 
 ## P6 — Frontend (branch `feat/init-frontend`)
 
