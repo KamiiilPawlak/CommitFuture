@@ -40,6 +40,8 @@ dependencies = [
     # Matching
     "scikit-learn",
     "numpy",
+    "celery",
+    "redis",
 ]
 
 [project.optional-dependencies]
