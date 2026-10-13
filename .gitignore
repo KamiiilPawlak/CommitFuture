@@ -10,6 +10,7 @@ PID/
 .venv/
 dist/
 build/
+research/
 .mypy_cache/
 .vscode/
 uploads/
@@ -22,5 +23,5 @@ frontend/.vite
 docs/architecture/matching-engine-roadmap.md
 docs/architecture/matching-scoring.md
 
-CI-research.md
+research/
 
