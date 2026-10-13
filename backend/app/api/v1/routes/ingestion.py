@@ -19,10 +19,7 @@ from app.services.cv_pipeline.extract.ingestion_service import (
     IngestionService,
     get_ingestion_service,
 )
-from app.services.cv_pipeline.processing_service import (
-    CVProcessingService,
-    get_cv_processing_service,
-)
+from app.services.cv_pipeline.tasks import process_cv_task
 
 router = APIRouter(prefix="/cv", tags=["CV Ingestion"])
 
@@ -38,7 +35,6 @@ async def upload_cv_document(
     file: UploadFile,
     background_tasks: BackgroundTasks,
     ingestion_service: IngestionService = Depends(get_ingestion_service),
-    processing_service: CVProcessingService = Depends(get_cv_processing_service),
 ) -> CVIngestionResponse:
     logger.info(f"Otrzymano żądanie POST /cv/upload  plik: {file.filename}")
 
@@ -52,11 +48,7 @@ async def upload_cv_document(
         )
         ingestion_service.repository.commit()
 
-        background_tasks.add_task(
-            processing_service.process_and_store,
-            lake_record.id,
-            raw_text_record.raw_text,
-        )
+        process_cv_task.delay(str(lake_record.id), raw_text_record.raw_text)
 
         return CVIngestionResponse(
             message="Dokument CV został pomyślnie przetworzony.",

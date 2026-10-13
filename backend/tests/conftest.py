@@ -18,8 +18,11 @@ def pytest_sessionfinish(*_args: object, **_kwargs: object) -> None:
     _postgres_container.stop()
 
 
+from app.celery_app import celery_app  # noqa: E402
 from app.core.config import settings  # noqa: E402
 from app.main import app  # noqa: E402
+
+celery_app.conf.update(task_always_eager=True, task_eager_propagates=True)
 
 
 @pytest.fixture
