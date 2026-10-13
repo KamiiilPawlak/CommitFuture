@@ -13,3 +13,5 @@ celery_app.conf.result_serializer = "json"
 celery_app.conf.accept_content = ["json"]
 
 celery_app.conf.imports = ["app.services.cv_pipeline.tasks"]
+
+celery_app.conf.broker_transport_options = {"visibility_timeout": 120}
