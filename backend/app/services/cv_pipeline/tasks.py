@@ -14,11 +14,3 @@ from app.services.cv_pipeline.processing_service import CVProcessingService
 def process_cv_task(cv_document_id: str, raw_text: str) -> None:
     service = CVProcessingService()
     asyncio.run(service.process_and_store(UUID(cv_document_id), raw_text))
-
-
-@celery_app.task(name="_resilience_probe", acks_late=True)
-def _resilience_probe(seconds: int) -> str:
-    import time
-
-    time.sleep(seconds)
-    return "done"
