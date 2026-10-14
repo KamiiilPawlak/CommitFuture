@@ -15,3 +15,10 @@ celery_app.conf.accept_content = ["json"]
 celery_app.conf.imports = ["app.services.cv_pipeline.tasks"]
 
 celery_app.conf.broker_transport_options = {"visibility_timeout": 120}
+
+celery_app.conf.beat_schedule = {
+    "recover-stale-pending-cv": {
+        "task": "cv_pipeline.recover_stale_pending",
+        "schedule": settings.STALE_PENDING_CHECK_INTERVAL_SECONDS,
+    },
+}

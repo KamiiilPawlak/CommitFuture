@@ -28,3 +28,7 @@ class CVStructuredData(SQLModel, table=True):
         default_factory=lambda: datetime.now(UTC),
         description="Znacznik czasu zakończenia przetwarzania Etapu B",
     )
+    recovery_attempts: int = Field(
+        default=0,
+        description="Liczba prób ponownego przetworzenia po wykryciu zawieszenia w statusie 'pending'",
+    )

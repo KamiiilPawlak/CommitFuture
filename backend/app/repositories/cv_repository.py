@@ -101,6 +101,25 @@ class CVRepository:
         )
         return dict(self.session.exec(statement).all())
 
+    def get_stale_pending(self, older_than: datetime) -> Sequence[CVStructuredData]:
+        statement = select(CVStructuredData).where(
+            CVStructuredData.status == "pending",
+            CVStructuredData.processed_at < older_than,
+        )
+        return self.session.exec(statement).all()
+
+    def increment_recovery_attempts(self, cv_document_id: UUID) -> CVStructuredData:
+        record = self.session.get(CVStructuredData, cv_document_id)
+        if record is None:
+            msg = f"Brak rekordu cv_structured_data dla dokumentu {cv_document_id}"
+            raise ValueError(msg)
+
+        record.recovery_attempts += 1
+        record.processed_at = datetime.now(UTC)
+        self.session.add(record)
+        self.session.flush()
+        return record
+
     def get_user_documents(self, user_id: UUID) -> Sequence[CVDocumentLake]:
         statement = select(CVDocumentLake).where(CVDocumentLake.id == user_id)
         return self.session.exec(statement).all()

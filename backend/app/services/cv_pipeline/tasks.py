@@ -3,6 +3,7 @@ from uuid import UUID
 
 from app.celery_app import celery_app
 from app.services.cv_pipeline.processing_service import CVProcessingService
+from app.services.cv_pipeline.recovery import recover_stale_pending_cv_documents
 
 
 @celery_app.task(
@@ -14,3 +15,8 @@ from app.services.cv_pipeline.processing_service import CVProcessingService
 def process_cv_task(cv_document_id: str, raw_text: str) -> None:
     service = CVProcessingService()
     asyncio.run(service.process_and_store(UUID(cv_document_id), raw_text))
+
+
+@celery_app.task(name="cv_pipeline.recover_stale_pending")
+def recover_stale_pending_task() -> None:
+    recover_stale_pending_cv_documents()
