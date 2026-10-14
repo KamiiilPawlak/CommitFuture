@@ -16,8 +16,9 @@
 </p>
 
 <p align="center">
-  W repozytorium zaimplementowana jest dziś strona CV: upload PDF → OCR → ekstrakcja ustrukturyzowanych danych → zapis wyniku → odczyt wyniku przez API.
-  Strona ofert pracy (scraping + matching) ma na razie jedynie szkielet modelu danych. Frontend to na razie samodzielny szkielet SPA (React + Vite), jeszcze niepodłączony do API.
+  W repozytorium zaimplementowane są dziś dwa pipeline'y: strona CV (upload PDF → OCR → ekstrakcja ustrukturyzowanych danych w tle przez Celery → zapis wyniku → odczyt wyniku przez API)
+  oraz strona ofert pracy (przyjęcie treści ogłoszenia → ekstrakcja ustrukturyzowanych danych → zapis), a do tego silnik dopasowania kandydata do ogłoszenia (matching engine).
+  Frontend to na razie samodzielny szkielet SPA (React + Vite), jeszcze niepodłączony do API.
 </p>
 
 ---
@@ -32,8 +33,10 @@
 
 - Python 3.11+, FastAPI, Pydantic v2
 - SQLModel / SQLAlchemy + PostgreSQL, Alembic
+- Celery + Redis (broker i result backend) — przetwarzanie CV w tle
 - PyMuPDF, pdfplumber, Tesseract OCR, pdf2image
 - Ekstrakcja ustrukturyzowanych danych: heurystyka (słowniki + regex + segmentacja sekcji, `backend/app/services/cv_pipeline/transform/heuristic/`), **bez LLM**
+- Matching engine (`backend/app/services/matching_engine/`) — dopasowanie profilu kandydata do ogłoszenia o pracę
 
 </td>
 <td valign="top" width="33%">
@@ -65,17 +68,26 @@
 <table>
 <tr><th>Serwis</th><th>Port</th><th>Rola</th></tr>
 <tr><td><code>api</code></td><td>8000</td><td>FastAPI — cała logika biznesowa (<code>backend/app</code>)</td></tr>
+<tr><td><code>worker</code></td><td>—</td><td>Celery worker — przetwarzanie CV w tle (<code>app.celery_app</code>)</td></tr>
 <tr><td><code>postgres</code></td><td>5432</td><td>Baza <code>cv_ai_matcher</code></td></tr>
+<tr><td><code>redis</code></td><td>6379</td><td>Broker i result backend dla Celery</td></tr>
 <tr><td><code>mkdocs</code></td><td>8001</td><td>Statyczna dokumentacja z katalogu <code>docs/</code></td></tr>
 </table>
 
 Pliki PDF trzymane są na dysku (`storage/cv_uploads/`), nie w obiektowym storage.
 
-Kluczowe endpointy: `POST /api/v1/cv/upload` (zapis + OCR, ekstrakcja heurystyczna w tle) oraz `GET /api/v1/cv/{cv_document_id}/structured` (odczyt statusu i wyniku ustrukturyzowanych danych).
+Kluczowe endpointy:
+
+- `POST /api/v1/cv/upload` — zapis + OCR, ekstrakcja heurystyczna uruchamiana w tle jako zadanie Celery
+- `GET /api/v1/cv/{cv_document_id}/structured` — odczyt statusu i wyniku ustrukturyzowanych danych CV
+- `GET /api/v1/cv/stats` — statystyki przetwarzania CV (liczba dokumentów per status: pending/completed/partial/failed)
+- `POST /api/v1/job-postings` — przyjęcie treści ogłoszenia o pracę i uruchomienie ekstrakcji w tle
+- `GET /api/v1/job-postings/{job_posting_id}` — odczyt statusu i ustrukturyzowanych danych ogłoszenia
+- `POST /api/v1/match` — policzenie dopasowania (on-demand) przetworzonego CV do treści ogłoszenia o pracę
 
 ## Wymagania
 
-- Docker + Docker Compose
+- Docker + Docker Compose — zalecany sposób uruchomienia, nie wymaga lokalnej instalacji Tesseracta (jest instalowany wewnątrz obrazu, patrz `backend/Dockerfile`)
 - Do pracy bez kontenerów: Python 3.11+, [`uv`](https://github.com/astral-sh/uv), Node.js 20+, zainstalowany lokalnie Tesseract OCR
 
 ## Szybki start
@@ -159,7 +171,7 @@ POSTGRES_DB=...
 DATABASE_URL=postgresql://user:password@host:5432/dbname
 ```
 
-Dodatkowe opcje konfiguracyjne (z wartościami domyślnymi w kodzie): `MAX_FILE_SIZE`, `ALLOWED_MIME_TYPES`, `TESSERACT_CMD` (ścieżka do binarki Tesseract — ustaw, jeśli nie jest dostępna w `PATH`, np. na Windows).
+Dodatkowe opcje konfiguracyjne (z wartościami domyślnymi w kodzie): `MAX_FILE_SIZE`, `ALLOWED_MIME_TYPES`, `TESSERACT_CMD` (ścieżka do binarki Tesseract — ustaw, jeśli nie jest dostępna w `PATH`, np. na Windows), `CELERY_BROKER_URL`, `CELERY_RESULT_BACKEND` (domyślnie `redis://localhost:6379/0`).
 
 ## Praca lokalna bez Dockera
 
@@ -170,6 +182,9 @@ Dodatkowe opcje konfiguracyjne (z wartościami domyślnymi w kodzie): `MAX_FILE_
 cd backend
 uv pip install --system .[dev]
 uvicorn app.main:app --reload
+
+# W drugim terminalu (wymaga uruchomionego Redis, np. `docker compose up redis`):
+celery -A app.celery_app worker --loglevel=info
 ```
 
 </details>

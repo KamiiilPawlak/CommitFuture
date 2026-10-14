@@ -43,7 +43,3 @@ class JobPostingProcessingService:
                 status=status,
             )
             repository.commit()
-
-
-def get_job_posting_processing_service() -> JobPostingProcessingService:
-    return JobPostingProcessingService()
