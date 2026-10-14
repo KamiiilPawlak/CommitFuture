@@ -12,7 +12,7 @@
 POST /cv/upload
   → IngestionService.process_cv_document   (Etap A: zapis + OCR, jak dotychczas)
   → BackgroundTasks.add_task(CVProcessingService.process_and_store)
-       → CVPipelineOrchestrator.process_cv  (Etap B: cleaning → normalizacja → heurystyka → LLM)
+       → CVPipelineOrchestrator.process_cv  (Etap B: cleaning → normalizacja → heurystyka)
        → CVRepository.upsert_structured_record → tabela cv_structured_data (status: pending|completed|partial|failed)
 ```
 
@@ -21,7 +21,7 @@ POST /cv/upload
 ## 1. Co działa dziś (po uwzględnieniu working tree)
 
 - Upload → walidacja rozszerzenia → Data Lake → OCR (pdfplumber/Tesseract fallback) → `cv_raw_text`.
-- Przetwarzanie w tle: cleaning → normalizacja → heurystyka (email/telefon/daty/tech/stanowiska/staż) → LLM (Ollama, schema-constrained) → zapis do `cv_structured_data` jako JSONB.
+- Przetwarzanie w tle: cleaning → normalizacja → heurystyka (email/telefon/daty/tech/stanowiska/staż) → zapis do `cv_structured_data` jako JSONB. **Korekta:** nie ma żadnego kroku LLM/Ollama w pipeline — wcześniejsze wersje tego dokumentu opisywały fazę LLM jako plan, który nigdy nie został zaimplementowany; dzisiejszy Etap B to wyłącznie OCR + heurystyka.
 - Status przetwarzania (`pending/completed/partial/failed`) jest zapisywany, ale **nic go dziś nie odczytuje** — patrz brak #1 poniżej.
 
 ## 2. Analiza braków
@@ -43,8 +43,6 @@ To jedyny brak, który czyni dzisiejszy pipeline praktycznie bezużytecznym z pe
 
 ### Jakość danych z pipeline'u
 
-- **Brak walidacji krzyżowej LLM ↔ heurystyka** — LLM może "zhalucynować" e-mail/telefon/firmę, której nie ma w `raw_text`; nic tego nie wykrywa ani nie oznacza w `structured_data`.
-- **Brak retry dla Ollamy** — błąd sieci/timeout/parsowania JSON powoduje jednorazowy fallback na `llm_result=None` (status `partial`) bez ponownej próby. Przy niestabilnym lokalnym Ollama to realny powód, dla którego duża część dokumentów skończy jako `partial`.
 - **`page_count` zawsze `0`** w `cv_raw_text` — liczba stron PDF nie jest liczona nigdzie (ani w ścieżce `pdfplumber`, ani w OCR).
 - **Zduplikowana/martwa logika domenowa:** `ExperienceService.calculate_experience` i `TechStackValidator` istnieją i są przetestowane jednostkowo, ale pipeline korzysta tylko z równoległej logiki w `experience_calc.py` i `FlashLookupEngine` — do decyzji: scalić czy usunąć.
 
@@ -56,11 +54,10 @@ To jedyny brak, który czyni dzisiejszy pipeline praktycznie bezużytecznym z pe
 ### Przenośność / infrastruktura
 
 - `OCRConfig.TESSERACT_CMD` zahardkodowany na Windows (`C:\Program Files\Tesseract-OCR\tesseract.exe`) — pipeline nie odpali się w kontenerze Linux/CI bez zmiany kodu.
-- `OLLAMA_BASE_URL=http://localhost:11434` domyślnie — brak udokumentowanego sposobu uruchomienia Ollamy jako usługi w docker-compose/CI dla pipeline'u Etapu B.
 
 ### Testy
 
-Dzisiejsze testy pokrywają poszczególne komponenty (`cleaning`, `normalization`, `heuristic`, `llm client`) i cały `CVPipelineOrchestrator.process_cv` w izolacji. **Nie ma testu end-to-end przez API** (`POST /cv/upload` → poczekaj na `BackgroundTasks` → sprawdź `cv_structured_data` w bazie) — czyli brak pokrycia właśnie tego połączenia, które jest teraz sercem pipeline'u.
+Dzisiejsze testy pokrywają poszczególne komponenty (`cleaning`, `normalization`, `heuristic`) i cały `CVPipelineOrchestrator.process_cv` w izolacji. **Nie ma testu end-to-end przez API** (`POST /cv/upload` → poczekaj na `BackgroundTasks` → sprawdź `cv_structured_data` w bazie) — czyli brak pokrycia właśnie tego połączenia, które jest teraz sercem pipeline'u.
 
 ## 3. Proponowane fazy
 
@@ -88,30 +85,26 @@ Priorytet najwyższy: bez tego Etap B produkuje dane, których nikt nie może od
 
 ### Faza 3 — Jakość i odporność danych z Etapu B
 
-- [ ] Walidacja krzyżowa LLM ↔ heurystyka: oznacz w `structured_data` pola z LLM, które nie mają potwierdzenia w `raw_text`/heurystyce (np. `llm_result.personal_info.email` różny od heurystycznego `email`) — jako metadane do dalszej oceny jakości, nie hard-fail.
-- [ ] Retry z backoffem dla `OllamaLLMClient.parse_cv` (np. 2–3 próby przy `httpx.HTTPError`/timeout) przed oznaczeniem `llm_result=None`.
 - [ ] Policz `page_count` przy ekstrakcji (`pdfplumber`/`pdf2image`) i zapisz do `cv_raw_text` zamiast stałego `0`.
 - [ ] Decyzja: `ExperienceService`/`TechStackValidator` — podłączyć do pipeline'u (usuwając duplikację w `experience_calc.py`/`FlashLookupEngine`) albo usunąć jako martwy kod.
 
 ### Faza 4 — Odporność przetwarzania w tle i obserwowalność
 
-- [ ] Ocenić, czy `BackgroundTasks` wystarcza na produkcję, czy potrzebna jest trwała kolejka (Celery/Arq/RQ) z retry/DLQ niezależnym od życia procesu API — szczególnie istotne, bo dziś restart serwera w trakcie przetwarzania zamraża rekord w `pending` bez żadnego mechanizmu odzyskania.
-- [ ] Zadanie/endpoint do "odzyskania" zawieszonych w `pending` dłużej niż X minut (retry albo oznaczenie `failed`).
-- [ ] Metryka/log agregujący odsetek `completed/partial/failed` do szybkiej oceny zdrowia pipeline'u.
+- [x] Ocenić, czy `BackgroundTasks` wystarcza na produkcję, czy potrzebna jest trwała kolejka (Celery/Arq/RQ) z retry/DLQ niezależnym od życia procesu API — **decyzja: Celery + Redis**, wdrożone (patrz [`celery-roadmap.md`](./celery-roadmap.md) Fazy 1–4). `BackgroundTasks` usunięty z `ingestion.py`, `POST /cv/upload` woła `process_cv_task.delay(...)`; `acks_late=True` + `visibility_timeout=120` w `app/celery_app.py` rozwiązują problem zamrażania w `pending` przy restarcie.
+- [ ] Zadanie/endpoint do "odzyskania" zawieszonych w `pending` dłużej niż X minut (retry albo oznaczenie `failed`) — osobna decyzja, wymaga Celery Beat; świadomie odłożone (patrz `celery-roadmap.md` sekcja 3).
+- [x] Metryka/log agregujący odsetek `completed/partial/failed` do szybkiej oceny zdrowia pipeline'u — `GET /api/v1/cv/stats`.
 
 ### Faza 5 — Przenośność i dokumentacja
 
 - [ ] `OCRConfig.TESSERACT_CMD` → zmienna środowiskowa/config, żeby pipeline odpalał się w kontenerze/CI.
-- [ ] Udokumentować (README/docker-compose) jak uruchomić Ollama lokalnie/w CI dla pipeline'u Etapu B.
 - [ ] Zaktualizować `cv-etl-pipline.md`, żeby odzwierciedlał Fazę 0 jako zrealizowaną (dziś opisuje Etap B jako niepodłączony).
 - [ ] Zaktualizować `checklist.md` (odznaczyć zrealizowane punkty P0, przeniosić pozostałe do odpowiednich faz tej roadmapy, żeby nie istniały dwie rozjeżdżające się listy TODO).
-- [ ] Zdecydować o losie usuniętych plików w `docs/architecture/` (diagramy `.drawio.svg`, `dependencies.svg`, `classes/packages_cv_matcher.png`, `security_policies.md`) — czy `overview.md` (dziś pusty) ma je zastąpić.
+- [x] Zdecydować o losie usuniętych plików w `docs/architecture/` (diagramy `.drawio.svg`, `dependencies.svg`, `classes/packages_cv_matcher.png`, `security_policies.md`) — **zrobione: nie odtwarzamy, `overview.md` zastępuje je opisem tekstowym** (decyzja i uzasadnienie per plik w `overview.md`, sekcja "Historia tego dokumentu").
 
 ## 4. Decyzje otwarte dla właściciela produktu/repo
 
 1. **Result API — sync czy async?** Czy `/cv/upload` powinien móc opcjonalnie czekać (parametr `?sync=true`) na wynik Etapu B dla małych plików, czy zawsze tylko fire-and-forget + polling przez `/status`?
-2. **Kolejka w tle** — czy zostajemy przy `BackgroundTasks` (prostsze, ale bez trwałości) do MVP, czy inwestujemy teraz w Celery/Arq (Faza 4) przed pierwszym wdrożeniem produkcyjnym?
-3. **Halucynacje LLM** — czy niezgodność LLM ↔ heurystyka ma tylko oznaczać dane metadanymi, czy ma automatycznie nadpisywać pole z LLM wartością z heurystyki (bezpieczniejsze, ale heurystyka nie wie o polach, których nie szuka, np. nazwa firmy)?
+2. ~~**Kolejka w tle** — czy zostajemy przy `BackgroundTasks` (prostsze, ale bez trwałości) do MVP, czy inwestujemy teraz w Celery/Arq (Faza 4) przed pierwszym wdrożeniem produkcyjnym?~~ **Rozstrzygnięte: Celery + Redis**, patrz [`celery-roadmap.md`](./celery-roadmap.md).
 
 ---
 
