@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from loguru import logger
 from sqlmodel import Session
 
@@ -11,10 +11,7 @@ from app.schema.job_posting_dto import (
     JobPostingSubmitRequest,
     JobPostingSubmitResponse,
 )
-from app.services.job_pipline.processing_service import (
-    JobPostingProcessingService,
-    get_job_posting_processing_service,
-)
+from app.services.job_pipline.tasks import process_job_posting_task
 
 router = APIRouter(prefix="/job-postings", tags=["Job Posting Ingestion"])
 
@@ -26,11 +23,7 @@ router = APIRouter(prefix="/job-postings", tags=["Job Posting Ingestion"])
 )
 async def submit_job_posting(
     payload: JobPostingSubmitRequest,
-    background_tasks: BackgroundTasks,
     session: Session = Depends(get_session),
-    processing_service: JobPostingProcessingService = Depends(
-        get_job_posting_processing_service
-    ),
 ) -> JobPostingSubmitResponse:
     logger.info("Otrzymano żądanie POST /job-postings")
 
@@ -38,11 +31,7 @@ async def submit_job_posting(
     job_posting = repository.create(payload.raw_text)
     repository.commit()
 
-    background_tasks.add_task(
-        processing_service.process_and_store,
-        job_posting.id,
-        job_posting.raw_text,
-    )
+    process_job_posting_task.delay(str(job_posting.id), job_posting.raw_text)
 
     return JobPostingSubmitResponse(
         message="Ogłoszenie o pracę zostało przyjęte do przetworzenia.",

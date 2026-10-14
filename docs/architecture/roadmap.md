@@ -91,7 +91,7 @@ Priorytet najwyższy: bez tego Etap B produkuje dane, których nikt nie może od
 ### Faza 4 — Odporność przetwarzania w tle i obserwowalność
 
 - [x] Ocenić, czy `BackgroundTasks` wystarcza na produkcję, czy potrzebna jest trwała kolejka (Celery/Arq/RQ) z retry/DLQ niezależnym od życia procesu API — **decyzja: Celery + Redis**, wdrożone (patrz [`celery-roadmap.md`](./celery-roadmap.md) Fazy 1–4). `BackgroundTasks` usunięty z `ingestion.py`, `POST /cv/upload` woła `process_cv_task.delay(...)`; `acks_late=True` + `visibility_timeout=120` w `app/celery_app.py` rozwiązują problem zamrażania w `pending` przy restarcie.
-- [ ] Zadanie/endpoint do "odzyskania" zawieszonych w `pending` dłużej niż X minut (retry albo oznaczenie `failed`) — osobna decyzja, wymaga Celery Beat; świadomie odłożone (patrz `celery-roadmap.md` sekcja 3).
+- [x] Zadanie/endpoint do "odzyskania" zawieszonych w `pending` dłużej niż X minut (retry albo oznaczenie `failed`) — **zrobione: Celery Beat**, patrz [`celery-roadmap.md`](./celery-roadmap.md) Faza 6 i [`research/celery-research.md`](../../research/celery-research.md) sekcja 10.
 - [x] Metryka/log agregujący odsetek `completed/partial/failed` do szybkiej oceny zdrowia pipeline'u — `GET /api/v1/cv/stats`.
 
 ### Faza 5 — Przenośność i dokumentacja
