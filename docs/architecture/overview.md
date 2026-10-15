@@ -32,7 +32,7 @@ Ten dokument **nie opisuje** przebiegu pipeline'u krok po kroku — to robi `cv-
                       ▼                             ▼                         ▼
              ┌─────────────────┐           ┌─────────────────┐      ┌─────────────────┐
              │ postgres         │           │ ollama           │      │ storage/         │
-             │ (cv_ai_matcher)  │  :5432    │ (qwen2.5:3b)     │ :11434│ cv_uploads/     │
+             │ (commit_future)  │  :5432    │ (qwen2.5:3b)     │ :11434│ cv_uploads/     │
              └─────────────────┘           └─────────────────┘      │ (dysk lokalny)   │
                                                                       └─────────────────┘
 
@@ -42,7 +42,7 @@ Ten dokument **nie opisuje** przebiegu pipeline'u krok po kroku — to robi `cv-
 ```
 
 - **api** — jedyny serwis z logiką biznesową; FastAPI + SQLModel, uruchamiany z `backend/Dockerfile`, montuje kod na żywo (`--reload`) w dev.
-- **postgres** — jedna baza `cv_ai_matcher`, bez rozdzielenia na schematy; healthcheck blokuje start `api`, aż baza odpowiada.
+- **postgres** — jedna baza `commit_future`, bez rozdzielenia na schematy; healthcheck blokuje start `api`, aż baza odpowiada.
 - **ollama** — lokalny serwer LLM; kontener przy starcie sam pobiera model `qwen2.5:3b` (`ollama pull`), więc pierwszy start trwa dłużej.
 - **mkdocs** — serwuje ten katalog (`docs/`) jako stronę dokumentacji, niezależnie od `api`.
 - **storage/cv_uploads/** — pliki PDF trzymane na dysku kontenera/hosta (bind mount `./backend:/code`), nie w obiekcie blob/S3 — patrz uwaga o przenośności w `roadmap.md` (Faza 5).

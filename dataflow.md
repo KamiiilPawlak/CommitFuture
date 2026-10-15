@@ -1,5 +1,7 @@
 # Przepływ danych: upload CV → wyświetlenie na stronie
 
+> **Nieaktualne.** Ten dokument opisuje architekturę z **FastAPI `BackgroundTasks`**, sprzed migracji na Celery. Aktualny opis przepływu danych (CV + ogłoszenia o pracę, Celery + Redis, odzyskiwanie zawieszonych zadań) jest w [`docs/architecture/dataflow.md`](docs/architecture/dataflow.md). Ten plik zostaje jako zapis historyczny poprzedniej wersji.
+
 Dokument opisuje pełną ścieżkę danych w aplikacji — od wgrania pliku CV przez użytkownika, przez przetwarzanie backendowe, aż po wyrenderowanie wyniku na stronie.
 
 **Mechanizm asynchroniczności:** wyłącznie wbudowane `BackgroundTasks` z FastAPI — brak Celery/Redis/kolejki/WebSocket/SSE. Frontend odpytuje endpoint wynikowy cyklicznie (`setTimeout` polling).

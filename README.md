@@ -69,7 +69,7 @@
 <tr><th>Serwis</th><th>Port</th><th>Rola</th></tr>
 <tr><td><code>api</code></td><td>8000</td><td>FastAPI — cała logika biznesowa (<code>backend/app</code>)</td></tr>
 <tr><td><code>worker</code></td><td>—</td><td>Celery worker — przetwarzanie CV w tle (<code>app.celery_app</code>)</td></tr>
-<tr><td><code>postgres</code></td><td>5432</td><td>Baza <code>cv_ai_matcher</code></td></tr>
+<tr><td><code>postgres</code></td><td>5432</td><td>Baza <code>commit_future</code></td></tr>
 <tr><td><code>redis</code></td><td>6379</td><td>Broker i result backend dla Celery</td></tr>
 <tr><td><code>mkdocs</code></td><td>8001</td><td>Statyczna dokumentacja z katalogu <code>docs/</code></td></tr>
 </table>
