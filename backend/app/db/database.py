@@ -1,22 +1,23 @@
 from collections.abc import Generator
+from pathlib import Path
 
+from alembic import command
+from alembic.config import Config
 from loguru import logger
-from sqlmodel import Session, SQLModel, create_engine
+from sqlmodel import Session, create_engine
 
 from app.core.config import settings
-from app.models.cv_document import CVDocumentLake
-from app.models.cv_raw_text import CVRawText
-from app.models.cv_structured_data import CVStructuredData
-from app.models.job_posting import JobPosting
 
 engine = create_engine(settings.DATABASE_URL, echo=True)
 
+BACKEND_DIR = Path(__file__).resolve().parents[2]
 
-def init_db() -> None:
-    logger.info("Inicjalizacja bazy danych")
-    _ = [CVDocumentLake, CVRawText, CVStructuredData, JobPosting]
-    logger.success("Tabela bazy danych zostala pomyslnie utworzona")
-    SQLModel.metadata.create_all(engine)
+
+def run_migrations() -> None:
+    logger.info("Stosowanie migracji Alembic do najnowszej wersji (head)")
+    alembic_cfg = Config(str(BACKEND_DIR / "alembic.ini"))
+    command.upgrade(alembic_cfg, "head")
+    logger.success("Schemat bazy danych jest aktualny")
 
 
 def get_session() -> Generator[Session, None, None]:

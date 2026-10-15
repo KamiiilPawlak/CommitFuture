@@ -1,7 +1,7 @@
-"""initial schema
+"""add cv_structured_data.recovery_attempts
 
 Revision ID: 1691a8e1f341
-Revises:
+Revises: 535ed1af87d0
 Create Date: 2026-10-15 11:55:50.461866
 
 """
@@ -13,7 +13,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = "1691a8e1f341"
-down_revision: str | Sequence[str] | None = None
+down_revision: str | Sequence[str] | None = "535ed1af87d0"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

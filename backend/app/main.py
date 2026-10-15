@@ -8,7 +8,7 @@ from loguru import logger
 from app.api.v1.router import api_router
 from app.core.logger import setup_logging
 
-from .db.database import init_db
+from .db.database import run_migrations
 
 setup_logging()
 
@@ -16,7 +16,7 @@ setup_logging()
 @asynccontextmanager
 async def lifespan(_app: FastAPI) -> AsyncGenerator[None, None]:
     logger.info("Uruchomienie aplikacji")
-    init_db()
+    run_migrations()
     yield
     logger.info("Zamykanie aplikacji")
 
