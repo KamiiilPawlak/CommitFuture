@@ -6,7 +6,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: abcd1234
-      POSTGRES_DB: cv_ai_matcher
+      POSTGRES_DB: commit_future
     ports:
       - "5432:5432"
     volumes:
@@ -41,7 +41,7 @@ services:
       - ./backend:/code
     environment:
       - WATCHFILES_FORCE_POLLING=true
-      - DATABASE_URL=postgresql+psycopg2://postgres:abcd1234@postgres:5432/cv_ai_matcher
+      - DATABASE_URL=postgresql+psycopg2://postgres:abcd1234@postgres:5432/commit_future
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
@@ -60,7 +60,7 @@ services:
     volumes:
       - ./backend:/code
     environment:
-      - DATABASE_URL=postgresql+psycopg2://postgres:abcd1234@postgres:5432/cv_ai_matcher
+      - DATABASE_URL=postgresql+psycopg2://postgres:abcd1234@postgres:5432/commit_future
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
     command: celery -A app.celery_app worker --loglevel=info
@@ -79,7 +79,7 @@ services:
     volumes:
       - ./backend:/code
     environment:
-      - DATABASE_URL=postgresql+psycopg2://postgres:abcd1234@postgres:5432/cv_ai_matcher
+      - DATABASE_URL=postgresql+psycopg2://postgres:abcd1234@postgres:5432/commit_future
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
     command: celery -A app.celery_app beat --loglevel=info

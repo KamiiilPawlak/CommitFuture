@@ -8,7 +8,7 @@ from sqlmodel import Session, SQLModel, create_engine
 from testcontainers.community.postgres import PostgresContainer
 
 _postgres_container = PostgresContainer(
-    "postgres:16-alpine", dbname="cv_ai_matcher_test"
+    "postgres:16-alpine", dbname="commit_future_test"
 )
 _postgres_container.start()
 os.environ["DATABASE_URL"] = _postgres_container.get_connection_url()

@@ -47,6 +47,9 @@ nav:
   - Architektura:
       - Decyzje (ADR): architecture/adr/0001-magic-bytes-validation.md
       - Bezpieczeństwo: architecture/security_policies.md
+      - Baza danych: architecture/database.md
+      - Migracje: architecture/migrations.md
+      - Przepływ danych: architecture/dataflow.md
       - Integracja z LLM (zarchiwizowane): architecture/llm-integration-archived.md
   - Instrukcje:
       - Lokalne Uruchomienie: how-to/local_development.md
