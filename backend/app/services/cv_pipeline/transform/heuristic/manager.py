@@ -9,6 +9,7 @@ from app.services.cv_pipeline.transform.heuristic.domain.experience_service impo
 )
 from app.services.cv_pipeline.transform.heuristic.domain.models import DateRange
 from app.services.cv_pipeline.transform.heuristic.extractors.dates import (
+    DateRangeOffset,
     extract_date_ranges_with_offsets,
 )
 from app.services.heuristic_shared.dictionary.certifications import (
@@ -115,7 +116,7 @@ class HeuristicExtractionManager:
         self,
         raw_text: str,
         experience_spans: list[tuple[int, int]],
-        experience_date_ranges: list[tuple[dict[str, Any], int]],
+        experience_date_ranges: list[tuple[DateRangeOffset, int]],
     ) -> list[dict[str, Any]]:
         """Bez pomocy LLM odtwarza przypisanie 'ten tytuł stanowiska i te
         technologie należą do tego okresu zatrudnienia' - wyłącznie na

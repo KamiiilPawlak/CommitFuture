@@ -5,7 +5,7 @@ from app.core.async_utils import run_coroutine_sync
 from app.services.job_pipline.processing_service import JobPostingProcessingService
 
 
-@celery_app.task(
+@celery_app.task(  # type: ignore[untyped-decorator]
     name="job_pipline.process_job_posting",
     acks_late=True,
     soft_time_limit=60,

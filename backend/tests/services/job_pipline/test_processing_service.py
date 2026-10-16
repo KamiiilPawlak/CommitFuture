@@ -1,3 +1,4 @@
+import json
 from typing import Any
 from uuid import uuid4
 
@@ -11,8 +12,6 @@ class FakeParseResult:
         self._data = data
 
     def model_dump_json(self) -> str:
-        import json
-
         return json.dumps(self._data)
 
 
@@ -26,9 +25,7 @@ def _capture_store(monkeypatch: pytest.MonkeyPatch) -> dict[str, Any]:
         captured["structured_data"] = structured_data
         captured["status"] = status
 
-    monkeypatch.setattr(
-        JobPostingProcessingService, "_store", staticmethod(fake_store)
-    )
+    monkeypatch.setattr(JobPostingProcessingService, "_store", staticmethod(fake_store))
     return captured
 
 

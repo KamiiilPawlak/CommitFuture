@@ -55,7 +55,11 @@ def test_cv_upload_is_processed_end_to_end_and_readable_via_structured_endpoint(
     client_with_fake_ocr: TestClient,
 ) -> None:
     files = {
-        "file": ("jan_kowalski_cv.pdf", io.BytesIO(b"%PDF-fake-bytes"), "application/pdf")
+        "file": (
+            "jan_kowalski_cv.pdf",
+            io.BytesIO(b"%PDF-fake-bytes"),
+            "application/pdf",
+        )
     }
 
     upload_response = client_with_fake_ocr.post("/api/v1/cv/upload", files=files)
@@ -80,7 +84,11 @@ def test_cv_stats_endpoint_counts_completed_document_after_processing(
     client_with_fake_ocr: TestClient,
 ) -> None:
     files = {
-        "file": ("jan_kowalski_cv.pdf", io.BytesIO(b"%PDF-fake-bytes"), "application/pdf")
+        "file": (
+            "jan_kowalski_cv.pdf",
+            io.BytesIO(b"%PDF-fake-bytes"),
+            "application/pdf",
+        )
     }
 
     client_with_fake_ocr.post("/api/v1/cv/upload", files=files)

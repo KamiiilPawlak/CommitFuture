@@ -1,4 +1,5 @@
 from collections.abc import Generator
+from typing import Any
 from uuid import UUID, uuid4
 
 import pytest
@@ -16,7 +17,7 @@ Requirements:
 - FastAPI
 """
 
-COMPLETED_STRUCTURED_DATA = {
+COMPLETED_STRUCTURED_DATA: dict[str, Any] = {
     "summary": None,
     "total_experience_months": 36,
     "seniority_estimate": "mid",
@@ -47,7 +48,7 @@ COMPLETED_STRUCTURED_DATA = {
 
 
 def _seed_cv_document(
-    *, status_value: str, structured_data: dict | None
+    *, status_value: str, structured_data: dict[str, Any] | None
 ) -> Generator[UUID, None, None]:
     with Session(engine) as session:
         lake = CVDocumentLake(

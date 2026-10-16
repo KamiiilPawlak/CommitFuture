@@ -100,7 +100,11 @@ def test_compute_skill_usage_ignores_unparseable_dates(
 ) -> None:
     work_experience = [
         WorkExperienceDto(
-            company="A", role="Dev", start_date=None, end_date=None, skills_used=["Python"]
+            company="A",
+            role="Dev",
+            start_date=None,
+            end_date=None,
+            skills_used=["Python"],
         ),
     ]
 
@@ -125,7 +129,9 @@ def test_build_unified_record_is_heuristic_only(
         "total_experience_years": 0.8,
     }
 
-    record = build_unified_record(heuristic_result=heuristic_result, validator=validator)
+    record = build_unified_record(
+        heuristic_result=heuristic_result, validator=validator
+    )
 
     assert record["work_experience"] == []
     assert record["seniority_estimate"] == "junior"

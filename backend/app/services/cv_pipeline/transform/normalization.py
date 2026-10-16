@@ -71,7 +71,7 @@ class CVTextNormalizer:
     def __init__(self, patterns: NormalizerPatterns = NormalizerPatterns()) -> None:
         self._patterns = patterns
 
-    def normalize_text(self, text: str) -> str:
+    def normalize_text(self, text: str | None) -> str:
         if not text:
             return ""
 

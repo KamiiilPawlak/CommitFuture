@@ -1,11 +1,13 @@
 from datetime import date
+from typing import Any
 
 from app.services.cv_pipeline.transform.heuristic.extractors.dates import (
+    DateRangeOffset,
     extract_date_ranges_with_offsets,
 )
 
 
-def _without_offset(results: list[dict]) -> list[dict]:
+def _without_offset(results: list[DateRangeOffset]) -> list[dict[str, Any]]:
     return [{k: v for k, v in result.items() if k != "offset"} for result in results]
 
 
@@ -74,4 +76,6 @@ def test_extract_date_ranges_empty_or_invalid() -> None:
     """Test braku dopasowań oraz pustego tekstu."""
     assert extract_date_ranges_with_offsets("") == []
     assert extract_date_ranges_with_offsets("None") == []
-    assert extract_date_ranges_with_offsets("Brak jakichkolwiek dat w tym tekście.") == []
+    assert (
+        extract_date_ranges_with_offsets("Brak jakichkolwiek dat w tym tekście.") == []
+    )
