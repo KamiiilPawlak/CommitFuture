@@ -1,11 +1,13 @@
 from datetime import date
+from typing import Any
 
 from app.services.cv_pipeline.transform.heuristic.extractors.dates import (
+    DateRangeOffset,
     extract_date_ranges_with_offsets,
 )
 
 
-def _without_offset(results: list[dict]) -> list[dict]:
+def _without_offset(results: list[DateRangeOffset]) -> list[dict[str, Any]]:
     return [{k: v for k, v in result.items() if k != "offset"} for result in results]
 
 

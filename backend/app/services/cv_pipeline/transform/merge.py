@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import date
-from typing import Any, Final, Literal
+from typing import Any, Final, TypedDict
 
 from app.schema.cv_extraction_dto import WorkExperienceDto
 from app.services.cv_pipeline.transform.dictionaries.validator import TechStackValidator
@@ -24,12 +24,10 @@ _SENIORITY_THRESHOLDS: Final[list[tuple[int, str]]] = [
 ]
 _SENIORITY_DEFAULT: Final[str] = "senior"
 
-# Źródło pola jest dziś zawsze "heuristic" - bez LLM nie ma już z czym
-# "mergować". Literal zostaje szerszy niż faktycznie produkowane wartości,
-# żeby nie trzeba było jednocześnie zmieniać CVStructuredRecord/HardSkillRecord.
-FieldSource: Final[Literal["heuristic", "llm", "merged"]] = Literal[
-    "heuristic", "llm", "merged"
-]
+
+class SkillUsage(TypedDict):
+    months_used: int
+    last_used: str
 
 
 def _parse_role_date(value: str | None) -> date | None:
@@ -73,7 +71,7 @@ def _role_date_span(entry: WorkExperienceDto) -> tuple[date, date] | None:
 def compute_skill_usage(
     work_experience: list[WorkExperienceDto],
     validator: TechStackValidator,
-) -> dict[str, dict[str, int | str | None]]:
+) -> dict[str, SkillUsage]:
     skill_spans: dict[str, list[tuple[date, date]]] = {}
     skill_is_current: dict[str, bool] = {}
 
@@ -89,7 +87,7 @@ def compute_skill_usage(
             if is_current:
                 skill_is_current[skill] = True
 
-    result: dict[str, dict[str, int | str | None]] = {}
+    result: dict[str, SkillUsage] = {}
     for skill, spans in skill_spans.items():
         merged = merge_overlapping_ranges(spans)
         total_days = sum((end - start).days + 1 for start, end in merged)
@@ -145,12 +143,12 @@ def build_hard_skills(
 
     result: list[dict[str, Any]] = []
     for skill in sorted(all_skills):
-        skill_usage: dict[str, Any] = usage.get(skill, {})
+        skill_usage = usage.get(skill)
         result.append(
             {
                 "name": skill,
-                "months_used": skill_usage.get("months_used"),
-                "last_used": skill_usage.get("last_used"),
+                "months_used": skill_usage["months_used"] if skill_usage else None,
+                "last_used": skill_usage["last_used"] if skill_usage else None,
                 "source": "heuristic",
             }
         )

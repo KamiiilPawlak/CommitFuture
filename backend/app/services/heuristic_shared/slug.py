@@ -1,3 +1,5 @@
+from typing import cast
+
 import regex as re
 
 _POLISH_DIACRITICS_TRANSLATION = str.maketrans(
@@ -26,5 +28,5 @@ def slugify(name: str) -> str:
     slug = name.strip().lower()
     slug = slug.translate(_POLISH_DIACRITICS_TRANSLATION)
     slug = slug.replace("+", "p").replace("#", "sharp")
-    slug = re.sub(r"[^a-z0-9]+", "_", slug)
+    slug = cast(str, re.sub(r"[^a-z0-9]+", "_", slug))
     return slug.strip("_")

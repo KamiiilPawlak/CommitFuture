@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from typing import Any
+from typing import Any, Protocol
 from uuid import UUID
 
 from loguru import logger
@@ -9,15 +9,22 @@ from sqlmodel import Session
 
 from app.db.database import engine
 from app.repositories.cv_repository import CVRepository
+from app.services.cv_pipeline.transform.dictionaries.validator import (
+    TechStackValidator,
+)
 from app.services.cv_pipeline.transform.merge import build_unified_record
 from app.services.cv_pipeline.transform.pipeline import CVPipelineOrchestrator
 
 
+class CVOrchestrator(Protocol):
+    tech_stack_validator: TechStackValidator
+
+    async def process_cv(self, raw_text: str) -> dict[str, Any]: ...
+
+
 class CVProcessingService:
-    def __init__(self, orchestrator: CVPipelineOrchestrator | None = None) -> None:
-        self.orchestrator: CVPipelineOrchestrator = (
-            orchestrator or CVPipelineOrchestrator()
-        )
+    def __init__(self, orchestrator: CVOrchestrator | None = None) -> None:
+        self.orchestrator: CVOrchestrator = orchestrator or CVPipelineOrchestrator()
 
     async def process_and_store(self, cv_document_id: UUID, raw_text: str) -> None:
         logger.info(

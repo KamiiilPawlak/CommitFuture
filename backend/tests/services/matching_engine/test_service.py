@@ -1,7 +1,9 @@
 from types import SimpleNamespace
+from typing import Any, cast
 from uuid import uuid4
 
 import pytest
+from sqlmodel import Session
 
 from app.repositories.cv_repository import CVRepository
 from app.services.matching_engine.service import (
@@ -10,13 +12,15 @@ from app.services.matching_engine.service import (
     match_candidate_to_job_posting,
 )
 
+_FAKE_SESSION = cast(Session, object())
+
 JOB_POSTING_TEXT = """
 Requirements:
 - Python
 - FastAPI
 """
 
-COMPLETED_STRUCTURED_DATA = {
+COMPLETED_STRUCTURED_DATA: dict[str, Any] = {
     "summary": None,
     "total_experience_months": 36,
     "seniority_estimate": "mid",
@@ -63,7 +67,7 @@ def test_match_candidate_to_job_posting_returns_result_for_completed_cv(
     _mock_structured(monkeypatch, structured)
 
     result = match_candidate_to_job_posting(
-        session=object(),
+        session=_FAKE_SESSION,
         cv_document_id=uuid4(),
         job_posting_raw_text=JOB_POSTING_TEXT,
     )
@@ -79,7 +83,7 @@ def test_match_candidate_to_job_posting_raises_when_cv_not_found(
 
     with pytest.raises(CVNotFoundError):
         match_candidate_to_job_posting(
-            session=object(),
+            session=_FAKE_SESSION,
             cv_document_id=uuid4(),
             job_posting_raw_text=JOB_POSTING_TEXT,
         )
@@ -94,7 +98,7 @@ def test_match_candidate_to_job_posting_raises_when_cv_not_completed(
 
     with pytest.raises(CVProcessingNotCompleteError):
         match_candidate_to_job_posting(
-            session=object(),
+            session=_FAKE_SESSION,
             cv_document_id=uuid4(),
             job_posting_raw_text=JOB_POSTING_TEXT,
         )
