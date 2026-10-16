@@ -23,8 +23,18 @@ COMPLETED_STRUCTURED_DATA = {
     "work_experience": [],
     "skills": {
         "hard": [
-            {"name": "python", "months_used": 36, "last_used": "2026", "source": "heuristic"},
-            {"name": "fastapi", "months_used": 20, "last_used": "2026", "source": "heuristic"},
+            {
+                "name": "python",
+                "months_used": 36,
+                "last_used": "2026",
+                "source": "heuristic",
+            },
+            {
+                "name": "fastapi",
+                "months_used": 20,
+                "last_used": "2026",
+                "source": "heuristic",
+            },
         ],
         "soft": [],
         "all_tech_stack_flat": ["python", "fastapi"],
@@ -36,7 +46,9 @@ COMPLETED_STRUCTURED_DATA = {
 }
 
 
-def _mock_structured(monkeypatch: pytest.MonkeyPatch, structured: object | None) -> None:
+def _mock_structured(
+    monkeypatch: pytest.MonkeyPatch, structured: object | None
+) -> None:
     monkeypatch.setattr(
         CVRepository, "get_structured_by_lake_id", lambda _self, _id: structured
     )

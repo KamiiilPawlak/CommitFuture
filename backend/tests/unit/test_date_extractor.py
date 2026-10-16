@@ -74,4 +74,6 @@ def test_extract_date_ranges_empty_or_invalid() -> None:
     """Test braku dopasowań oraz pustego tekstu."""
     assert extract_date_ranges_with_offsets("") == []
     assert extract_date_ranges_with_offsets("None") == []
-    assert extract_date_ranges_with_offsets("Brak jakichkolwiek dat w tym tekście.") == []
+    assert (
+        extract_date_ranges_with_offsets("Brak jakichkolwiek dat w tym tekście.") == []
+    )

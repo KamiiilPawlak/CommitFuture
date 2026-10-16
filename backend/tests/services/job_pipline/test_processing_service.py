@@ -25,9 +25,7 @@ def _capture_store(monkeypatch: pytest.MonkeyPatch) -> dict[str, Any]:
         captured["structured_data"] = structured_data
         captured["status"] = status
 
-    monkeypatch.setattr(
-        JobPostingProcessingService, "_store", staticmethod(fake_store)
-    )
+    monkeypatch.setattr(JobPostingProcessingService, "_store", staticmethod(fake_store))
     return captured
 
 

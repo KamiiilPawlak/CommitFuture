@@ -15,9 +15,7 @@ Requirements:
 def test_submit_job_posting_returns_201_with_pending_or_completed_status(
     client: TestClient,
 ) -> None:
-    response = client.post(
-        "/api/v1/job-postings", json={"raw_text": JOB_POSTING_TEXT}
-    )
+    response = client.post("/api/v1/job-postings", json={"raw_text": JOB_POSTING_TEXT})
 
     assert response.status_code == status.HTTP_201_CREATED
     data = response.json()
@@ -45,7 +43,9 @@ def test_get_job_posting_returns_structured_data_after_processing(
     data = response.json()
     assert data["status"] == "completed"
     assert data["structured_data"]["min_seniority"] == "senior"
-    skill_names = {skill["name"] for skill in data["structured_data"]["required_skills"]}
+    skill_names = {
+        skill["name"] for skill in data["structured_data"]["required_skills"]
+    }
     assert {"python", "fastapi", "postgresql"} <= skill_names
 
 

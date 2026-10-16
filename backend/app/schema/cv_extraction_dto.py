@@ -40,5 +40,3 @@ class LanguageDto(BaseModel):
         default=None,
         description="Poziom znajomości wg CEFR (np. A2, B2, C1) lub opisowy",
     )
-
-
