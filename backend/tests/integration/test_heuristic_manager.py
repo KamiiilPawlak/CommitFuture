@@ -9,7 +9,7 @@ from app.services.cv_pipeline.transform.heuristic.manager import (
 @patch("app.services.cv_pipeline.transform.heuristic.domain.experience_calc.date")
 def test_heuristic_manager_full_cv_integration(mock_date: MagicMock) -> None:
     mock_date.today.return_value = date(2024, 1, 1)
-    mock_date.side_effect = lambda *args, **kw: date(*args, **kw)
+    mock_date.side_effect = date
 
     manager = HeuristicExtractionManager()
 

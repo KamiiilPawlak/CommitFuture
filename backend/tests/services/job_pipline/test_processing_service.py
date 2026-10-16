@@ -1,3 +1,4 @@
+import json
 from typing import Any
 from uuid import uuid4
 
@@ -11,8 +12,6 @@ class FakeParseResult:
         self._data = data
 
     def model_dump_json(self) -> str:
-        import json
-
         return json.dumps(self._data)
 
 

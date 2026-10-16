@@ -79,6 +79,7 @@ _FIELD_ANCHOR_PATTERN = re.compile(
 )
 
 _education_fields_engine = FlashLookupEngine(EDUCATION_FIELDS_DICTIONARY)
+_MAX_ANCHOR_DISTANCE_CHARS = 40
 
 
 def extract_field_of_study(text: str) -> str | None:
@@ -97,7 +98,7 @@ def extract_field_of_study(text: str) -> str | None:
 
     for field, offset in sorted(matches_with_offsets, key=lambda m: m[1]):
         for anchor_offset in anchor_offsets:
-            if 0 <= offset - anchor_offset <= 40:
+            if 0 <= offset - anchor_offset <= _MAX_ANCHOR_DISTANCE_CHARS:
                 return field
 
     return matches_with_offsets[0][0]

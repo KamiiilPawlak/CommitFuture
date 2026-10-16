@@ -38,7 +38,7 @@ COMPLETED_STRUCTURED_DATA = {
 
 def _mock_structured(monkeypatch: pytest.MonkeyPatch, structured: object | None) -> None:
     monkeypatch.setattr(
-        CVRepository, "get_structured_by_lake_id", lambda self, _id: structured
+        CVRepository, "get_structured_by_lake_id", lambda _self, _id: structured
     )
 
 

@@ -1,3 +1,4 @@
+import asyncio
 from pathlib import Path
 from typing import Final
 from uuid import uuid4
@@ -71,8 +72,8 @@ class StorageService:
 
     async def delete_file(self, file_path: str | Path) -> None:
         path = Path(file_path)
-        if path.exists():
-            path.unlink()
+        if await asyncio.to_thread(path.exists):
+            await asyncio.to_thread(path.unlink)
             logger.info(f"Plik fizyczny został usunięty z dysku: {path}")
         else:
             logger.warning(f"Próbowano usunąć plik, ale nie istnieje na dysku: {path}")
