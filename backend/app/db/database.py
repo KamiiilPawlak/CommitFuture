@@ -1,3 +1,4 @@
+import os
 from collections.abc import Generator
 from pathlib import Path
 
@@ -14,6 +15,10 @@ BACKEND_DIR = Path(__file__).resolve().parents[2]
 
 
 def run_migrations() -> None:
+    if os.getenv("SKIP_MIGRATIONS") == "1":
+        logger.info("Pominięto migracje Alembic (SKIP_MIGRATIONS=1)")
+        return
+
     logger.info("Stosowanie migracji Alembic do najnowszej wersji (head)")
     alembic_cfg = Config(str(BACKEND_DIR / "alembic.ini"))
     command.upgrade(alembic_cfg, "head")

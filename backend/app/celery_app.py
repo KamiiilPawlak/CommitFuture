@@ -14,6 +14,7 @@ celery_app.conf.accept_content = ["json"]
 
 celery_app.conf.imports = [
     "app.services.cv_pipeline.tasks",
+    "app.services.cv_pipeline.recovery",
     "app.services.job_pipline.tasks",
 ]
 

@@ -5,10 +5,12 @@ from datetime import UTC, datetime, timedelta
 from loguru import logger
 from sqlmodel import Session
 
+from app.celery_app import celery_app
 from app.core.config import settings
 from app.db.database import engine
 from app.models.cv_structured_data import CVStructuredData
 from app.repositories.cv_repository import CVRepository
+from app.services.cv_pipeline.tasks import process_cv_task
 
 
 def recover_stale_pending_cv_documents(session: Session | None = None) -> None:
@@ -35,8 +37,6 @@ def _recover_stale_pending(session: Session, threshold: datetime) -> None:
 
 
 def _recover_one(repository: CVRepository, record: CVStructuredData) -> None:
-    from app.services.cv_pipeline.tasks import process_cv_task  # noqa: PLC0415
-
     cv_document_id = record.cv_document_id
 
     if record.recovery_attempts >= settings.STALE_PENDING_MAX_ATTEMPTS:
@@ -69,3 +69,8 @@ def _recover_one(repository: CVRepository, record: CVStructuredData) -> None:
         f"{settings.STALE_PENDING_MAX_ATTEMPTS})."
     )
     process_cv_task.delay(str(cv_document_id), raw_text_record.raw_text)
+
+
+@celery_app.task(name="cv_pipeline.recover_stale_pending")  # type: ignore[untyped-decorator]
+def recover_stale_pending_task() -> None:
+    recover_stale_pending_cv_documents()

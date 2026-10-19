@@ -30,17 +30,30 @@ function Invoke-Dev {
 
 . (Join-Path $PSScriptRoot "scripts\process-tracking.ps1")
 
-function Invoke-Quality {
+function Invoke-QualityTools {
     param (
         [string]$QualityTarget = "all"
     )
-    $ScriptPath = ".\scripts\quality.ps1"
-    if (Test-Path $ScriptPath) {
-        Write-Host "Uruchomienie zadania: Quality ($QualityTarget)..." -ForegroundColor Cyan
-        & $ScriptPath -Target $QualityTarget
+    $BackendScript = ".\scripts\qt-backend.ps1"
+    $FrontendScript = ".\scripts\qt-frontend.ps1"
+
+    if ($QualityTarget -eq "backend" -or $QualityTarget -eq "all") {
+        if (Test-Path $BackendScript) {
+            Write-Host "Uruchomienie zadania: Quality Tools (backend)..." -ForegroundColor Cyan
+            & $BackendScript
+        }
+        else {
+            throw "Nie znaleziono pliku skryptu: $BackendScript"
+        }
     }
-    else {
-        throw "Nie znaleziono pliku skryptu: $ScriptPath"
+    if ($QualityTarget -eq "frontend" -or $QualityTarget -eq "all") {
+        if (Test-Path $FrontendScript) {
+            Write-Host "Uruchomienie zadania: Quality Tools (frontend)..." -ForegroundColor Cyan
+            & $FrontendScript
+        }
+        else {
+            throw "Nie znaleziono pliku skryptu: $FrontendScript"
+        }
     }
 }
 
@@ -71,15 +84,16 @@ $TaskRegistry = @{
     "build"            = { Invoke-BuildTask }
     "default"          = { Invoke-DefaultWorkflow }
     "dev"              = { Invoke-Dev }
+    "venv"             = { Invoke-Dev }
     "backend"          = { Invoke-Start }
     "frontend"         = { Invoke-Frontend }
     "start"            = { Invoke-StartAll }
     "stop"             = { Invoke-StopAll }
     "stop-backend"     = { Invoke-StopBackend }
     "stop-frontend"    = { Invoke-StopFrontend }
-    "quality"          = { Invoke-Quality -QualityTarget "all" }
-    "quality-backend"  = { Invoke-Quality -QualityTarget "backend" }
-    "quality-frontend" = { Invoke-Quality -QualityTarget "frontend" }
+    "quality-tools"          = { Invoke-QualityTools -QualityTarget "all" }
+    "quality-tools-backend"  = { Invoke-QualityTools -QualityTarget "backend" }
+    "quality-tools-frontend" = { Invoke-QualityTools -QualityTarget "frontend" }
     "help"             = { Show-Help }
 }
 

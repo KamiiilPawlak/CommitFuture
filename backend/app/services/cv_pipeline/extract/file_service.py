@@ -42,7 +42,7 @@ class StorageService:
 
     async def save_pdf_file(self, file: UploadFile) -> tuple[str, str, int]:
         if not file.filename or not file.filename.lower().endswith(".pdf"):
-            msg: str = "Niedozwolone rozszerzenie pliku. Wymagany format to PDF."
+            msg: str = "Niedozwolony format pliku. Wymagany format to PDF."
             raise ValueError(msg)
 
         content = await self._read_within_limit(file)

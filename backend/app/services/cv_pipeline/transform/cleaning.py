@@ -5,10 +5,10 @@ import ftfy
 import regex
 
 MOJIBAKE_MID_PATTERN: Final[regex.Pattern[str]] = regex.compile(
-    r"(\p{L})[^\p{L}\s'`\-\.@+#/&+&](\p{L})"
+    r"(\p{L})[^\p{L}\s'`\-\.@+/&](\p{L})"
 )
 MOJIBAKE_START_PATTERN: Final[regex.Pattern[str]] = regex.compile(
-    r"\b[^\p{L}\s'`\-\.@+#/&+&](\p{L})"
+    r"(?:^|(?<=\s))[^\p{L}\s'`\-\.@+/&](\p{L})"
 )
 
 GRAPHIC_NOISE_PATTERN: Final[regex.Pattern[str]] = regex.compile(
