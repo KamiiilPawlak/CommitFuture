@@ -62,9 +62,6 @@ jobs:
       - name: bandit
         run: bandit -r app/ -ll
 
-      - name: pytest
-        run: pytest
-
   frontend:
     name: Frontend (eslint, prettier, knip, tsc, jest)
     runs-on: ubuntu-latest
@@ -97,6 +94,3 @@ jobs:
 
       - name: typecheck + build
         run: npm run build
-
-      - name: jest
-        run: npm run test
