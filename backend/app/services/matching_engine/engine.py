@@ -35,7 +35,9 @@ def _skill_cosine_similarity(
         [1.0 if skill in candidate_skill_names else 0.0 for skill in vocabulary]
     ).reshape(1, -1)
 
-    weight_per_skill = {skill.name: skill.weight for skill in job_posting.required_skills}
+    weight_per_skill = {
+        skill.name: skill.weight for skill in job_posting.required_skills
+    }
     job_vector = np.array(
         [weight_per_skill.get(skill, 0.0) for skill in vocabulary]
     ).reshape(1, -1)

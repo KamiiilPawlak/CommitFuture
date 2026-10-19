@@ -17,6 +17,9 @@ class FakeOrchestrator:
 
 
 class FailingOrchestrator:
+    def __init__(self) -> None:
+        self.tech_stack_validator = TechStackValidator()
+
     async def process_cv(self, _raw_text: str) -> dict[str, Any]:
         msg = "boom"
         raise RuntimeError(msg)

@@ -1,8 +1,15 @@
 from datetime import date
-from typing import cast
+from typing import TypedDict, cast
 
 import dateparser
 import regex as re
+
+
+class DateRangeOffset(TypedDict):
+    start_date: date
+    end_date: date | None
+    is_current: bool
+    offset: int
 
 
 def _parse_single_date(date_str: str) -> date | str | None:
@@ -78,17 +85,17 @@ def _find_date_ranges(
 
 def extract_date_ranges_with_offsets(
     text: str,
-) -> list[dict[str, date | bool | str | int | None]]:
+) -> list[DateRangeOffset]:
     """Jak extract_date_ranges, ale z dodatkowym kluczem 'offset' (pozycja
     początku dopasowania w tekście) — potrzebnym do przypisywania wpisów
     doświadczenia (tech stack, obowiązki) do najbliższego wcześniejszego
     zakresu dat bez pomocy LLM."""
     return [
-        {
-            "start_date": start_date,
-            "end_date": end_date,
-            "is_current": is_current,
-            "offset": offset,
-        }
+        DateRangeOffset(
+            start_date=start_date,
+            end_date=end_date,
+            is_current=is_current,
+            offset=offset,
+        )
         for start_date, end_date, is_current, offset in _find_date_ranges(text)
     ]

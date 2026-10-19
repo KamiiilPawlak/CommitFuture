@@ -8,11 +8,11 @@ export interface CvIngestionResponse {
   raw_text: string
 }
 
-export type CvStructuredStatus = "pending" | "completed" | "partial" | "failed"
+type CvStructuredStatus = "pending" | "completed" | "partial" | "failed"
 
-export type FieldSource = "heuristic" | "llm" | "merged"
+type FieldSource = "heuristic" | "llm" | "merged"
 
-export interface WorkExperienceRecord {
+interface WorkExperienceRecord {
   company: string | null
   role: string | null
   start_date: string | null
@@ -22,36 +22,36 @@ export interface WorkExperienceRecord {
   skills_used: string[]
 }
 
-export interface HardSkillRecord {
+interface HardSkillRecord {
   name: string
   months_used: number | null
   last_used: string | null
   source: FieldSource
 }
 
-export interface SkillsRecord {
+interface SkillsRecord {
   hard: HardSkillRecord[]
   soft: string[]
   all_tech_stack_flat: string[]
 }
 
-export interface EducationDto {
+interface EducationDto {
   institution: string | null
   degree: string | null
   field_of_study: string | null
   graduation_year: number | null
 }
 
-export interface LanguageDto {
+interface LanguageDto {
   language: string
   level: string | null
 }
 
-export interface ValidationRecord {
+interface ValidationRecord {
   warnings: string[]
 }
 
-export interface CvStructuredData {
+interface CvStructuredData {
   summary: string | null
   total_experience_months: number | null
   seniority_estimate: string | null

@@ -1,9 +1,14 @@
 import io
+from pathlib import Path
 
 from fastapi import status
 from fastapi.testclient import TestClient
 
-MOCK_PDF_BYTES = b"%PDF-1.4\n1 0 obj\n<< /Type /Catalog >>\nendobj\ntrailer\n<< /Root 1 0 R >>\n%%EOF"
+REAL_CV_PDF_PATH = (
+    Path(__file__).resolve().parents[4]
+    / "test_file"
+    / "Curriculum Vitae - Jan Kowalski.pdf"
+)
 MOCK_TXT_BYTES = "Oto zwykły plik tekstowy, który nie jest akceptowany.".encode()
 
 
@@ -29,13 +34,12 @@ def test_upload_cv_empty_file_returns_400(client: TestClient) -> None:
 
 
 def test_upload_cv_success(client: TestClient) -> None:
-    files = {
-        "file": ("jan_kowalski_cv.pdf", io.BytesIO(MOCK_PDF_BYTES), "application/pdf")
-    }
+    pdf_bytes = REAL_CV_PDF_PATH.read_bytes()
+    files = {"file": ("jan_kowalski_cv.pdf", io.BytesIO(pdf_bytes), "application/pdf")}
 
     response = client.post("/api/v1/cv/upload", files=files)
 
     assert response.status_code == status.HTTP_201_CREATED
 
     data = response.json()
-    assert data["filename"] == "jan_kowalski_cv.pdf"
+    assert data["original_name"] == "jan_kowalski_cv.pdf"
