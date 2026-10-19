@@ -5,7 +5,9 @@ from fastapi import status
 from fastapi.testclient import TestClient
 
 REAL_CV_PDF_PATH = (
-    Path(__file__).resolve().parents[4] / "test_file" / "Curriculum Vitae - Jan Kowalski.pdf"
+    Path(__file__).resolve().parents[4]
+    / "test_file"
+    / "Curriculum Vitae - Jan Kowalski.pdf"
 )
 MOCK_TXT_BYTES = "Oto zwykły plik tekstowy, który nie jest akceptowany.".encode()
 
