@@ -13,9 +13,6 @@ _postgres_container = PostgresContainer(
 _postgres_container.start()
 os.environ["DATABASE_URL"] = _postgres_container.get_connection_url()
 
-# Tabele tworzy fixture `setup_database` przez SQLModel.metadata.create_all().
-# Uruchamianie alembicowych migracji przy każdym starcie TestClient (lifespan)
-# powodowałoby kolizję z już istniejącymi tabelami.
 os.environ["SKIP_MIGRATIONS"] = "1"
 
 
