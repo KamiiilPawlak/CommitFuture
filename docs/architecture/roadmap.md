@@ -2,7 +2,9 @@
 
 > Stan na: 2026-10-05, branch `docs/update-docs`. Ten dokument opisuje, co **faktycznie** jest zaimplementowane w `backend/app` (w tym zmiany jeszcze niezacommitowane w working tree), jakich elementów brakuje do uznania pipeline'u CV za "pełny ETL", i w jakiej kolejności je domykać.
 >
-> Powiązane dokumenty: [`cv-etl-pipline.md`](./cv-etl-pipline.md) (opis krok-po-kroku Etapu A/B — **częściowo nieaktualny**, patrz niżej), [`checklist.md`](../../checklist.md) (wcześniejsza lista TODO, częściowo już zrealizowana).
+> Powiązane dokumenty: [`cv-etl-pipline.md`](./cv-etl-pipline.md) (opis krok-po-kroku Etapu A/B — **nieaktualny, wciąż opisuje LLM/Ollama**, patrz niżej), [`checklist.md`](../../checklist.md) (zaktualizowany 2026-10-20, zawiera dzisiejszy, realny stan projektu), [`matching-engine-roadmap.md`](./matching-engine-roadmap.md) (silnik matchingu CV↔ogłoszenie, cosine similarity, bez LLM — zrealizowany w całości).
+>
+> **Korekta 2026-10-20:** cała ta roadmapa pochodzi z okresu, gdy Etap B był opisywany jako docelowo sparowany z LLM (Ollama). To nigdy nie zostało trwale wdrożone — dzisiejszy pipeline to wyłącznie OCR + heurystyka, a dopasowanie do ogłoszeń liczy osobny `matching_engine` przez cosine similarity. Fazy 1–2 niżej są już zrealizowane; aktualny stan patrz `checklist.md`.
 
 ## 0. Ważna korekta względem `cv-etl-pipline.md`
 
@@ -68,25 +70,25 @@ Dzisiejsze testy pokrywają poszczególne komponenty (`cleaning`, `normalization
 - [x] Zapis wyniku z `status` (`pending/completed/partial/failed`).
 - [ ] Commit tych zmian + aktualizacja `cv-etl-pipline.md`/`checklist.md`, żeby nie rozjeżdżały się z kodem (patrz Faza 4).
 
-### Faza 1 — Result API (odblokowuje realne użycie pipeline'u)
+### Faza 1 — Result API (odblokowuje realne użycie pipeline'u) ✅
 
-Priorytet najwyższy: bez tego Etap B produkuje dane, których nikt nie może odebrać.
+Zrealizowane, choć inaczej niż pierwotnie zapisano niżej (status i wynik połączone w jeden endpoint, nie dwa osobne):
 
-- [ ] `GET /api/v1/cv/{cv_document_id}/status` — zwraca `status` z `cv_structured_data` (albo `pending`, jeśli rekordu jeszcze nie ma).
-- [ ] `GET /api/v1/cv/{cv_document_id}/result` — zwraca `structured_data` gdy `status in {completed, partial}`; 404/409 gdy `pending`/`failed`.
-- [ ] Rozstrzygnąć `ProcessedCVTO` (`app/schema/ingestion_dto.py`) — zdefiniowane, nieużywane; albo staje się DTO odpowiedzi `/result`, albo zostaje usunięte.
-- [ ] Test integracyjny end-to-end: upload → poczekaj na background task → `GET /result` zwraca dane zgodne z tym, co zapisał `CVProcessingService`.
+- [x] `GET /api/v1/cv/{cv_document_id}/structured` — zwraca `status` oraz `structured_data` z `cv_structured_data` (404, jeśli rekordu jeszcze nie ma); zastępuje planowany podział na `/status` + `/result`.
+- [x] `GET /api/v1/cv/stats` — zliczenia per status (`pending/completed/partial/failed`), dodatkowo ponad to, co planowano w tej fazie.
+- [x] `ProcessedCVTO` (`app/schema/ingestion_dto.py`) rozstrzygnięte.
+- [x] Test integracyjny end-to-end: `backend/tests/integration/api/test_cv_pipeline_e2e.py` — upload → Celery (`task_always_eager`) → `GET /structured`/`GET /stats`.
 
-### Faza 2 — Bezpieczeństwo i limity uploadu
+### Faza 2 — Bezpieczeństwo i limity uploadu ✅
 
-- [ ] Podłącz `verify_file_integrity()` do `StorageService.save_pdf_file` (magic bytes przed zapisem na dysk).
-- [ ] Wyegzekwuj `settings.MAX_FILE_SIZE` w `StorageService` (odrzuć plik > 5 MB z czytelnym błędem 400, nie 500 po zapełnieniu dysku).
-- [ ] Nowy ADR opisujący decyzję o magic bytes (zastępujący usunięty `0001-magic-bytes-validation.md`), skoro mechanizm faktycznie wchodzi do użycia.
+- [x] `verify_file_integrity()` podłączone do `StorageService.save_pdf_file` (magic bytes przed zapisem na dysk).
+- [x] `settings.MAX_FILE_SIZE` wyegzekwowane w `StorageService`.
+- [x] ADR o magic bytes istnieje (`docs/architecture/adr/0001-magic-bytes-validation.md`).
 
 ### Faza 3 — Jakość i odporność danych z Etapu B
 
-- [ ] Policz `page_count` przy ekstrakcji (`pdfplumber`/`pdf2image`) i zapisz do `cv_raw_text` zamiast stałego `0`.
-- [ ] Decyzja: `ExperienceService`/`TechStackValidator` — podłączyć do pipeline'u (usuwając duplikację w `experience_calc.py`/`FlashLookupEngine`) albo usunąć jako martwy kod.
+- [x] `page_count` liczony realnie przy ekstrakcji, nie stały `0`.
+- [ ] Decyzja: `ExperienceService`/`TechStackValidator` — podłączyć do pipeline'u (usuwając duplikację w `experience_calc.py`/`FlashLookupEngine`) albo usunąć jako martwy kod. **Wciąż otwarte.**
 
 ### Faza 4 — Odporność przetwarzania w tle i obserwowalność
 
@@ -96,9 +98,9 @@ Priorytet najwyższy: bez tego Etap B produkuje dane, których nikt nie może od
 
 ### Faza 5 — Przenośność i dokumentacja
 
-- [ ] `OCRConfig.TESSERACT_CMD` → zmienna środowiskowa/config, żeby pipeline odpalał się w kontenerze/CI.
-- [ ] Zaktualizować `cv-etl-pipline.md`, żeby odzwierciedlał Fazę 0 jako zrealizowaną (dziś opisuje Etap B jako niepodłączony).
-- [ ] Zaktualizować `checklist.md` (odznaczyć zrealizowane punkty P0, przeniosić pozostałe do odpowiednich faz tej roadmapy, żeby nie istniały dwie rozjeżdżające się listy TODO).
+- [x] `OCRConfig.TESSERACT_CMD` → zmienna środowiskowa/config, pipeline odpala się w kontenerze/CI.
+- [ ] Zaktualizować `cv-etl-pipline.md` — wciąż opisuje Etap B jako sparowany z LLM (Ollama) i niepodłączony do API; nieaktualne względem kodu (2026-10-20).
+- [x] `checklist.md` zaktualizowany (2026-10-20) — zrealizowane punkty odznaczone, LLM/Ollama usunięte z opisu, dodany `matching_engine` i realne otwarte luki (frontend matchingu, CI bez testów, brak CD).
 - [x] Zdecydować o losie usuniętych plików w `docs/architecture/` (diagramy `.drawio.svg`, `dependencies.svg`, `classes/packages_cv_matcher.png`, `security_policies.md`) — **zrobione: nie odtwarzamy, `overview.md` zastępuje je opisem tekstowym** (decyzja i uzasadnienie per plik w `overview.md`, sekcja "Historia tego dokumentu").
 
 ## 4. Decyzje otwarte dla właściciela produktu/repo

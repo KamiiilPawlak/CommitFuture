@@ -69,3 +69,19 @@ export interface CvStructuredDataResponse {
   structured_data: CvStructuredData | null
   processed_at: string
 }
+
+export interface MatchRequest {
+  cv_document_id: string
+  job_posting_raw_text: string
+}
+
+export interface MatchResultResponse {
+  overall_score: number
+  seniority_match: boolean
+  skill_coverage: number
+  matched_skills: string[]
+  missing_skills: string[]
+  domain_overlap: string[]
+  soft_skill_overlap: string[]
+  education_match: boolean
+}
