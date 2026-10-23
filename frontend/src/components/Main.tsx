@@ -3,7 +3,7 @@ import { CvMatchOutput } from "./CvMatchOutput"
 
 function Main() {
   return (
-    <main className="w-full flex-1 flex flex-col md:flex-row gap-6">
+    <main className="w-full flex-1 flex flex-col md:flex-row gap-6 p-5">
       <CvMatchInput />
       <CvMatchOutput />
     </main>

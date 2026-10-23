@@ -1,4 +1,9 @@
-import type { CvIngestionResponse, CvStructuredDataResponse } from "@/lib/api/types"
+import type {
+  CvIngestionResponse,
+  CvStructuredDataResponse,
+  MatchRequest,
+  MatchResultResponse,
+} from "@/lib/api/types"
 
 const API_URL = import.meta.env.VITE_API_URL
 
@@ -46,4 +51,18 @@ export async function getCvStructured(cvDocumentId: string): Promise<CvStructure
   }
 
   return (await response.json()) as CvStructuredDataResponse
+}
+
+export async function matchCv(payload: MatchRequest): Promise<MatchResultResponse> {
+  const response = await fetch(`${API_URL}/match`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  })
+
+  if (!response.ok) {
+    throw new ApiError(await parseErrorDetail(response), response.status)
+  }
+
+  return (await response.json()) as MatchResultResponse
 }
