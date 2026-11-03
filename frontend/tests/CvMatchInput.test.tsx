@@ -89,6 +89,37 @@ describe("CvMatchInput", () => {
     expect(button).toBeEnabled()
   })
 
+  it("disables the button immediately and ignores a second click while the upload is in flight", async () => {
+    let resolveUpload!: (cvDocumentId: string) => void
+    const upload = jest.fn(
+      () =>
+        new Promise<string>((resolve) => {
+          resolveUpload = resolve
+        }),
+    )
+    const fetchResult = jest.fn()
+    setStoreState({ upload, fetchResult })
+
+    render(<CvMatchInput onMatchResult={jest.fn()} />)
+
+    fillJobDescription("Szukamy programisty")
+    await act(async () => {
+      fireEvent.change(getFileInput(), { target: { files: [createPdfFile()] } })
+    })
+
+    const button = screen.getByRole("button", { name: "Rozpocznij matchowanie" })
+    fireEvent.click(button)
+
+    expect(screen.getByRole("button", { name: "Matchowanie..." })).toBeDisabled()
+    fireEvent.click(screen.getByRole("button", { name: "Matchowanie..." }))
+
+    expect(upload).toHaveBeenCalledTimes(1)
+
+    await act(async () => {
+      resolveUpload("doc-1")
+    })
+  })
+
   it("shows the selected file after a PDF is dropped and allows removing it", async () => {
     setStoreState({ upload: jest.fn(), fetchResult: jest.fn() })
     render(<CvMatchInput onMatchResult={jest.fn()} />)

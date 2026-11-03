@@ -17,6 +17,7 @@ function CvMatchInput({ onMatchResult }: CvMatchInputProps) {
   const [cvDocumentId, setCvDocumentId] = useState<string | null>(null)
   const [matchError, setMatchError] = useState<string | null>(null)
   const [isMatchDone, setIsMatchDone] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
   const matchedDocumentIdRef = useRef<string | null>(null)
 
   const upload = useCvStore((state) => state.upload)
@@ -25,7 +26,7 @@ function CvMatchInput({ onMatchResult }: CvMatchInputProps) {
 
   const cvFailed = cvResult?.status === "error"
   const displayedError = matchError ?? (cvFailed ? cvResult.error : null)
-  const isMatching = cvDocumentId !== null && !displayedError && !isMatchDone
+  const isMatching = isUploading || (cvDocumentId !== null && !displayedError && !isMatchDone)
 
   const onDrop = (acceptedFiles: File[]) => {
     setFile(acceptedFiles[0] ?? null)
@@ -43,6 +44,7 @@ function CvMatchInput({ onMatchResult }: CvMatchInputProps) {
     setIsMatchDone(false)
     onMatchResult(null)
     matchedDocumentIdRef.current = null
+    setIsUploading(true)
 
     try {
       const newCvDocumentId = await upload(file)
@@ -50,6 +52,8 @@ function CvMatchInput({ onMatchResult }: CvMatchInputProps) {
       void fetchResult(newCvDocumentId)
     } catch (err) {
       setMatchError(err instanceof ApiError ? err.message : "Nie udało się przesłać CV.")
+    } finally {
+      setIsUploading(false)
     }
   }
 
