@@ -23,5 +23,11 @@ frontend/.vite
 docs/architecture/matching-engine-roadmap.md
 docs/architecture/matching-scoring.md
 
+checklist.md
+dataflow.md
+
+celerybeat-schedule*
+backend/celerybeat-schedule*
+
 research/
 
