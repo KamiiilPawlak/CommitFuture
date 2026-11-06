@@ -5,9 +5,8 @@ from typing import Any, Final, TypedDict
 
 from app.schema.cv_extraction_dto import WorkExperienceDto
 from app.services.cv_pipeline.transform.dictionaries.validator import TechStackValidator
-from app.services.cv_pipeline.transform.heuristic.domain.experience_calc import (
-    convert_extracted_range_to_dates,
-    merge_overlapping_ranges,
+from app.services.cv_pipeline.transform.heuristic.domain.experience_service import (
+    ExperienceService,
 )
 from app.services.cv_pipeline.transform.heuristic.domain.models import DateRange
 
@@ -55,7 +54,9 @@ def is_current_role(end_date: str | None) -> bool:
     return end_date.strip().lower() in _CURRENT_MARKERS
 
 
-def _role_date_span(entry: WorkExperienceDto) -> tuple[date, date] | None:
+def _role_date_span(
+    entry: WorkExperienceDto, experience_service: ExperienceService
+) -> tuple[date, date] | None:
     start: date | None = _parse_role_date(entry.start_date)
     if start is None:
         return None
@@ -63,7 +64,7 @@ def _role_date_span(entry: WorkExperienceDto) -> tuple[date, date] | None:
     is_current: bool = is_current_role(entry.end_date)
     end: date | None = None if is_current else _parse_role_date(entry.end_date)
 
-    return convert_extracted_range_to_dates(
+    return experience_service.compute_date_span(
         DateRange(start_date=start, end_date=end, is_current=is_current)
     )
 
@@ -71,12 +72,14 @@ def _role_date_span(entry: WorkExperienceDto) -> tuple[date, date] | None:
 def compute_skill_usage(
     work_experience: list[WorkExperienceDto],
     validator: TechStackValidator,
+    experience_service: ExperienceService | None = None,
 ) -> dict[str, SkillUsage]:
+    experience_service = experience_service or ExperienceService()
     skill_spans: dict[str, list[tuple[date, date]]] = {}
     skill_is_current: dict[str, bool] = {}
 
     for entry in work_experience:
-        span: tuple[date, date] | None = _role_date_span(entry)
+        span: tuple[date, date] | None = _role_date_span(entry, experience_service)
         if span is None:
             continue
 
@@ -89,7 +92,7 @@ def compute_skill_usage(
 
     result: dict[str, SkillUsage] = {}
     for skill, spans in skill_spans.items():
-        merged = merge_overlapping_ranges(spans)
+        merged = experience_service.merge_ranges(spans)
         total_days = sum((end - start).days + 1 for start, end in merged)
         months_used = round(total_days / _DAYS_PER_MONTH)
 
