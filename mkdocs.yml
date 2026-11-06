@@ -45,12 +45,13 @@ markdown_extensions:
 nav:
   - Strona Główna: index.md
   - Architektura:
+      - Przegląd: architecture/overview.md
+      - Pipeline CV (ETL): architecture/pipeline/cv-etl-pipeline.md
+      - Integracja z LLM (zarchiwizowane): architecture/pipeline/llm-integration-archived.md
       - Decyzje (ADR): architecture/adr/0001-magic-bytes-validation.md
-      - Bezpieczeństwo: architecture/security_policies.md
-      - Baza danych: architecture/database.md
-      - Migracje: architecture/migrations.md
-      - Przepływ danych: architecture/dataflow.md
-      - Integracja z LLM (zarchiwizowane): architecture/llm-integration-archived.md
+      - Baza danych: architecture/db/schema.md
+      - Migracje: architecture/db/migrations.md
+      - Przepływ danych: architecture/db/dataflow.md
   - Instrukcje:
       - Lokalne Uruchomienie: how-to/local_development.md
       - Testowanie: how-to/testing.md

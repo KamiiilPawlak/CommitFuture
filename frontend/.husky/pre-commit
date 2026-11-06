@@ -1,1 +1,2 @@
+backend/.venv/Scripts/pre-commit.exe run --config=.pre-commit-config.yaml
 cd frontend && npx lint-staged
