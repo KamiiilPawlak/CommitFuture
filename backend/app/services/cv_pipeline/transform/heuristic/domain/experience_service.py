@@ -14,9 +14,7 @@ class ExperienceService:
     def compute_date_span(self, raw_range: DateRange) -> tuple[date, date] | None:
         return convert_extracted_range_to_dates(raw_range)
 
-    def merge_ranges(
-        self, ranges: list[tuple[date, date]]
-    ) -> list[tuple[date, date]]:
+    def merge_ranges(self, ranges: list[tuple[date, date]]) -> list[tuple[date, date]]:
         return merge_overlapping_ranges(ranges)
 
     def calculate_experience(self, raw_ranges: list[DateRange]) -> ExperienceMetrics:

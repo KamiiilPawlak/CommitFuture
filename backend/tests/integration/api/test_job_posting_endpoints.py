@@ -26,7 +26,7 @@ def test_submit_job_posting_returns_201_with_pending_or_completed_status(
 def test_submit_job_posting_rejects_empty_raw_text(client: TestClient) -> None:
     response = client.post("/api/v1/job-postings", json={"raw_text": ""})
 
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
 
 
 def test_get_job_posting_returns_structured_data_after_processing(

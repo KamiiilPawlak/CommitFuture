@@ -148,4 +148,4 @@ def test_match_rejects_empty_job_posting_text(
         },
     )
 
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
