@@ -2,13 +2,13 @@
 
 > Stan na: 2026-10-05, branch `docs/update-docs`. Ten dokument opisuje, co **faktycznie** jest zaimplementowane w `backend/app` (w tym zmiany jeszcze niezacommitowane w working tree), jakich elementów brakuje do uznania pipeline'u CV za "pełny ETL", i w jakiej kolejności je domykać.
 >
-> Powiązane dokumenty: [`cv-etl-pipline.md`](./cv-etl-pipline.md) (opis krok-po-kroku Etapu A/B — **nieaktualny, wciąż opisuje LLM/Ollama**, patrz niżej), [`checklist.md`](../../checklist.md) (zaktualizowany 2026-10-20, zawiera dzisiejszy, realny stan projektu), [`matching-engine-roadmap.md`](./matching-engine-roadmap.md) (silnik matchingu CV↔ogłoszenie, cosine similarity, bez LLM — zrealizowany w całości).
+> Powiązane dokumenty: [`cv-etl-pipeline.md`](../pipeline/cv-etl-pipeline.md) (opis krok-po-kroku Etapu A/B — **nieaktualny, wciąż opisuje LLM/Ollama**, patrz niżej), [`checklist.md`](../../checklist.md) (zaktualizowany 2026-10-20, zawiera dzisiejszy, realny stan projektu), [`matching-engine-roadmap.md`](../../research/matching-engine-roadmap.md) (silnik matchingu CV↔ogłoszenie, cosine similarity, bez LLM — zrealizowany w całości).
 >
 > **Korekta 2026-10-20:** cała ta roadmapa pochodzi z okresu, gdy Etap B był opisywany jako docelowo sparowany z LLM (Ollama). To nigdy nie zostało trwale wdrożone — dzisiejszy pipeline to wyłącznie OCR + heurystyka, a dopasowanie do ogłoszeń liczy osobny `matching_engine` przez cosine similarity. Fazy 1–2 niżej są już zrealizowane; aktualny stan patrz `checklist.md`.
 
-## 0. Ważna korekta względem `cv-etl-pipline.md`
+## 0. Ważna korekta względem `cv-etl-pipeline.md`
 
-`cv-etl-pipline.md` i `checklist.md` opisują Etap B jako **niepodłączony do API**. To już nieaktualne — w working tree (niecommitowane zmiany w `ingestion.py`, `cv_repository.py`, `database.py`, `models/__init__.py` + nowy plik `cv_structured_data.py`) pipeline jest spięty end-to-end:
+`cv-etl-pipeline.md` i `checklist.md` opisują Etap B jako **niepodłączony do API**. To już nieaktualne — w working tree (niecommitowane zmiany w `ingestion.py`, `cv_repository.py`, `database.py`, `models/__init__.py` + nowy plik `cv_structured_data.py`) pipeline jest spięty end-to-end:
 
 ```
 POST /cv/upload
@@ -68,7 +68,7 @@ Dzisiejsze testy pokrywają poszczególne komponenty (`cleaning`, `normalization
 - [x] `CVPipelineOrchestrator.process_cv` wywoływany po zapisie `cv_raw_text` (przez `BackgroundTasks`).
 - [x] Tabela `cv_structured_data` (model `CVStructuredData`) jako miejsce docelowe wyniku.
 - [x] Zapis wyniku z `status` (`pending/completed/partial/failed`).
-- [ ] Commit tych zmian + aktualizacja `cv-etl-pipline.md`/`checklist.md`, żeby nie rozjeżdżały się z kodem (patrz Faza 4).
+- [ ] Commit tych zmian + aktualizacja `cv-etl-pipeline.md`/`checklist.md`, żeby nie rozjeżdżały się z kodem (patrz Faza 4).
 
 ### Faza 1 — Result API (odblokowuje realne użycie pipeline'u) ✅
 
@@ -99,7 +99,7 @@ Zrealizowane, choć inaczej niż pierwotnie zapisano niżej (status i wynik poł
 ### Faza 5 — Przenośność i dokumentacja
 
 - [x] `OCRConfig.TESSERACT_CMD` → zmienna środowiskowa/config, pipeline odpala się w kontenerze/CI.
-- [ ] Zaktualizować `cv-etl-pipline.md` — wciąż opisuje Etap B jako sparowany z LLM (Ollama) i niepodłączony do API; nieaktualne względem kodu (2026-10-20).
+- [ ] Zaktualizować `cv-etl-pipeline.md` — wciąż opisuje Etap B jako sparowany z LLM (Ollama) i niepodłączony do API; nieaktualne względem kodu (2026-10-20).
 - [x] `checklist.md` zaktualizowany (2026-10-20) — zrealizowane punkty odznaczone, LLM/Ollama usunięte z opisu, dodany `matching_engine` i realne otwarte luki (frontend matchingu, CI bez testów, brak CD).
 - [x] Zdecydować o losie usuniętych plików w `docs/architecture/` (diagramy `.drawio.svg`, `dependencies.svg`, `classes/packages_cv_matcher.png`, `security_policies.md`) — **zrobione: nie odtwarzamy, `overview.md` zastępuje je opisem tekstowym** (decyzja i uzasadnienie per plik w `overview.md`, sekcja "Historia tego dokumentu").
 

@@ -2,7 +2,7 @@
 
 Dokument opisuje aktualny, rzeczywisty przepływ danych dla dwóch niezależnych pipeline'ów: **CV** i **ogłoszenie o pracę**. Oba działają na tym samym wzorcu: szybki zapis synchroniczny w ramach żądania HTTP + ciężkie przetwarzanie zlecone do Celery.
 
-> Starszy dokument w katalogu głównym repo (`dataflow.md`) opisuje wcześniejszą wersję architektury, oparta na FastAPI `BackgroundTasks` — od migracji opisanej w `celery-roadmap.md` jest nieaktualny. Ten dokument jest jego następcą dla ścieżki CV i rozszerza opis o ścieżkę ogłoszeń o pracę. Szczegóły samej logiki heurystycznej Etapu B (czyszczenie/normalizacja/ekstrakcja) opisuje `cv-etl-pipline.md` — ten dokument skupia się na przepływie między komponentami (HTTP → DB → Celery → DB), nie powtarza algorytmów ekstrakcji.
+> Starszy dokument w katalogu głównym repo (`dataflow.md`) opisuje wcześniejszą wersję architektury, oparta na FastAPI `BackgroundTasks` — od migracji opisanej w `celery-roadmap.md` jest nieaktualny. Ten dokument jest jego następcą dla ścieżki CV i rozszerza opis o ścieżkę ogłoszeń o pracę. Szczegóły samej logiki heurystycznej Etapu B (czyszczenie/normalizacja/ekstrakcja) opisuje `cv-etl-pipeline.md` — ten dokument skupia się na przepływie między komponentami (HTTP → DB → Celery → DB), nie powtarza algorytmów ekstrakcji.
 
 **Mechanizm asynchroniczności:** Celery + Redis (broker i result backend), nie `BackgroundTasks`. Konfiguracja: `app/celery_app.py`.
 
@@ -36,7 +36,7 @@ Dokument opisuje aktualny, rzeczywisty przepływ danych dla dwóch niezależnych
        ▼
 6. CVProcessingService.process_and_store(cv_document_id, raw_text)
        a. CVPipelineOrchestrator.process_cv(raw_text)   → clean_ocr_text → normalize_text → extract_all
-          (szczegóły: cv-etl-pipline.md, kroki 6-8; dziś czysto heurystyczne, bez LLM)
+          (szczegóły: cv-etl-pipeline.md, kroki 6-8; dziś czysto heurystyczne, bez LLM)
        b. build_unified_record(...)                     → finalny CVStructuredRecord
        c. Nowa sesja DB (Session(engine), niezależna od request scope)
           CVRepository.upsert_structured_record(status="completed"/"failed") → UPDATE po PK, commit
@@ -117,5 +117,5 @@ Prostszy wariant tego samego wzorca — bez etapu OCR/Data Lake, tekst przychodz
 ## Co jest poza zakresem tego dokumentu
 
 - Dalsze etapy po zapisaniu `cv_structured_data`/`job_posting` (matching CV ↔ ogłoszenie) — `app/services/matching_engine/` istnieje jako kod, ale nie jest tu opisany; patrz `matching-scoring.md`.
-- Szczegóły samej ekstrakcji heurystycznej CV (regexy, słowniki, segmentacja) — `cv-etl-pipline.md`.
-- Migracje schematu bazy używanej przez te tabele — [`migrations.md`](./migrations.md), model danych — [`database.md`](./database.md).
+- Szczegóły samej ekstrakcji heurystycznej CV (regexy, słowniki, segmentacja) — `cv-etl-pipeline.md`.
+- Migracje schematu bazy używanej przez te tabele — [`migrations.md`](./migrations.md), model danych — [`schema.md`](./schema.md).

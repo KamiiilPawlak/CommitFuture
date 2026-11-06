@@ -10,12 +10,12 @@ CommitFuture (nazwa produktu: **CV AI Matcher**) ma dopasowywać kandydatów do 
 
 | Dokument | Zawartość |
 | --- | --- |
-| [`cv-etl-pipline.md`](./cv-etl-pipline.md) | Szczegółowy, krok-po-kroku opis pipeline'u CV (Etap A — Ingestion, Etap B — ETL/NLP) na podstawie faktycznego kodu, z tabelami konfiguracji i testów. |
-| [`roadmap.md`](./roadmap.md) | Analiza braków względem "pełnego ETL" i proponowane fazy domykania (Result API, kolejka w tle, obserwowalność). |
+| [`pipeline/cv-etl-pipeline.md`](./pipeline/cv-etl-pipeline.md) | Szczegółowy, krok-po-kroku opis pipeline'u CV (Etap A — Ingestion, Etap B — ETL/NLP) na podstawie faktycznego kodu, z tabelami konfiguracji i testów. |
+| [`planning/roadmap.md`](./planning/roadmap.md) | Analiza braków względem "pełnego ETL" i proponowane fazy domykania (Result API, kolejka w tle, obserwowalność). |
 | [`adr/0001-magic-bytes-validation.md`](./adr/0001-magic-bytes-validation.md) | Decyzja architektoniczna o walidacji plików przez magic bytes. |
-| [`../../checklist.md`](../../checklist.md) | Lista TODO wg priorytetów (P0–P4), część punktów już zrealizowana. |
+| [`../checklist.md`](../checklist.md) | Lista TODO wg priorytetów (P0–P4), część punktów już zrealizowana. |
 
-Ten dokument **nie opisuje** przebiegu pipeline'u krok po kroku — to robi `cv-etl-pipline.md`. Tutaj chodzi o to, jak komponenty systemu się do siebie składają i gdzie czego szukać w kodzie.
+Ten dokument **nie opisuje** przebiegu pipeline'u krok po kroku — to robi `cv-etl-pipeline.md`. Tutaj chodzi o to, jak komponenty systemu się do siebie składają i gdzie czego szukać w kodzie.
 
 ## Komponenty systemu (`docker-compose.yml`)
 
@@ -60,7 +60,7 @@ Ten dokument **nie opisuje** przebiegu pipeline'u krok po kroku — to robi `cv-
 | `services/ingestion_service/` | Etap A: `IngestionService` (orkiestracja), `StorageService` (zapis/odczyt plików + walidacja), `OCRService` (pdfplumber/Tesseract), `storage_path_provider.py`. |
 | `services/etl_cv_service/` | Etap B: `pipeline.py` (`CVPipelineOrchestrator`), `cleaning.py`, `normalization.py`, `heuristic/` (ekstrakcja regułowa), `llm/` (klient Ollama), `validation.py` (walidacja krzyżowa LLM↔heurystyka), `dictionaries/` (słownik tech stacku + `TechStackValidator`), `processing_service.py` (`CVProcessingService` — łączy Etap A i B, wołany z `BackgroundTasks`). |
 
-## Przepływ danych (skrót — szczegóły w `cv-etl-pipline.md`)
+## Przepływ danych (skrót — szczegóły w `cv-etl-pipeline.md`)
 
 ```text
 POST /api/v1/cv/upload
@@ -91,5 +91,5 @@ Klient dostaje odpowiedź HTTP zanim Etap B się zakończy (przetwarzanie w tle)
 **Decyzja (zamyka `checklist.md` sekcja P4 i `roadmap.md` Fazę 5 w tej sprawie): usunięte pliki NIE są odtwarzane.** Szczegóły:
 
 - `classes_cv_matcher.png`, `packages_cv_matcher.png`, `dependencies.svg` — diagramy generowane automatycznie (`pyreverse`/`pydeps`) ze stanu kodu z 2026-10-05. Odtworzenie miałoby sens tylko jako nowe wygenerowanie z aktualnego kodu, nie jako przywrócenie starych plików z gita — a moduły, które by pokazały, zmieniły się od tego czasu jeszcze bardziej (Celery, `job_pipline/`, `matching_engine/`), więc wygenerowany teraz diagram i tak wymagałby odświeżenia przy następnej większej zmianie. Niewarte utrzymywania jako statyczny plik; tekstowe tabele w tym dokumencie ("Mapa modułów") pełnią tę rolę.
-- Diagramy `.drawio.svg` w `diagrams/` (`cleaning`, `heurestic`, `storage`) — ręcznie rysowane, opisywały kroki pipeline'u ("Document Detection", "Quality Check", "Section Detection"), które nie istnieją jako osobne moduły w dzisiejszym kodzie. Sekcja ["Przepływ danych"](#przepływ-danych-skrót---szczegóły-w-cv-etl-pipline-md) i `cv-etl-pipline.md` opisują to samo tekstowo, aktualizowane wraz z kodem.
+- Diagramy `.drawio.svg` w `diagrams/` (`cleaning`, `heurestic`, `storage`) — ręcznie rysowane, opisywały kroki pipeline'u ("Document Detection", "Quality Check", "Section Detection"), które nie istnieją jako osobne moduły w dzisiejszym kodzie. Sekcja ["Przepływ danych"](#przepływ-danych-skrót---szczegóły-w-cv-etl-pipeline-md) i `cv-etl-pipeline.md` opisują to samo tekstowo, aktualizowane wraz z kodem.
 - `security_policies.md` — **sprawdzone w historii gita** (`git show <commit przed usunięciem>:docs/architecture/security_policies.md`): mimo nazwy, dokument **nie opisywał żadnych zasad bezpieczeństwa** — jego cała treść to dwa osadzone obrazki (`dependencies.svg`, `classes_cv_matcher.png`) z podpisami "Wykres Zależności Pakietów" i "Diagram Klas UML", zero tekstu o walidacji plików/magic bytes. Wcześniejsze przypuszczenie w `checklist.md` ("część z nich pokrywa się z punktami z sekcji P1") było błędne — nie ma nic do przeniesienia. Rzeczywisty opis walidacji uploadu (magic bytes, limit rozmiaru) żyje w `adr/0001-magic-bytes-validation.md`.
