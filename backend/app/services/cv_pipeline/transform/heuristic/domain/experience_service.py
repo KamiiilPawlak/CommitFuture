@@ -11,10 +11,18 @@ from app.services.cv_pipeline.transform.heuristic.domain.models import (
 
 
 class ExperienceService:
+    def compute_date_span(self, raw_range: DateRange) -> tuple[date, date] | None:
+        return convert_extracted_range_to_dates(raw_range)
+
+    def merge_ranges(
+        self, ranges: list[tuple[date, date]]
+    ) -> list[tuple[date, date]]:
+        return merge_overlapping_ranges(ranges)
+
     def calculate_experience(self, raw_ranges: list[DateRange]) -> ExperienceMetrics:
         valid_ranges: list[tuple[date, date]] = []
         for range_item in raw_ranges:
-            converted = convert_extracted_range_to_dates(range_item)
+            converted = self.compute_date_span(range_item)
             if converted:
                 valid_ranges.append(converted)
 
@@ -27,7 +35,7 @@ class ExperienceService:
                 max_date=None,
             )
 
-        merged = merge_overlapping_ranges(valid_ranges)
+        merged = self.merge_ranges(valid_ranges)
 
         total_days = sum((end - start).days + 1 for start, end in merged)
         total_months = round(total_days / 30.4375)
