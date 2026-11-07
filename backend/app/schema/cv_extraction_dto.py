@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field
 
 
-class WorkExperienceDto(BaseModel):
+class RawWorkExperienceDto(BaseModel):
     company: str | None = Field(default=None, description="Nazwa firmy lub organizacji")
     role: str | None = Field(default=None, description="Stanowisko / Rola zawodowa")
     start_date: str | None = Field(

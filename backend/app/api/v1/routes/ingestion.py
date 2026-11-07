@@ -7,7 +7,7 @@ from sqlmodel import Session
 
 from app.db.database import get_session
 from app.repositories.cv_repository import CVRepository
-from app.schema.ingestion_dto import (
+from app.schema.ingestion_response import (
     CVIngestionResponse,
     CVProcessingStatsResponse,
     CVStructuredDataResponse,

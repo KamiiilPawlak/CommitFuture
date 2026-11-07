@@ -6,7 +6,7 @@ from sqlmodel import Session
 
 from app.db.database import get_session
 from app.repositories.job_posting_repository import JobPostingRepository
-from app.schema.job_posting_dto import (
+from app.schema.job_posting_response import (
     JobPostingStructuredResponse,
     JobPostingSubmitRequest,
     JobPostingSubmitResponse,

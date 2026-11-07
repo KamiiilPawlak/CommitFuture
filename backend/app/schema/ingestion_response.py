@@ -1,4 +1,3 @@
-# app/models/ingestion_dto.py
 from datetime import datetime
 from uuid import UUID
 
