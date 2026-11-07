@@ -28,7 +28,7 @@ def match_candidate_to_job_posting(
     deterministyczny i tani (bez LLM), więc liczenie na żądanie jest
     praktycznie bezpłatne i zawsze aktualne względem najnowszego CV."""
     repository = CVRepository(session)
-    structured = repository.get_structured_by_lake_id(cv_document_id)
+    structured = repository.get_structured_by_cv_document_id(cv_document_id)
 
     if structured is None:
         msg = "Nie znaleziono ustrukturyzowanych danych dla podanego dokumentu CV."

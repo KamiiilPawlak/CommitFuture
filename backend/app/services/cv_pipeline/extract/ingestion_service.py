@@ -54,7 +54,7 @@ class IngestionService:
             char_count, word_count, metadata = self._build_text_metrics(raw_text)
 
             raw_text_record: CVRawText = self.repository.create_raw_text_record(
-                lake_id=lake_record.id,
+                cv_document_id=lake_record.id,
                 raw_text=raw_text,
                 character_count=char_count,
                 word_count=word_count,

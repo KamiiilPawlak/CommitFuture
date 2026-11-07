@@ -36,7 +36,7 @@ class CVRepository:
     def create_raw_text_record(  # noqa: PLR0913
         self,
         *,
-        lake_id: UUID,
+        cv_document_id: UUID,
         raw_text: str,
         character_count: int,
         word_count: int,
@@ -45,7 +45,7 @@ class CVRepository:
         metadata_json: dict[str, Any] | None,
     ) -> CVRawText:
         raw_cv_record = CVRawText(
-            cv_document_id=lake_id,
+            cv_document_id=cv_document_id,
             raw_text=raw_text,
             character_count=character_count,
             word_count=word_count,
@@ -59,11 +59,8 @@ class CVRepository:
         self.session.flush()
         return raw_cv_record
 
-    def get_lake_by_id(self, lake_id: UUID) -> CVDocumentLake | None:
-        return self.session.get(CVDocumentLake, lake_id)
-
-    def get_raw_text_by_lake_id(self, lake_id: UUID) -> CVRawText | None:
-        statement = select(CVRawText).where(CVRawText.cv_document_id == lake_id)
+    def get_raw_text_by_cv_document_id(self, cv_document_id: UUID) -> CVRawText | None:
+        statement = select(CVRawText).where(CVRawText.cv_document_id == cv_document_id)
         return self.session.exec(statement).first()
 
     def upsert_structured_record(
@@ -92,8 +89,10 @@ class CVRepository:
         self.session.flush()
         return structured_record
 
-    def get_structured_by_lake_id(self, lake_id: UUID) -> CVStructuredData | None:
-        return self.session.get(CVStructuredData, lake_id)
+    def get_structured_by_cv_document_id(
+        self, cv_document_id: UUID
+    ) -> CVStructuredData | None:
+        return self.session.get(CVStructuredData, cv_document_id)
 
     def count_structured_by_status(self) -> dict[str, int]:
         statement = select(CVStructuredData.status, func.count()).group_by(
@@ -119,10 +118,6 @@ class CVRepository:
         self.session.add(record)
         self.session.flush()
         return record
-
-    def get_user_documents(self, user_id: UUID) -> Sequence[CVDocumentLake]:
-        statement = select(CVDocumentLake).where(CVDocumentLake.id == user_id)
-        return self.session.exec(statement).all()
 
     def commit(self) -> None:
         self.session.commit()

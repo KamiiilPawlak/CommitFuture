@@ -23,7 +23,7 @@ def _age_structured_record(
     db_session: Session, cv_document_id: Any, *, minutes_old: int
 ) -> None:
     repository = CVRepository(db_session)
-    record = repository.get_structured_by_lake_id(cv_document_id)
+    record = repository.get_structured_by_cv_document_id(cv_document_id)
     assert record is not None
     record.processed_at = datetime.now(UTC) - timedelta(minutes=minutes_old)
     db_session.add(record)
@@ -36,7 +36,7 @@ async def test_recover_stale_pending_requeues_task_when_raw_text_exists(
     repository = CVRepository(db_session)
     lake_record = _make_lake_document(repository)
     repository.create_raw_text_record(
-        lake_id=lake_record.id,
+        cv_document_id=lake_record.id,
         raw_text="Jan Kowalski, Python developer",
         character_count=30,
         word_count=4,
@@ -65,7 +65,7 @@ async def test_recover_stale_pending_requeues_task_when_raw_text_exists(
 
     assert delayed_calls == [(str(lake_record.id), "Jan Kowalski, Python developer")]
 
-    record = repository.get_structured_by_lake_id(lake_record.id)
+    record = repository.get_structured_by_cv_document_id(lake_record.id)
     assert record is not None
     assert record.status == "pending"
     assert record.recovery_attempts == 1
@@ -87,7 +87,7 @@ async def test_recover_stale_pending_marks_failed_without_raw_text(
 
     recovery_module.recover_stale_pending_cv_documents(session=db_session)
 
-    record = repository.get_structured_by_lake_id(lake_record.id)
+    record = repository.get_structured_by_cv_document_id(lake_record.id)
     assert record is not None
     assert record.status == "failed"
 
@@ -98,7 +98,7 @@ async def test_recover_stale_pending_marks_failed_after_max_attempts(
     repository = CVRepository(db_session)
     lake_record = _make_lake_document(repository)
     repository.create_raw_text_record(
-        lake_id=lake_record.id,
+        cv_document_id=lake_record.id,
         raw_text="Jan Kowalski, Python developer",
         character_count=30,
         word_count=4,
@@ -128,7 +128,7 @@ async def test_recover_stale_pending_marks_failed_after_max_attempts(
     recovery_module.recover_stale_pending_cv_documents(session=db_session)
 
     assert delayed_calls == []
-    record = repository.get_structured_by_lake_id(lake_record.id)
+    record = repository.get_structured_by_cv_document_id(lake_record.id)
     assert record is not None
     assert record.status == "failed"
 
