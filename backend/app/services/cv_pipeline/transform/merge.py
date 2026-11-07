@@ -4,7 +4,6 @@ from datetime import date
 from typing import Any, Final, TypedDict
 
 from app.schema.cv_extraction_dto import WorkExperienceDto
-from app.services.cv_pipeline.transform.dictionaries.validator import TechStackValidator
 from app.services.cv_pipeline.transform.heuristic.domain.experience_service import (
     ExperienceService,
 )
@@ -54,6 +53,10 @@ def is_current_role(end_date: str | None) -> bool:
     return end_date.strip().lower() in _CURRENT_MARKERS
 
 
+def normalize_skills(skills: list[str]) -> list[str]:
+    return sorted({skill.strip().lower() for skill in skills if skill.strip()})
+
+
 def _role_date_span(
     entry: WorkExperienceDto, experience_service: ExperienceService
 ) -> tuple[date, date] | None:
@@ -71,7 +74,6 @@ def _role_date_span(
 
 def compute_skill_usage(
     work_experience: list[WorkExperienceDto],
-    validator: TechStackValidator,
     experience_service: ExperienceService | None = None,
 ) -> dict[str, SkillUsage]:
     experience_service = experience_service or ExperienceService()
@@ -85,7 +87,7 @@ def compute_skill_usage(
 
         is_current: bool = is_current_role(entry.end_date)
 
-        for skill in validator.validate_skills(entry.skills_used):
+        for skill in normalize_skills(entry.skills_used):
             skill_spans.setdefault(skill, []).append(span)
             if is_current:
                 skill_is_current[skill] = True
@@ -106,9 +108,7 @@ def compute_skill_usage(
     return result
 
 
-def build_work_experience_entry(
-    entry: WorkExperienceDto, validator: TechStackValidator
-) -> dict[str, object]:
+def build_work_experience_entry(entry: WorkExperienceDto) -> dict[str, object]:
     return {
         "company": entry.company,
         "role": entry.role,
@@ -116,7 +116,7 @@ def build_work_experience_entry(
         "end_date": None if is_current_role(entry.end_date) else entry.end_date,
         "is_current": is_current_role(entry.end_date),
         "responsibilities": entry.responsibilities,
-        "skills_used": validator.validate_skills(entry.skills_used),
+        "skills_used": normalize_skills(entry.skills_used),
     }
 
 
@@ -127,20 +127,16 @@ def estimate_seniority(total_experience_months: int) -> str:
     return _SENIORITY_DEFAULT
 
 
-def build_flat_tech_stack(
-    heuristic_tech_stack: list[str],
-    validator: TechStackValidator,
-) -> list[str]:
-    return validator.validate_skills(heuristic_tech_stack)
+def build_flat_tech_stack(heuristic_tech_stack: list[str]) -> list[str]:
+    return normalize_skills(heuristic_tech_stack)
 
 
 def build_hard_skills(
     work_experience: list[WorkExperienceDto],
     heuristic_tech_stack: list[str],
-    validator: TechStackValidator,
 ) -> list[dict[str, Any]]:
-    usage = compute_skill_usage(work_experience, validator)
-    heuristic_set = set(validator.validate_skills(heuristic_tech_stack))
+    usage = compute_skill_usage(work_experience)
+    heuristic_set = set(normalize_skills(heuristic_tech_stack))
 
     all_skills: set[str] = set(usage) | heuristic_set
 
@@ -193,10 +189,7 @@ def _build_education_from_heuristic(
     ]
 
 
-def build_unified_record(
-    heuristic_result: dict[str, Any],
-    validator: TechStackValidator,
-) -> dict[str, Any]:
+def build_unified_record(heuristic_result: dict[str, Any]) -> dict[str, Any]:
     work_experience = [
         _heuristic_candidate_to_work_experience_dto(candidate)
         for candidate in heuristic_result.get("work_experience_candidates", [])
@@ -209,17 +202,15 @@ def build_unified_record(
         "total_experience_months": total_experience_months,
         "seniority_estimate": estimate_seniority(total_experience_months),
         "work_experience": [
-            build_work_experience_entry(entry, validator) for entry in work_experience
+            build_work_experience_entry(entry) for entry in work_experience
         ],
         "skills": {
-            "hard": build_hard_skills(work_experience, heuristic_tech_stack, validator),
+            "hard": build_hard_skills(work_experience, heuristic_tech_stack),
             # extract_soft_skill_tags zwraca już znormalizowane slugi (np.
             # "ownership", "communication") - ten sam słownik co dla ogłoszeń
             # o pracę, więc po stronie kandydata i oferty porównujemy to samo.
             "soft": heuristic_result.get("soft_skill_tags", []),
-            "all_tech_stack_flat": build_flat_tech_stack(
-                heuristic_tech_stack, validator
-            ),
+            "all_tech_stack_flat": build_flat_tech_stack(heuristic_tech_stack),
         },
         "education": _build_education_from_heuristic(
             heuristic_result.get("education_field_of_study")

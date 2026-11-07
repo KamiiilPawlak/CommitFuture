@@ -319,8 +319,6 @@ _TECH_CATEGORY_MAP_LOWER: dict[str, SkillCategory] = {
 
 def get_skill_category(canonical_name: str) -> SkillCategory:
     """Wielkość liter MUSI być ignorowana: TECH_STACK_DICTIONARY (ten moduł)
-    używa Title Case ("Python"), ale TechStackValidator - osobny, lowercase'owy
-    kanoniczny słownik używany przy budowaniu HardSkillRecord w merge.py -
-    zapisuje nazwy małymi literami ("python"). Bez normalizacji każde
-    dopasowanie tu padało i każdy skill dostawał kategorię "other"."""
+    używa Title Case ("Python"), ale merge.py normalizuje skille do lowercase
+    ("python") przed zapisem do HardSkillRecord."""
     return _TECH_CATEGORY_MAP_LOWER.get(canonical_name.strip().lower(), "other")
