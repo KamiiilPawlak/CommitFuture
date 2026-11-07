@@ -29,5 +29,6 @@ dataflow.md
 celerybeat-schedule*
 backend/celerybeat-schedule*
 
-research/
+backend/scratch_*
 
+research/

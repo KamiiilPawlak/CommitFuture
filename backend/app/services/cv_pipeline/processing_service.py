@@ -9,16 +9,11 @@ from sqlmodel import Session
 
 from app.db.database import engine
 from app.repositories.cv_repository import CVRepository
-from app.services.cv_pipeline.transform.dictionaries.validator import (
-    TechStackValidator,
-)
 from app.services.cv_pipeline.transform.merge import build_unified_record
 from app.services.cv_pipeline.transform.pipeline import CVPipelineOrchestrator
 
 
 class CVOrchestrator(Protocol):
-    tech_stack_validator: TechStackValidator
-
     async def process_cv(self, raw_text: str) -> dict[str, Any]: ...
 
 
@@ -41,10 +36,7 @@ class CVProcessingService:
             self._store(cv_document_id, structured_data={}, status="failed")
             return
 
-        unified_record: dict[str, Any] = build_unified_record(
-            heuristic_result=result,
-            validator=self.orchestrator.tech_stack_validator,
-        )
+        unified_record: dict[str, Any] = build_unified_record(heuristic_result=result)
 
         status: str = "completed"
 
