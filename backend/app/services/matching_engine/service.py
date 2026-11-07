@@ -4,7 +4,7 @@ from sqlmodel import Session
 
 from app.repositories.cv_repository import CVRepository
 from app.schema.cv_structured_record import CVStructuredRecord
-from app.schema.matching_profile import MatchResultDto
+from app.schema.match_dto import MatchResultDto
 from app.services.cv_pipeline.transform.derive_matching_profile import (
     derive_matching_profile,
 )

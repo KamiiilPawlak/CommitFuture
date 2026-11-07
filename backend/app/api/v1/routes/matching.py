@@ -4,8 +4,7 @@ from pydantic import ValidationError
 from sqlmodel import Session
 
 from app.db.database import get_session
-from app.schema.match_dto import MatchRequestDto
-from app.schema.matching_profile import MatchResultDto
+from app.schema.match_dto import MatchRequestDto, MatchResultDto
 from app.services.matching_engine.service import (
     CVNotFoundError,
     CVProcessingNotCompleteError,
