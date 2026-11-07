@@ -1,7 +1,6 @@
 import pytest
 
 from app.schema.cv_extraction_dto import WorkExperienceDto
-from app.services.cv_pipeline.transform.dictionaries.validator import TechStackValidator
 from app.services.cv_pipeline.transform.merge import (
     build_flat_tech_stack,
     build_unified_record,
@@ -10,11 +9,6 @@ from app.services.cv_pipeline.transform.merge import (
     estimate_seniority,
     is_current_role,
 )
-
-
-@pytest.fixture
-def validator() -> TechStackValidator:
-    return TechStackValidator()
 
 
 @pytest.mark.parametrize(
@@ -49,9 +43,7 @@ def test_estimate_seniority_thresholds(months: int, expected: str) -> None:
     assert estimate_seniority(months) == expected
 
 
-def test_build_work_experience_entry_present_role_has_null_end_date(
-    validator: TechStackValidator,
-) -> None:
+def test_build_work_experience_entry_present_role_has_null_end_date() -> None:
     entry = WorkExperienceDto(
         company="Firma X",
         role="Python Developer",
@@ -61,16 +53,14 @@ def test_build_work_experience_entry_present_role_has_null_end_date(
         skills_used=["python", "Docker "],
     )
 
-    built = build_work_experience_entry(entry, validator)
+    built = build_work_experience_entry(entry)
 
     assert built["end_date"] is None
     assert built["is_current"] is True
     assert built["skills_used"] == ["docker", "python"]
 
 
-def test_compute_skill_usage_merges_overlapping_ranges_per_skill(
-    validator: TechStackValidator,
-) -> None:
+def test_compute_skill_usage_merges_overlapping_ranges_per_skill() -> None:
     work_experience = [
         WorkExperienceDto(
             company="A",
@@ -88,16 +78,14 @@ def test_compute_skill_usage_merges_overlapping_ranges_per_skill(
         ),
     ]
 
-    usage = compute_skill_usage(work_experience, validator)
+    usage = compute_skill_usage(work_experience)
 
     assert usage["python"]["months_used"] > usage["docker"]["months_used"]
     assert usage["docker"]["last_used"] == "2022"
     assert usage["kubernetes"]["last_used"] != "2022"
 
 
-def test_compute_skill_usage_ignores_unparseable_dates(
-    validator: TechStackValidator,
-) -> None:
+def test_compute_skill_usage_ignores_unparseable_dates() -> None:
     work_experience = [
         WorkExperienceDto(
             company="A",
@@ -108,20 +96,16 @@ def test_compute_skill_usage_ignores_unparseable_dates(
         ),
     ]
 
-    assert compute_skill_usage(work_experience, validator) == {}
+    assert compute_skill_usage(work_experience) == {}
 
 
-def test_build_flat_tech_stack_dedupes_across_sources(
-    validator: TechStackValidator,
-) -> None:
-    result = build_flat_tech_stack(["Python", "docker", "Kubernetes"], validator)
+def test_build_flat_tech_stack_dedupes_across_sources() -> None:
+    result = build_flat_tech_stack(["Python", "docker", "Kubernetes"])
 
     assert result == ["docker", "kubernetes", "python"]
 
 
-def test_build_unified_record_is_heuristic_only(
-    validator: TechStackValidator,
-) -> None:
+def test_build_unified_record_is_heuristic_only() -> None:
     heuristic_result = {
         "tech_stack": ["Python"],
         "job_titles": ["Python Developer"],
@@ -129,9 +113,7 @@ def test_build_unified_record_is_heuristic_only(
         "total_experience_years": 0.8,
     }
 
-    record = build_unified_record(
-        heuristic_result=heuristic_result, validator=validator
-    )
+    record = build_unified_record(heuristic_result=heuristic_result)
 
     assert record["work_experience"] == []
     assert record["seniority_estimate"] == "junior"

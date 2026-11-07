@@ -4,22 +4,17 @@ from uuid import uuid4
 import pytest
 
 from app.services.cv_pipeline.processing_service import CVProcessingService
-from app.services.cv_pipeline.transform.dictionaries.validator import TechStackValidator
 
 
 class FakeOrchestrator:
     def __init__(self, process_cv_result: dict[str, Any]) -> None:
         self._result = process_cv_result
-        self.tech_stack_validator = TechStackValidator()
 
     async def process_cv(self, _raw_text: str) -> dict[str, Any]:
         return self._result
 
 
 class FailingOrchestrator:
-    def __init__(self) -> None:
-        self.tech_stack_validator = TechStackValidator()
-
     async def process_cv(self, _raw_text: str) -> dict[str, Any]:
         msg = "boom"
         raise RuntimeError(msg)
