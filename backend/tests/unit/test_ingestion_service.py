@@ -6,7 +6,7 @@ import pytest
 from fastapi import UploadFile
 from starlette.datastructures import Headers
 
-from app.models.cv_document import CVDocumentLake
+from app.models.cv_document_lake import CVDocumentLake
 from app.models.cv_raw_text import CVRawText
 from app.services.cv_pipeline.extract import IngestionService
 

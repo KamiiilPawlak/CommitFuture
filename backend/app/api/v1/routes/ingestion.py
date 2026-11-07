@@ -7,7 +7,7 @@ from sqlmodel import Session
 
 from app.db.database import get_session
 from app.repositories.cv_repository import CVRepository
-from app.schema.ingestion_dto import (
+from app.schema.ingestion_response import (
     CVIngestionResponse,
     CVProcessingStatsResponse,
     CVStructuredDataResponse,
@@ -97,7 +97,7 @@ async def get_cv_structured_data(
     session: Session = Depends(get_session),
 ) -> CVStructuredDataResponse:
     repository = CVRepository(session)
-    structured_record = repository.get_structured_by_lake_id(cv_document_id)
+    structured_record = repository.get_structured_by_cv_document_id(cv_document_id)
 
     if structured_record is None:
         raise HTTPException(

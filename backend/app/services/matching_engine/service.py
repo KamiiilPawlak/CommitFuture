@@ -4,7 +4,7 @@ from sqlmodel import Session
 
 from app.repositories.cv_repository import CVRepository
 from app.schema.cv_structured_record import CVStructuredRecord
-from app.schema.matching_profile import MatchResultDto
+from app.schema.match_dto import MatchResultDto
 from app.services.cv_pipeline.transform.derive_matching_profile import (
     derive_matching_profile,
 )
@@ -28,7 +28,7 @@ def match_candidate_to_job_posting(
     deterministyczny i tani (bez LLM), więc liczenie na żądanie jest
     praktycznie bezpłatne i zawsze aktualne względem najnowszego CV."""
     repository = CVRepository(session)
-    structured = repository.get_structured_by_lake_id(cv_document_id)
+    structured = repository.get_structured_by_cv_document_id(cv_document_id)
 
     if structured is None:
         msg = "Nie znaleziono ustrukturyzowanych danych dla podanego dokumentu CV."

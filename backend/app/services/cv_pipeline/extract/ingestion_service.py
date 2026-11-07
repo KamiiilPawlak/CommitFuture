@@ -7,7 +7,7 @@ from loguru import logger
 from sqlmodel import Session
 
 from app.db.database import get_session
-from app.models.cv_document import CVDocumentLake
+from app.models.cv_document_lake import CVDocumentLake
 from app.models.cv_raw_text import CVRawText
 from app.repositories.cv_repository import CVRepository
 
@@ -54,7 +54,7 @@ class IngestionService:
             char_count, word_count, metadata = self._build_text_metrics(raw_text)
 
             raw_text_record: CVRawText = self.repository.create_raw_text_record(
-                lake_id=lake_record.id,
+                cv_document_id=lake_record.id,
                 raw_text=raw_text,
                 character_count=char_count,
                 word_count=word_count,

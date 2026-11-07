@@ -1,6 +1,6 @@
 import pytest
 
-from app.schema.cv_extraction_dto import WorkExperienceDto
+from app.schema.cv_extraction_dto import RawWorkExperienceDto
 from app.services.cv_pipeline.transform.merge import (
     build_flat_tech_stack,
     build_unified_record,
@@ -44,7 +44,7 @@ def test_estimate_seniority_thresholds(months: int, expected: str) -> None:
 
 
 def test_build_work_experience_entry_present_role_has_null_end_date() -> None:
-    entry = WorkExperienceDto(
+    entry = RawWorkExperienceDto(
         company="Firma X",
         role="Python Developer",
         start_date="2020-01",
@@ -62,14 +62,14 @@ def test_build_work_experience_entry_present_role_has_null_end_date() -> None:
 
 def test_compute_skill_usage_merges_overlapping_ranges_per_skill() -> None:
     work_experience = [
-        WorkExperienceDto(
+        RawWorkExperienceDto(
             company="A",
             role="Dev",
             start_date="2020-01",
             end_date="2022-01",
             skills_used=["Python", "Docker"],
         ),
-        WorkExperienceDto(
+        RawWorkExperienceDto(
             company="B",
             role="Lead Dev",
             start_date="2022-02",
@@ -87,7 +87,7 @@ def test_compute_skill_usage_merges_overlapping_ranges_per_skill() -> None:
 
 def test_compute_skill_usage_ignores_unparseable_dates() -> None:
     work_experience = [
-        WorkExperienceDto(
+        RawWorkExperienceDto(
             company="A",
             role="Dev",
             start_date=None,

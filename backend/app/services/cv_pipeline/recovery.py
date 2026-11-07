@@ -50,7 +50,7 @@ def _recover_one(repository: CVRepository, record: CVStructuredData) -> None:
         )
         return
 
-    raw_text_record = repository.get_raw_text_by_lake_id(cv_document_id)
+    raw_text_record = repository.get_raw_text_by_cv_document_id(cv_document_id)
     if raw_text_record is None:
         logger.error(
             f"[Recovery] Brak cv_raw_text dla zawieszonego dokumentu "

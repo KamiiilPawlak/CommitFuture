@@ -8,7 +8,7 @@ from fastapi.testclient import TestClient
 from sqlmodel import Session
 
 from app.db.database import engine
-from app.models.cv_document import CVDocumentLake
+from app.models.cv_document_lake import CVDocumentLake
 from app.models.cv_structured_data import CVStructuredData
 
 JOB_POSTING_TEXT = """

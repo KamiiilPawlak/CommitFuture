@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import date
 from typing import Any, Final, TypedDict
 
-from app.schema.cv_extraction_dto import WorkExperienceDto
+from app.schema.cv_extraction_dto import RawWorkExperienceDto
 from app.services.cv_pipeline.transform.heuristic.domain.experience_service import (
     ExperienceService,
 )
@@ -58,7 +58,7 @@ def normalize_skills(skills: list[str]) -> list[str]:
 
 
 def _role_date_span(
-    entry: WorkExperienceDto, experience_service: ExperienceService
+    entry: RawWorkExperienceDto, experience_service: ExperienceService
 ) -> tuple[date, date] | None:
     start: date | None = _parse_role_date(entry.start_date)
     if start is None:
@@ -73,7 +73,7 @@ def _role_date_span(
 
 
 def compute_skill_usage(
-    work_experience: list[WorkExperienceDto],
+    work_experience: list[RawWorkExperienceDto],
     experience_service: ExperienceService | None = None,
 ) -> dict[str, SkillUsage]:
     experience_service = experience_service or ExperienceService()
@@ -108,7 +108,7 @@ def compute_skill_usage(
     return result
 
 
-def build_work_experience_entry(entry: WorkExperienceDto) -> dict[str, object]:
+def build_work_experience_entry(entry: RawWorkExperienceDto) -> dict[str, object]:
     return {
         "company": entry.company,
         "role": entry.role,
@@ -132,7 +132,7 @@ def build_flat_tech_stack(heuristic_tech_stack: list[str]) -> list[str]:
 
 
 def build_hard_skills(
-    work_experience: list[WorkExperienceDto],
+    work_experience: list[RawWorkExperienceDto],
     heuristic_tech_stack: list[str],
 ) -> list[dict[str, Any]]:
     usage = compute_skill_usage(work_experience)
@@ -157,11 +157,11 @@ def build_hard_skills(
 
 def _heuristic_candidate_to_work_experience_dto(
     candidate: dict[str, Any],
-) -> WorkExperienceDto:
+) -> RawWorkExperienceDto:
     start_date: date | None = candidate.get("start_date")
     end_date: date | None = candidate.get("end_date")
 
-    return WorkExperienceDto(
+    return RawWorkExperienceDto(
         company=None,
         role=candidate.get("job_title"),
         start_date=start_date.strftime("%Y-%m") if start_date else None,

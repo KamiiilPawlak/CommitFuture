@@ -1,10 +1,10 @@
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 
+from app.schema.match_dto import MatchResultDto
 from app.schema.matching_profile import (
     CandidateMatchingProfileDto,
     JobPostingMatchingDto,
-    MatchResultDto,
     SeniorityLevel,
 )
 
