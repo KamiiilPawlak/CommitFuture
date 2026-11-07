@@ -7,7 +7,7 @@ from loguru import logger
 from sqlmodel import Session
 
 from app.db.database import get_session
-from app.models.cv_document import CVDocumentLake
+from app.models.cv_document_lake import CVDocumentLake
 from app.models.cv_raw_text import CVRawText
 from app.repositories.cv_repository import CVRepository
 

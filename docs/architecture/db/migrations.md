@@ -89,5 +89,5 @@ Migracja `1691a8e1f341` została zweryfikowana i zastosowana:
 
 ## Co zostało poza zakresem
 
-- **CI/CD** — uruchamianie `alembic upgrade head` automatycznie (np. przy starcie kontenera `api`) nie jest skonfigurowane; dziś to ręczny krok.
-- `init_db()` / `SQLModel.metadata.create_all()` nie zostało usunięte z kodu — nowe środowiska (świeża baza) wciąż mogą dostać schemat tą drogą. Docelowo powinno to zostać zastąpione przez `alembic upgrade head` jako jedyny sposób tworzenia schematu, żeby historia migracji była źródłem prawdy dla każdej bazy (w tym świeżej) — patrz `celery-roadmap.md` Faza 5.
+- `run_migrations()` (`app/db/database.py`) woła `alembic upgrade head` automatycznie w `lifespan` FastAPI (`app/main.py`) — dzieje się to przy każdym starcie aplikacji/kontenera `api`, nie jest to ręczny krok. `init_db()`/`SQLModel.metadata.create_all()` zostało w całości usunięte z kodu — `alembic upgrade head` jest jedynym sposobem tworzenia/aktualizowania schematu, dla każdej bazy, w tym świeżej.
+- Deploy CD poza środowiskiem Docker Compose (np. Render) wciąż nie istnieje — patrz `ci-cd-roadmap.md` Faza 6.

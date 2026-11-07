@@ -5,7 +5,7 @@ import pytest
 from sqlmodel import Session
 
 from app.core.config import settings
-from app.models.cv_document import CVDocumentLake
+from app.models.cv_document_lake import CVDocumentLake
 from app.repositories.cv_repository import CVRepository
 from app.services.cv_pipeline import recovery as recovery_module
 
